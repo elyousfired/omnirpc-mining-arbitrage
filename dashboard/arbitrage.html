@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OmniRPC — حاسبة أربيتراج التعدين وماكينات NVIDIA</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-elev: #0f1626;
+      --bg-card: #131c31;
+      --bg-hover: #1a2540;
+      --border: #24314f;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.16);
+      --cyan: #38bdf8;
+      --cyan-soft: rgba(56, 189, 248, 0.14);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.16);
+      --purple: #a78bfa;
+      --purple-soft: rgba(167, 139, 250, 0.15);
+      --rose: #f43f5e;
+      --rose-soft: rgba(244, 63, 94, 0.15);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, #0c233a 0%, var(--bg) 52%);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .ltr { direction: ltr; unicode-bidi: embed; font-family: var(--mono); }
+
+    header {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(7, 11, 20, 0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 24px;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo-badge {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--emerald), var(--cyan));
+      display: grid; place-items: center;
+      font-weight: 900; color: #05131c; font-family: var(--mono); font-size: 13px;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.35);
+    }
+    .brand h1 { margin: 0; font-size: 18px; font-weight: 800; }
+    .brand p { margin: 0; font-size: 12px; color: var(--muted); }
+
+    .nav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .nav-link {
+      text-decoration: none; color: var(--muted); background: var(--bg-card);
+      border: 1px solid var(--border); padding: 7px 13px; border-radius: 8px;
+      font-size: 13px; font-weight: 700; transition: 0.15s;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--cyan); }
+    .nav-link.active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.24), rgba(56, 189, 248, 0.2));
+      border-color: var(--emerald);
+    }
+
+    main { max-width: 1520px; margin: 0 auto; padding: 20px 24px 60px; }
+
+    .calc-panel {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.09), rgba(56, 189, 248, 0.08));
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 18px;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 700; }
+    input, select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 11px;
+      font-size: 13px;
+      font-family: var(--sans);
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--cyan); }
+
+    .btn {
+      border: 1px solid var(--border); background: var(--bg-card); color: var(--text);
+      padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: 0.15s; font-family: var(--sans);
+      text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn:hover:not(:disabled) { background: var(--bg-hover); border-color: var(--cyan); }
+    .btn-primary { background: linear-gradient(135deg, #059669, #0284c7); border-color: transparent; color: #fff; }
+    .btn-sm { padding: 4px 9px; font-size: 11.5px; }
+
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px; margin-bottom: 18px;
+    }
+    .kpi-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 16px; position: relative; overflow: hidden;
+    }
+    .kpi-card::after {
+      content: ""; position: absolute; top: 0; right: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--emerald), var(--cyan));
+    }
+    .kpi-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    .kpi-value { font-size: 24px; font-weight: 800; font-family: var(--mono); direction: ltr; text-align: right; }
+    .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .tab-btn {
+      background: var(--bg-elev); border: 1px solid var(--border); color: var(--muted);
+      padding: 9px 16px; border-radius: 9px; cursor: pointer; font-size: 13.5px; font-weight: 700;
+      font-family: var(--sans);
+    }
+    .tab-btn.active { color: #fff; border-color: var(--emerald); background: rgba(16, 185, 129, 0.16); }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; background: var(--bg-elev); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px;
+    }
+    .toolbar-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    .pill-filter {
+      border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+      padding: 6px 11px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: var(--sans);
+    }
+    .pill-filter.active { background: var(--cyan-soft); color: #bae6fd; border-color: var(--cyan); }
+
+    .table-wrap {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; overflow-x: auto; margin-bottom: 20px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 12.8px; }
+    th, td { padding: 10px 11px; text-align: right; border-bottom: 1px solid rgba(36, 49, 79, 0.65); vertical-align: middle; }
+    th { background: var(--bg-elev); color: var(--muted); font-size: 11.8px; font-weight: 700; white-space: nowrap; }
+    tr:hover td { background: rgba(26, 37, 64, 0.55); }
+
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .b-green { background: var(--emerald-soft); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .b-amber { background: var(--amber-soft); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .b-cyan { background: var(--cyan-soft); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .b-purple { background: var(--purple-soft); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .b-rose { background: var(--rose-soft); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.35); }
+
+    .addr-box { display: flex; align-items: center; gap: 6px; direction: ltr; }
+    .addr { font-family: var(--mono); font-size: 11.5px; color: #93c5fd; word-break: break-all; max-width: 240px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo-badge">ARB</div>
+      <div>
+        <h1>حاسبة أربيتراج التعدين وماكينات NVIDIA</h1>
+        <p>مقارنة مباشرة بين كلفة كراء ماكينة السحابة / الكهرباء مقابل عائد التعدين والسيولة</p>
+      </div>
+    </div>
+
+    <div class="nav-links">
+      <a class="nav-link" href="/">لوحة التحكم (807+ شبكة)</a>
+      <a class="nav-link" href="/mining">رادار التعدين (كل 1 ساعة)</a>
+      <a class="nav-link active" href="/arbitrage">أربيتراج التعدين و NVIDIA</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="calc-panel">
+      <div class="calc-grid">
+        <div class="field">
+          <label>نوع ماكينة NVIDIA (GPU)</label>
+          <select id="gpuSelect" onchange="onGpuChanged()">
+            <option value="rtx4090" selected>NVIDIA RTX 4090 (24GB)</option>
+            <option value="rtx5090">NVIDIA RTX 5090 (32GB)</option>
+            <option value="rtx4070">NVIDIA RTX 4070 (12GB)</option>
+            <option value="rtx3060ti">NVIDIA RTX 3060 Ti (8GB)</option>
+            <option value="rig6x3060ti">Rig 6x RTX 3060 Ti (48GB)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>وضع التشغيل</label>
+          <select id="modeSelect" onchange="toggleModeInputs()">
+            <option value="cloud" selected>كراء ماكينة سحابية (Vast.ai / RunPod)</option>
+            <option value="local">بيسي / ريغ منزلي (فاتورة الكهرباء)</option>
+          </select>
+        </div>
+
+        <div class="field" id="cloudRateField">
+          <label>سعر كراء الماكينة ($ / ساعة)</label>
+          <input type="number" id="cloudRateInput" step="0.01" min="0" value="0.42" />
+        </div>
+
+        <div class="field" id="kwhField" style="display:none;">
+          <label>ثمن الكهرباء ($ / kWh)</label>
+          <input type="number" id="kwhInput" step="0.01" min="0" value="0.14" />
+        </div>
+
+        <div class="field">
+          <label>عدد المعاملات / ساعة (On-Chain)</label>
+          <input type="number" id="txPerHrInput" step="1" min="1" value="20" />
+        </div>
+
+        <div>
+          <button class="btn btn-primary" style="width:100%;" id="btnRecalc" onclick="loadArbitrage()">احسب الأربيتراج لايف</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">كلفة الماكينة المختارة</div>
+        <div class="kpi-value" id="kpiMachineCost">—</div>
+        <div class="kpi-sub" id="kpiMachineSub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">أفضل عملة NVIDIA PoW حالياً</div>
+        <div class="kpi-value" id="kpiBestCoin">—</div>
+        <div class="kpi-sub" id="kpiBestCoinSub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">بروتوكولات الشبكات (PoW / CUDA)</div>
+        <div class="kpi-value" style="color:var(--amber);" id="kpiOnchainPow">—</div>
+        <div class="kpi-sub" id="kpiOnchainSub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">سعر البيتكوين المرجعي</div>
+        <div class="kpi-value" style="color:var(--cyan);" id="kpiBtcPrice">—</div>
+        <div class="kpi-sub" id="kpiUpdatedAt">—</div>
+      </div>
+    </section>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('onchain', this)">بروتوكولات الشبكات المكتشفة (الاسم + التوكن + العنوان)</button>
+      <button class="tab-btn" onclick="switchTab('gpupow', this)">عملات NVIDIA CUDA المباشرة (حساب ربح/خسارة السحابة)</button>
+    </div>
+
+    <div id="tab-onchain" class="panel active">
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <input type="text" id="searchBox" placeholder="ابحث بالاسم، التوكن، الموقع، العنوان 0x... أو الشبكة..." style="min-width:280px;" oninput="renderOnchainTable()" />
+          <button class="pill-filter active" onclick="setFilter('ALL', this)">الكل</button>
+          <button class="pill-filter" onclick="setFilter('VERIFIED', this)">موثّق فقط (Verified)</button>
+          <button class="pill-filter" onclick="setFilter('CUDA', this)">NVIDIA CUDA / PoW فقط</button>
+          <button class="pill-filter" onclick="setFilter('PRICED', this)">عندها سعر وسيولة</button>
+          <button class="pill-filter" onclick="setFilter('STRONG', this)">فرص عالية (Score &gt;= 60)</button>
+        </div>
+        <span class="badge b-cyan" id="onchainCountBadge">0 بروتوكول</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>التقييم</th>
+              <th>سمية البروتوكول والموقع</th>
+              <th>التوكن والسعر والسيولة</th>
+              <th>عقد البروتوكول + عنوان التوكن</th>
+              <th>الشبكة ونوع التعدين</th>
+              <th>كلفة الغاز / الماكينة</th>
+              <th>نقطة التعادل (Break-Even)</th>
+              <th>الأمان</th>
+            </tr>
+          </thead>
+          <tbody id="onchainTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-gpupow" class="panel">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>النتيجة</th>
+              <th>العملة (Coin)</th>
+              <th>الخوارزمية والسرعة</th>
+              <th>السعر والـ Market Cap</th>
+              <th>الإنتاج اليومي التقديري</th>
+              <th>الدخل الإجمالي ($/يوم)</th>
+              <th>كلفة الماكينة ($/يوم)</th>
+              <th>صافي الأربيتراج ($/يوم | $/ساعة)</th>
+              <th>ROI %</th>
+            </tr>
+          </thead>
+          <tbody id="gpuCoinsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const STATE = {
+      data: null,
+      filter: "ALL",
+      defaults: { rtx3060ti: 0.14, rtx4070: 0.22, rtx4090: 0.42, rtx5090: 0.85, rig6x3060ti: 0.80 }
+    };
+
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+    }
+    function fmtNum(n, d = 2) {
+      const v = Number(n);
+      return Number.isFinite(v) ? v.toLocaleString("en-US", { maximumFractionDigits: d }) : "—";
+    }
+
+    function onGpuChanged() {
+      const id = document.getElementById("gpuSelect").value;
+      if (STATE.defaults[id] !== undefined) {
+        document.getElementById("cloudRateInput").value = STATE.defaults[id];
+      }
+      loadArbitrage();
+    }
+
+    function toggleModeInputs() {
+      const m = document.getElementById("modeSelect").value;
+      document.getElementById("cloudRateField").style.display = m === "cloud" ? "block" : "none";
+      document.getElementById("kwhField").style.display = m === "local" ? "block" : "none";
+      loadArbitrage();
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(`tab-${name}`).classList.add("active");
+    }
+
+    function setFilter(mode, btn) {
+      STATE.filter = mode;
+      document.querySelectorAll(".pill-filter").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderOnchainTable();
+    }
+
+    function copyText(txt, btn) {
+      navigator.clipboard.writeText(txt).then(() => {
+        const old = btn.textContent;
+        btn.textContent = "تم النسخ ✓";
+        setTimeout(() => { btn.textContent = old; }, 1200);
+      });
+    }
+
+    async function loadArbitrage() {
+      const btn = document.getElementById("btnRecalc");
+      btn.disabled = true;
+      btn.textContent = "جاري الحساب...";
+      try {
+        const gpu = document.getElementById("gpuSelect").value;
+        const mode = document.getElementById("modeSelect").value;
+        const cloudRate = document.getElementById("cloudRateInput").value || "0.42";
+        const kwh = document.getElementById("kwhInput").value || "0.14";
+        const txHr = document.getElementById("txPerHrInput").value || "20";
+        const qs = new URLSearchParams({ gpu, mode, cloud_rate: cloudRate, kwh_cost: kwh, tx_per_hr: txHr });
+        const res = await fetch(`/api/arbitrage?${qs.toString()}`);
+        STATE.data = await res.json();
+        renderKPIs();
+        renderOnchainTable();
+        renderGpuCoinsTable();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "احسب الأربيتراج لايف";
+      }
+    }
+
+    function renderKPIs() {
+      const d = STATE.data;
+      if (!d) return;
+      const m = d.machine || {};
+      const s = d.summary || {};
+      document.getElementById("kpiMachineCost").textContent = `$${fmtNum(m.machine_cost_hr_usd, 3)} / hr`;
+      document.getElementById("kpiMachineSub").textContent = `$${fmtNum(m.machine_cost_day_usd, 2)} / يوم • ${m.label} (${m.watts}W)`;
+
+      const best = s.best_gpu_l1_coin;
+      if (best) {
+        const col = best.net_day_usd > 0 ? "var(--emerald)" : "var(--rose)";
+        document.getElementById("kpiBestCoin").innerHTML = `<span style="color:${col}">${esc(best.symbol)} (${best.net_day_usd >= 0 ? "+" : ""}$${fmtNum(best.net_day_usd, 2)}/d)</span>`;
+        document.getElementById("kpiBestCoinSub").textContent = `${best.coin_name} (${best.algorithm}) • مربح: ${s.profitable_gpu_l1_coins}/${s.total_gpu_l1_coins}`;
+      }
+
+      document.getElementById("kpiOnchainPow").textContent = `${s.cuda_pow_protocols} PoW / ${s.total_onchain_protocols}`;
+      document.getElementById("kpiOnchainSub").textContent = `فرص قوية (>=60): ${s.strong_onchain_opportunities} بروتوكول`;
+      document.getElementById("kpiBtcPrice").textContent = `$${fmtNum(d.btc_usd, 0)}`;
+      document.getElementById("kpiUpdatedAt").textContent = `آخر حساب: ${d.updated_at}`;
+    }
+
+    function renderOnchainTable() {
+      const rows = (STATE.data && STATE.data.onchain_protocols) || [];
+      const q = document.getElementById("searchBox").value.trim().toLowerCase();
+      const filtered = rows.filter(r => {
+        if (STATE.filter === "VERIFIED" && r.verification_level !== "verified") return false;
+        if (STATE.filter === "CUDA" && !r.is_cuda_pow) return false;
+        if (STATE.filter === "PRICED" && !r.price_usd) return false;
+        if (STATE.filter === "STRONG" && r.arbitrage_score < 60) return false;
+        if (!q) return true;
+        const websitesStr = (r.websites || []).join(" ");
+        return `${r.protocol_name} ${r.token_symbol} ${r.address} ${r.token_address || ""} ${websitesStr} ${r.chain_name} ${r.protocol_type}`.toLowerCase().includes(q);
+      });
+
+      document.getElementById("onchainCountBadge").textContent = `${filtered.length} بروتوكول`;
+      const tbody = document.getElementById("onchainTbody");
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">ما كاينش نتائج فهاد الفلتر.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => {
+        const scoreCls = r.arbitrage_score >= 60 ? "b-green" : (r.arbitrage_score >= 35 ? "b-amber" : "b-cyan");
+        const modeBadge = r.is_cuda_pow ? `<span class="badge b-amber">${esc(r.mining_mode)}</span>` : `<span class="badge b-purple">${esc(r.mining_mode)}</span>`;
+        const verCls = r.verification_level === "verified" ? "b-green" : (r.verification_level === "onchain_confirmed" ? "b-cyan" : "b-rose");
+        const verBadge = r.verification_label ? `<span class="badge ${verCls}" style="margin-top:4px;">${esc(r.verification_label)}</span>` : "";
+
+        const websitesHtml = (r.websites || []).slice(0, 2).map(u =>
+          `<a class="btn btn-sm" style="border-color:rgba(16,185,129,0.45);color:#6ee7b7;" target="_blank" href="${esc(u)}">🌐 الموقع الرسمي</a>`
+        ).join("");
+        const socialsHtml = (r.socials || []).slice(0, 2).map((u, idx) => {
+          const label = u.includes("twitter") || u.includes("x.com") ? "𝕏 / Twitter" : (u.includes("t.me") ? "Telegram" : (u.includes("discord") ? "Discord" : `رابط ${idx + 1}`));
+          return `<a class="btn btn-sm" target="_blank" href="${esc(u)}">${esc(label)}</a>`;
+        }).join("");
+
+        const priceHtml = r.price_usd
+          ? `<strong class="ltr" style="color:#6ee7b7;">$${r.price_usd < 0.01 ? r.price_usd.toPrecision(4) : fmtNum(r.price_usd, 4)}</strong><br><small class="ltr" style="color:var(--muted);">Liq: $${fmtNum(r.liquidity_usd, 0)} | Vol: $${fmtNum(r.volume_24h_usd, 0)}</small>`
+          : `<span style="color:var(--muted);">بدون سعر DEX بعد</span>`;
+
+        let beHtml = "";
+        if (r.breakeven_tokens_tx !== null && r.breakeven_tokens_tx !== undefined) {
+          beHtml = `<strong class="ltr" style="color:#6ee7b7;">${fmtNum(r.breakeven_tokens_tx, 3)} ${esc(r.token_symbol)} / tx</strong><br><small class="ltr" style="color:var(--muted);">${fmtNum(r.breakeven_tokens_hr, 2)} / hr ($${fmtNum(r.breakeven_usd_tx, 5)}/tx)</small>`;
+        } else {
+          beHtml = `<strong class="ltr" style="color:#fbbf24;">&gt;= $${fmtNum(r.breakeven_usd_tx, 5)} / tx</strong><br><small class="ltr" style="color:var(--muted);">&gt;= $${fmtNum(r.breakeven_usd_hr, 3)} / hr (قبل الإدراج)</small>`;
+        }
+
+        const tokenAddrHtml = r.token_differs_from_protocol && r.token_address
+          ? `<div class="addr-box" style="margin-top:5px;">
+               <span style="font-size:10px;color:#6ee7b7;">Token:</span>
+               <span class="addr" style="color:#6ee7b7;">${esc(r.token_address)}</span>
+               <button class="btn btn-sm" onclick="copyText('${esc(r.token_address)}', this)">نسخ</button>
+             </div>`
+          : `<div style="font-size:10px;color:var(--muted);margin-top:3px;">التوكن = نفس عقد البروتوكول</div>`;
+
+        const secCls = r.risk_level === "high" ? "b-rose" : (r.risk_level === "low" ? "b-green" : "b-cyan");
+
+        return `<tr>
+          <td><span class="badge ${scoreCls}">${r.arbitrage_score}/100</span><br><small>${esc(r.verdict)}</small></td>
+          <td><strong>${esc(r.protocol_name)}</strong>${r.is_new ? ' <span class="badge b-green">جديد</span>' : ''}<br>
+            ${verBadge}
+            <div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;">
+              ${websitesHtml}
+              ${socialsHtml}
+              <a class="btn btn-sm" target="_blank" href="${esc(r.explorer_url)}">${esc(r.explorer_name)}</a>
+              ${r.dex_url ? `<a class="btn btn-sm" target="_blank" href="${esc(r.dex_url)}">DexScreener</a>` : ""}
+            </div>
+          </td>
+          <td><span class="badge b-cyan">${esc(r.token_symbol)}</span><br>${priceHtml}</td>
+          <td>
+            <div class="addr-box">
+              <span style="font-size:10px;color:var(--muted);">Protocol:</span>
+              <span class="addr">${esc(r.address)}</span>
+              <button class="btn btn-sm" onclick="copyText('${esc(r.address)}', this)">نسخ</button>
+            </div>
+            ${tokenAddrHtml}
+          </td>
+          <td><strong>${esc(r.chain_name)}</strong><br>${modeBadge}<br><small style="color:var(--muted);">Callers: ${r.unique_callers} | Mint: ${r.cumulative_mints}</small></td>
+          <td class="ltr">Gas: $${fmtNum(r.gas_cost_tx_usd, 5)}/tx<br><small style="color:var(--muted);">Total: $${fmtNum(r.total_cost_hr_usd, 3)}/hr</small></td>
+          <td>${beHtml}</td>
+          <td><span class="badge ${secCls}">${esc(r.security_verdict)}</span></td>
+        </tr>`;
+      }).join("");
+    }
+
+    function renderGpuCoinsTable() {
+      const coins = (STATE.data && STATE.data.gpu_l1_coins) || [];
+      const tbody = document.getElementById("gpuCoinsTbody");
+      if (!coins.length) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted);">تعذر جلب بيانات WhatToMine حالياً.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = coins.map(c => {
+        const netCol = c.net_day_usd >= 0 ? "#6ee7b7" : "#fda4af";
+        const vCls = c.net_day_usd > 0.05 ? "b-green" : (c.net_day_usd > -0.25 ? "b-amber" : "b-rose");
+        return `<tr>
+          <td><span class="badge ${vCls}">${esc(c.verdict)}</span></td>
+          <td><strong>${esc(c.coin_name)}</strong> <span class="badge b-cyan">${esc(c.symbol)}</span></td>
+          <td class="ltr">${esc(c.algorithm)}<br><small style="color:var(--muted);">${esc(c.gpu_hashrate)}</small></td>
+          <td class="ltr">$${c.coin_price_usd < 0.01 ? c.coin_price_usd.toPrecision(4) : fmtNum(c.coin_price_usd, 4)}<br><small style="color:var(--muted);">MC: ${esc(c.market_cap)}</small></td>
+          <td class="ltr">${fmtNum(c.est_coins_day, 4)} ${esc(c.symbol)}</td>
+          <td class="ltr">$${fmtNum(c.gross_day_usd, 3)}<br><small style="color:var(--muted);">$${fmtNum(c.gross_hr_usd, 4)}/hr</small></td>
+          <td class="ltr">$${fmtNum(c.machine_cost_day_usd, 3)}<br><small style="color:var(--muted);">$${fmtNum(c.machine_cost_hr_usd, 4)}/hr</small></td>
+          <td class="ltr" style="color:${netCol};font-weight:800;">${c.net_day_usd >= 0 ? "+" : ""}$${fmtNum(c.net_day_usd, 3)}/d<br><small>${c.net_hr_usd >= 0 ? "+" : ""}$${fmtNum(c.net_hr_usd, 4)}/hr</small></td>
+          <td class="ltr" style="color:${netCol};">${c.roi_pct >= 0 ? "+" : ""}${fmtNum(c.roi_pct, 1)}%</td>
+        </tr>`;
+      }).join("");
+    }
+
+    loadArbitrage();
+  </script>
+</body>
+</html>

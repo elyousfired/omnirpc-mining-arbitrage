@@ -1,0 +1,36 @@
+{
+  "pow_chains_live": 3,
+  "chains": [
+    {
+      "chain": "Bitcoin",
+      "latest_height": 975597,
+      "tx_count": 6530,
+      "miner_pool": "Foundry USA",
+      "reward_sat": 313358444,
+      "difficulty": 148364561003867.4,
+      "diff_progress_pct": 92.70833333333334
+    },
+    {
+      "chain": "Kaspa",
+      "daa_score": "590983931",
+      "difficulty": 1.609509919043246e+16,
+      "hashrate_th": 321901.98380864924
+    },
+    {
+      "chain": "Ergo",
+      "height": 1915413,
+      "params": {
+        "height": 506880,
+        "storageFeeFactor": 1250000,
+        "minValuePerByte": 360,
+        "maxBlockSize": 1271009,
+        "maxBlockCost": 7030268,
+        "blockVersion": 2,
+        "tokenAccessCost": 100,
+        "inputCost": 2000,
+        "dataInputCost": 100,
+        "outputCost": 100
+      }
+    }
+  ]
+}

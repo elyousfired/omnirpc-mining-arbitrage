@@ -1,0 +1,223 @@
+{
+  "cosmos_scanned": 40,
+  "cosmos_ok": 40,
+  "cosmos_with_txs": [
+    {
+      "slug": "pocket",
+      "name": "Pocket Network",
+      "chain_id": "pocket",
+      "ok": true,
+      "height": 1006057,
+      "txs_in_latest_block": 1,
+      "msg_types": {}
+    },
+    {
+      "slug": "sentinel",
+      "name": "Sentinel",
+      "chain_id": "sentinelhub-2",
+      "ok": true,
+      "height": 32770855,
+      "txs_in_latest_block": 7,
+      "msg_types": {
+        "MsgUpdateSessionRequest": 10,
+        "MsgUpdateNodeStatusRequest": 3,
+        "MsgStartSessionRequest": 1,
+        "MsgExec": 1
+      }
+    },
+    {
+      "slug": "unification",
+      "name": "Unification",
+      "chain_id": "FUND-MainNet-2",
+      "ok": true,
+      "height": 24408242,
+      "txs_in_latest_block": 1,
+      "msg_types": {}
+    },
+    {
+      "slug": "zetachain",
+      "name": "ZetaChain",
+      "chain_id": "zetachain_7000-1",
+      "ok": true,
+      "height": 20145972,
+      "txs_in_latest_block": 7,
+      "msg_types": {}
+    },
+    {
+      "slug": "nibiru",
+      "name": "Nibiru",
+      "chain_id": "cataclysm-1",
+      "ok": true,
+      "height": 49527967,
+      "txs_in_latest_block": 2,
+      "msg_types": {
+        "MsgExecuteContract": 2,
+        "wasm:set_prices": 1,
+        "wasm:trigger_trade_batch": 1
+      }
+    },
+    {
+      "slug": "ritbit",
+      "name": "Rubin",
+      "chain_id": "ritbit-mainnet",
+      "ok": true,
+      "height": 24764995,
+      "txs_in_latest_block": 6,
+      "msg_types": {}
+    },
+    {
+      "slug": "sovr",
+      "name": "Sovren",
+      "chain_id": "sovr-1",
+      "ok": true,
+      "height": 2863576,
+      "txs_in_latest_block": 1,
+      "msg_types": {}
+    },
+    {
+      "slug": "zigchain",
+      "name": "ZIGChain",
+      "chain_id": "zigchain-1",
+      "ok": true,
+      "height": 13723344,
+      "txs_in_latest_block": 4,
+      "msg_types": {}
+    },
+    {
+      "slug": "thorchain",
+      "name": "THORChain",
+      "chain_id": "thorchain-1",
+      "ok": true,
+      "height": 28645350,
+      "txs_in_latest_block": 17,
+      "msg_types": {}
+    },
+    {
+      "slug": "xpla",
+      "name": "CONX",
+      "chain_id": "dimension_37-1",
+      "ok": true,
+      "height": 22207050,
+      "txs_in_latest_block": 2,
+      "msg_types": {}
+    },
+    {
+      "slug": "nyx",
+      "name": "Nym",
+      "chain_id": "nyx",
+      "ok": true,
+      "height": 26525734,
+      "txs_in_latest_block": 1,
+      "msg_types": {}
+    }
+  ],
+  "substrate_scanned": 30,
+  "substrate_ok": 30,
+  "substrate_sample": [
+    {
+      "slug": "darwinia2",
+      "name": "Darwinia 2",
+      "ok": true,
+      "height": 13859609,
+      "extrinsics_count": 2
+    },
+    {
+      "slug": "bridgeHubKusama",
+      "name": "Kusama Bridge Hub",
+      "ok": true,
+      "height": 9450056,
+      "extrinsics_count": 2
+    },
+    {
+      "slug": "karura",
+      "name": "Karura",
+      "ok": true,
+      "height": 12846333,
+      "extrinsics_count": 2
+    },
+    {
+      "slug": "vara_network",
+      "name": "Vara Network",
+      "ok": true,
+      "height": 37626201,
+      "extrinsics_count": 2
+    },
+    {
+      "slug": "bridgeHubPolkadot",
+      "name": "Polkadot Bridge Hub",
+      "ok": true,
+      "height": 8938302,
+      "extrinsics_count": 4
+    },
+    {
+      "slug": "polkadex",
+      "name": "Polkadex",
+      "ok": true,
+      "height": 13442986,
+      "extrinsics_count": 1
+    },
+    {
+      "slug": "avail_mainnet",
+      "name": "Avail",
+      "ok": true,
+      "height": 3717084,
+      "extrinsics_count": 3
+    },
+    {
+      "slug": "centrifuge",
+      "name": "Centrifuge",
+      "ok": true,
+      "height": 9818491,
+      "extrinsics_count": 2
+    },
+    {
+      "slug": "peopleKusama",
+      "name": "Kusama People",
+      "ok": true,
+      "height": 11536306,
+      "extrinsics_count": 2
+    },
+    {
+      "slug": "hyperbridge",
+      "name": "Hyperbridge",
+      "ok": true,
+      "height": 12729037,
+      "extrinsics_count": 7
+    },
+    {
+      "slug": "vflow",
+      "name": "VFlow",
+      "ok": true,
+      "height": 5856638,
+      "extrinsics_count": 2
+    },
+    {
+      "slug": "mythos",
+      "name": "Mythos",
+      "ok": true,
+      "height": 11957146,
+      "extrinsics_count": 2
+    },
+    {
+      "slug": "humanode",
+      "name": "Humanode",
+      "ok": true,
+      "height": 20664709,
+      "extrinsics_count": 1
+    },
+    {
+      "slug": "bittensor",
+      "name": "Bittensor",
+      "ok": true,
+      "height": 9492938,
+      "extrinsics_count": 11
+    },
+    {
+      "slug": "interlay",
+      "name": "Interlay",
+      "ok": true,
+      "height": 10885373,
+      "extrinsics_count": 2
+    }
+  ]
+}

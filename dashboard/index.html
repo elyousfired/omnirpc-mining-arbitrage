@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OmniRPC — لوحة التحكم المباشرة للبلوكشين (807 شبكة)</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-elev: #0f1626;
+      --bg-card: #131c31;
+      --bg-hover: #1a2540;
+      --border: #24314f;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.14);
+      --cyan: #38bdf8;
+      --cyan-soft: rgba(56, 189, 248, 0.14);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --rose: #f43f5e;
+      --rose-soft: rgba(244, 63, 94, 0.15);
+      --purple: #a78bfa;
+      --purple-soft: rgba(167, 139, 250, 0.15);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top right, #0e1a33 0%, var(--bg) 48%);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .ltr { direction: ltr; unicode-bidi: embed; font-family: var(--mono); }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(7, 11, 20, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--emerald), var(--cyan));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #06101d;
+      font-family: var(--mono);
+      font-size: 16px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--emerald-soft);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.85); }
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      padding: 8px 13px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.16s ease;
+      font-family: var(--sans);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--bg-hover);
+      border-color: var(--cyan);
+    }
+
+    .btn:disabled { opacity: 0.55; cursor: wait; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #059669, #0284c7);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    main {
+      max-width: 1460px;
+      margin: 0 auto;
+      padding: 22px 24px 60px;
+    }
+
+    .scan-banner {
+      display: none;
+      margin-bottom: 18px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: var(--cyan-soft);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #bae6fd;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .scan-banner.active { display: flex; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--emerald), var(--cyan));
+      opacity: 0.75;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      font-family: var(--mono);
+      direction: ltr;
+      text-align: right;
+    }
+
+    .kpi-sub {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 9px 15px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-family: var(--sans);
+      transition: 0.15s;
+    }
+
+    .tab-btn:hover { color: var(--text); background: var(--bg-elev); }
+
+    .tab-btn.active {
+      color: #fff;
+      background: var(--bg-card);
+      border-color: var(--cyan);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.14);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="text"], input[type="number"], select, textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+      font-family: var(--sans);
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: var(--cyan); }
+
+    .toggle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12.5px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 11px 13px;
+      text-align: right;
+      border-bottom: 1px solid rgba(36, 49, 79, 0.65);
+      vertical-align: middle;
+    }
+
+    th {
+      background: var(--bg-elev);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:hover td { background: rgba(26, 37, 64, 0.55); }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .b-green { background: var(--emerald-soft); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .b-cyan  { background: var(--cyan-soft); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .b-amber { background: var(--amber-soft); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .b-purple{ background: var(--purple-soft); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .b-rose  { background: var(--rose-soft); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    .addr {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #93c5fd;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .fn-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      direction: ltr;
+    }
+
+    .fn-chip {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 5px;
+      color: #cbd5e1;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .card h3 {
+      margin: 0 0 12px 0;
+      font-size: 15.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--amber), var(--emerald));
+    }
+
+    .console-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 960px) {
+      .console-grid { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    pre.code-out {
+      margin: 0;
+      background: #04070e;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      color: #a7f3d0;
+      font-family: var(--mono);
+      font-size: 12px;
+      direction: ltr;
+      text-align: left;
+      overflow: auto;
+      max-height: 460px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 14, 0.78);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: min(920px, 100%);
+      max-height: 88vh;
+      overflow-y: auto;
+      background: var(--bg-elev);
+      border: 1px solid var(--cyan);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .empty-msg {
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo-badge">RPC</div>
+      <div>
+        <h1>لوحة تحكم OmniRPC المباشرة</h1>
+        <p>قراءة البلوكات الخام واكتشاف التعدين والسكّ من السلاسل مباشرة (EVM • Cosmos • Substrate • L1s • PoW)</p>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <a class="btn" style="border-color:var(--amber);color:#fcd34d;text-decoration:none;" href="/mining">رادار التعدين التلقائي (1 ساعة)</a>
+      <a class="btn" style="border-color:var(--emerald);color:#6ee7b7;text-decoration:none;" href="/arbitrage">أربيتراج التعدين و NVIDIA</a>
+      <span class="pill-live"><span class="dot"></span> <span id="hdrLiveBadge">807 شبكة متصلة</span></span>
+      <select id="scanPreset" title="اختر نوع الفحص">
+        <option value="evm_fast">سكان EVM سريع (60 شبكة • 8 بلوكات)</option>
+        <option value="evm_full">سكان EVM شامل (598 شبكة • 12 بلوك)</option>
+        <option value="non_evm">سكان Cosmos + Substrate</option>
+        <option value="pow">سكان PoW (Bitcoin / Kaspa / Ergo)</option>
+        <option value="pool">تحديث لائحة الـ RPC الكاملة</option>
+      </select>
+      <button class="btn btn-primary" id="btnRunScan" onclick="triggerScan()">تشغيل السكان دابا</button>
+      <button class="btn" onclick="loadAllData()">تحديث البيانات</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="scanBanner" class="scan-banner">
+      <div><strong>جاري الفحص المباشر:</strong> <span id="scanStatusText">...</span></div>
+      <span class="ltr" id="scanElapsed">0s</span>
+    </div>
+
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">إجمالي الشبكات الحية فـ OmniRPC</div>
+        <div class="kpi-value" id="kpiTotalChains">—</div>
+        <div class="kpi-sub" id="kpiChainBreakdown">EVM • Cosmos • Substrate • Majors</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">البلوكات والمعاملات الخام الممسوحة</div>
+        <div class="kpi-value" id="kpiBlocksTxs">—</div>
+        <div class="kpi-sub" id="kpiEvmActive">الشبكات النشطة بالمعاملات</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">عقود التعدين / السكّ المكتشفة (EVM)</div>
+        <div class="kpi-value" id="kpiMiningCount">—</div>
+        <div class="kpi-sub" id="kpiPureMiningCount">العقود الصافية بدوال mint/mine</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">أعلى بلوك Bitcoin / هاش Kaspa لايف</div>
+        <div class="kpi-value" id="kpiPowStats">—</div>
+        <div class="kpi-sub" id="kpiNonEvmHealth">Cosmos • Substrate • Solana • Sui</div>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab-btn active" onclick="switchTab('mining', this)">رادار التعدين والسكّ (EVM)</button>
+      <button class="tab-btn" onclick="switchTab('chains', this)">مستكشف الـ 807 شبكات</button>
+      <button class="tab-btn" onclick="switchTab('nonevm', this)">Solana / Sui / Cosmos / Substrate</button>
+      <button class="tab-btn" onclick="switchTab('pow', this)">شبكات PoW المباشرة</button>
+      <button class="tab-btn" onclick="switchTab('console', this)">وحدة تحكم RPC المباشر</button>
+    </nav>
+
+    <!-- TAB 1: MINING RADAR -->
+    <section id="panel-mining" class="panel active">
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <input type="text" id="miningSearch" placeholder="قلب بالسمية، العقد 0x، الدالة (mint, claim)..." style="min-width: 290px;" oninput="renderMiningTable()" />
+          <label class="toggle-pill">
+            <input type="checkbox" id="chkPureMint" checked onchange="renderMiningTable()" />
+            <span>عقود التعدين والسكّ الصافية فقط (حيد USDC/التحويلات العادية)</span>
+          </label>
+        </div>
+        <div class="toolbar-group">
+          <span class="badge b-cyan" id="miningShowingCount">0 نتيجة</span>
+          <a class="btn btn-sm" href="/api/download/csv" download="onchain_mining_candidates.csv">تحميل CSV</a>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>الشبكة</th>
+              <th>الرمز</th>
+              <th>عنوان العقد</th>
+              <th>التصنيف</th>
+              <th>الدوال المفككة (4-Byte ABI)</th>
+              <th>أحداث Mint</th>
+              <th>المعاملات</th>
+              <th>متصلين</th>
+              <th>إجراء مباشر</th>
+            </tr>
+          </thead>
+          <tbody id="miningTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 2: 807 CHAINS EXPLORER -->
+    <section id="panel-chains" class="panel">
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <input type="text" id="chainSearch" placeholder="بحث عن بلوكشين (اسم، Chain ID، رمز، slug)..." style="min-width: 290px;" oninput="renderChainsTable()" />
+          <select id="ecoFilter" onchange="renderChainsTable()">
+            <option value="ALL">جميع الشبكات (807)</option>
+            <option value="EVM">EVM فقط</option>
+            <option value="Cosmos">Cosmos / IBC فقط</option>
+            <option value="Substrate">Substrate WSS فقط</option>
+            <option value="Majors">Non-EVM Majors (5)</option>
+          </select>
+        </div>
+        <div class="toolbar-group">
+          <span class="badge b-green" id="chainsShowingCount">0 شبكة</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>النوع</th>
+              <th>الشبكة</th>
+              <th>المعرّف (ID / Slug)</th>
+              <th>الرمز</th>
+              <th>آخر بلوك مسجّل</th>
+              <th>السرعة (ms)</th>
+              <th>نقطة الاتصال الرئيسية (RPC)</th>
+              <th>قراءة حية</th>
+            </tr>
+          </thead>
+          <tbody id="chainsTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 3: NON-EVM -->
+    <section id="panel-nonevm" class="panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3><span>Solana — البرامج الأكثر نشاطاً فالبلوكات الحية</span> <span class="badge b-purple" id="solMeta">SOL</span></h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Program ID</th><th>الاستدعاءات</th><th>الموقّعين</th></tr></thead>
+              <tbody id="solTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span>Sui (GraphQL) — استدعاءات Move الحية</span> <span class="badge b-cyan" id="suiMeta">SUI</span></h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>حزمة ودالة Move</th><th>العدد</th></tr></thead>
+              <tbody id="suiTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3><span>Cosmos / IBC — السلاسل النشطة ورسائل WASM</span> <span class="badge b-green" id="cosMeta">Cosmos</span></h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>السلسلة</th><th>الارتفاع</th><th>معاملات</th><th>الرسائل المفككة / WASM</th><th>فحص</th></tr></thead>
+              <tbody id="cosTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span>Substrate / Polkadot (WSS) — السلاسل الحية</span> <span class="badge b-amber" id="subMeta">Substrate</span></h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>الشبكة</th><th>الارتفاع</th><th>Extrinsics</th><th>فحص</th></tr></thead>
+              <tbody id="subTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: POW -->
+    <section id="panel-pow" class="panel">
+      <div class="grid-3" id="powCards"></div>
+    </section>
+
+    <!-- TAB 5: CONSOLE -->
+    <section id="panel-console" class="panel">
+      <div class="console-grid">
+        <div class="card">
+          <h3>إرسال طلب RPC مباشر</h3>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <label>الإيكوسيستيم:</label>
+            <select id="conEco" onchange="updateConsolePresets()">
+              <option value="evm">EVM JSON-RPC</option>
+              <option value="cosmos">Cosmos REST/LCD</option>
+              <option value="substrate">Substrate WebSocket RPC</option>
+              <option value="major">Major L1 (Solana / Sui / Near / TON / Aptos)</option>
+            </select>
+
+            <label>المعرّف (Chain ID أو Slug أو اسم):</label>
+            <input type="text" id="conTarget" value="8453" class="ltr" />
+
+            <label>الطريقة أو المسار (Method / Path):</label>
+            <input type="text" id="conMethod" value="eth_blockNumber" class="ltr" />
+
+            <label>البارامترات (JSON Array لـ RPC):</label>
+            <textarea id="conParams" rows="4" class="ltr">[]</textarea>
+
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <button class="btn btn-sm" onclick="setConsolePreset('evm','8453','eth_blockNumber','[]')">Base Block#</button>
+              <button class="btn btn-sm" onclick="setConsolePreset('evm','1','eth_gasPrice','[]')">ETH Gas</button>
+              <button class="btn btn-sm" onclick="setConsolePreset('cosmos','nibiru','/cosmos/base/tendermint/v1beta1/blocks/latest','[]')">Nibiru Block</button>
+              <button class="btn btn-sm" onclick="setConsolePreset('substrate','bittensor','chain_getBlock','[]')">Bittensor Block</button>
+            </div>
+
+            <button class="btn btn-primary" onclick="runConsoleCall()">تنفيذ الطلب دابا</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>الرد المباشر من العقدة (Node Response)</h3>
+          <pre id="consoleOut" class="code-out">// النتيجة غادي تبان هنا مباشرة من البلوكشين...</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- LIVE BLOCK MODAL -->
+  <div id="liveModal" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalTitle" style="margin:0; font-size:17px;">فحص مباشر للبلوك</h2>
+          <small id="modalSub" style="color:var(--muted);"></small>
+        </div>
+        <button class="btn btn-sm" onclick="closeModal()">إغلاق ✕</button>
+      </div>
+      <div id="modalBody">جاري الاتصال بالعقدة...</div>
+    </div>
+  </div>
+
+  <script>
+    const STATE = {
+      overview: null,
+      chains: [],
+      mining: [],
+      nonEvm: null,
+      pow: null,
+      solana: null,
+      sui: null,
+      pollTimer: null
+    };
+
+    const PURE_NOISE_FNS = new Set([
+      "transfer(address,uint256)",
+      "transferFrom(address,address,uint256)",
+      "approve(address,uint256)",
+      "transferWithAuthorization(address,address,uint256,uint256,uint256,bytes32,uint8,bytes32,bytes32)",
+      "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"
+    ]);
+
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, c => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]
+      ));
+    }
+
+    function fmtNum(n) {
+      if (n === null || n === undefined || n === "") return "—";
+      const v = Number(n);
+      return Number.isFinite(v) ? v.toLocaleString("en-US") : String(n);
+    }
+
+    function isPureMining(row) {
+      const fns = (row.decoded_functions || []).map(f => String(f));
+      const hasMintKeyword = fns.some(f => /mint|mine|claim|burn|reward|stake|grid|pow|nonce/i.test(f));
+      if (hasMintKeyword) return true;
+      const nonNoise = fns.filter(f => !PURE_NOISE_FNS.has(f));
+      if (nonNoise.length > 0 && row.detection_reason === "Multi-Caller On-Chain Mint Pattern") return true;
+      return fns.length === 0 && (row.mint_events_in_window || 0) > 0;
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("panel-" + name).classList.add("active");
+    }
+
+    async function loadAllData() {
+      try {
+        const [ovRes, poolRes, minRes] = await Promise.all([
+          fetch("/api/overview"),
+          fetch("/api/pool"),
+          fetch("/api/mining")
+        ]);
+        STATE.overview = await ovRes.json();
+        const pool = await poolRes.json();
+        const min = await minRes.json();
+
+        // Flatten chains
+        const list = [];
+        for (const c of (pool.evm || [])) {
+          list.push({ eco: "EVM", name: c.name, id: String(c.chain_id), symbol: c.symbol || "ETH", block: c.block_height, ms: c.latency_ms, rpc: c.best_rpc, rpcCount: (c.working_rpcs || []).length, rawKey: String(c.chain_id) });
+        }
+        for (const c of (pool.cosmos || [])) {
+          list.push({ eco: "Cosmos", name: c.name, id: c.slug, symbol: c.denom || c.cosmos_chain_id || "-", block: c.block_height, ms: c.latency_ms, rpc: c.best_rest, rpcCount: (c.working_rest || []).length, rawKey: c.slug });
+        }
+        for (const c of (pool.substrate || [])) {
+          list.push({ eco: "Substrate", name: c.name, id: c.slug, symbol: c.symbol || "-", block: c.block_height, ms: c.latency_ms, rpc: c.best_rpc, rpcCount: (c.working_rpcs || []).length, rawKey: c.slug });
+        }
+        for (const c of (pool.non_evm_majors || [])) {
+          list.push({ eco: "Majors", name: c.name, id: c.ecosystem, symbol: c.symbol, block: c.block_height, ms: c.latency_ms, rpc: c.best_rpc, rpcCount: 1, rawKey: c.name.toLowerCase() });
+        }
+        STATE.chains = list;
+        STATE.mining = min.evm_candidates || [];
+        STATE.solana = min.solana || null;
+        STATE.sui = min.sui || null;
+        STATE.nonEvm = min.non_evm || null;
+        STATE.pow = min.pow || null;
+
+        renderKPIs();
+        renderMiningTable();
+        renderChainsTable();
+        renderNonEvm();
+        renderPoW();
+        checkScanStatus();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderKPIs() {
+      const counts = STATE.overview?.pool_counts || {};
+      const m = STATE.overview?.mining_summary || {};
+      const powChains = STATE.pow?.chains || [];
+      const btc = powChains.find(x => x.chain === "Bitcoin");
+      const kas = powChains.find(x => x.chain === "Kaspa");
+
+      const total = counts.total_live_chains || STATE.chains.length;
+      document.getElementById("hdrLiveBadge").textContent = `${fmtNum(total)} شبكة متصلة`;
+      document.getElementById("kpiTotalChains").textContent = fmtNum(total);
+      document.getElementById("kpiChainBreakdown").textContent =
+        `EVM ${counts.evm_live || 0} • Cosmos ${counts.cosmos_live || 0} • Substrate ${counts.substrate_live || 0} • Majors ${counts.non_evm_majors_live || 0}`;
+
+      document.getElementById("kpiBlocksTxs").textContent =
+        `${fmtNum(m.total_raw_blocks_scanned || 0)} / ${fmtNum(m.total_raw_txs_scanned || 0)}`;
+      document.getElementById("kpiEvmActive").textContent =
+        `${fmtNum(m.evm_chains_with_txs || 0)} شبكة نشطة من أصل ${fmtNum(m.evm_chains_scanned || 0)}`;
+
+      const pureCount = STATE.mining.filter(isPureMining).length;
+      document.getElementById("kpiMiningCount").textContent = fmtNum(STATE.mining.length);
+      document.getElementById("kpiPureMiningCount").textContent = `${fmtNum(pureCount)} عقد صافي بدوال السكّ/التعدين`;
+
+      const btcTxt = btc ? `#${fmtNum(btc.latest_height)}` : "—";
+      const kasTxt = kas ? `${Math.round(Number(kas.hashrate_th || 0) / 1000)} PH/s` : "—";
+      document.getElementById("kpiPowStats").textContent = `${btcTxt} | ${kasTxt}`;
+      const cosOk = STATE.nonEvm?.cosmos_ok ?? 0;
+      const subOk = STATE.nonEvm?.substrate_ok ?? 0;
+      document.getElementById("kpiNonEvmHealth").textContent = `Cosmos ${cosOk}/${STATE.nonEvm?.cosmos_scanned ?? 0} • Substrate ${subOk}/${STATE.nonEvm?.substrate_scanned ?? 0}`;
+    }
+
+    function renderMiningTable() {
+      const q = document.getElementById("miningSearch").value.trim().toLowerCase();
+      const pureOnly = document.getElementById("chkPureMint").checked;
+      const tbody = document.getElementById("miningTbody");
+
+      const filtered = STATE.mining.filter(r => {
+        if (pureOnly && !isPureMining(r)) return false;
+        if (!q) return true;
+        const blob = `${r.chain_name} ${r.chain_id} ${r.symbol} ${r.address} ${(r.decoded_functions || []).join(" ")} ${r.detection_reason}`.toLowerCase();
+        return blob.includes(q);
+      });
+
+      document.getElementById("miningShowingCount").textContent = `${filtered.length} عقد`;
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty-msg">ما كاينش نتائج مطابقة للفلتر الحالي.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.slice(0, 200).map(r => {
+        const pure = isPureMining(r);
+        const fns = (r.decoded_functions || []).slice(0, 4).map(f => `<span class="fn-chip" title="${esc(f)}">${esc(f)}</span>`).join("");
+        const badge = pure
+          ? `<span class="badge b-amber">تعدين / سكّ</span>`
+          : `<span class="badge b-cyan">نشاط توكن</span>`;
+        return `<tr>
+          <td><strong>${esc(r.chain_name)}</strong><br><small class="ltr" style="color:var(--muted)">ID: ${esc(r.chain_id)}</small></td>
+          <td><span class="badge b-purple">${esc(r.symbol)}</span></td>
+          <td><span class="addr">${esc(r.address)}</span></td>
+          <td>${badge}</td>
+          <td><div class="fn-list">${fns || "<span class='fn-chip'>—</span>"}</div></td>
+          <td class="ltr"><strong>${fmtNum(r.mint_events_in_window)}</strong></td>
+          <td class="ltr">${fmtNum(r.tx_count)}</td>
+          <td class="ltr">${fmtNum(r.unique_callers)}</td>
+          <td><button class="btn btn-sm" onclick="inspectLiveBlock('EVM', '${esc(r.chain_id)}', '${esc(r.chain_name)}')">فحص بلوك لايف</button></td>
+        </tr>`;
+      }).join("");
+    }
+
+    function renderChainsTable() {
+      const q = document.getElementById("chainSearch").value.trim().toLowerCase();
+      const eco = document.getElementById("ecoFilter").value;
+      const tbody = document.getElementById("chainsTbody");
+
+      const filtered = STATE.chains.filter(c => {
+        if (eco !== "ALL" && c.eco !== eco) return false;
+        if (!q) return true;
+        return `${c.name} ${c.id} ${c.symbol} ${c.rpc}`.toLowerCase().includes(q);
+      });
+
+      document.getElementById("chainsShowingCount").textContent = `${fmtNum(filtered.length)} شبكة`;
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-msg">لا توجد شبكة بهذا البحث.</td></tr>`;
+        return;
+      }
+
+      const ecoClass = { EVM: "b-cyan", Cosmos: "b-green", Substrate: "b-amber", Majors: "b-purple" };
+      tbody.innerHTML = filtered.slice(0, 250).map(c => `<tr>
+        <td><span class="badge ${ecoClass[c.eco] || 'b-cyan'}">${esc(c.eco)}</span></td>
+        <td><strong>${esc(c.name)}</strong></td>
+        <td class="ltr">${esc(c.id)}</td>
+        <td><span class="badge b-purple">${esc(c.symbol)}</span></td>
+        <td class="ltr">${fmtNum(c.block)}</td>
+        <td class="ltr">${c.ms ? Math.round(c.ms) + " ms" : "—"}</td>
+        <td><span class="addr" style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(c.rpc)}">${esc(c.rpc)}</span> <small style="color:var(--muted)">(${c.rpcCount})</small></td>
+        <td><button class="btn btn-sm" onclick="inspectLiveBlock('${esc(c.eco)}', '${esc(c.rawKey)}', '${esc(c.name)}')">قراءة لايف</button></td>
+      </tr>`).join("");
+    }
+
+    function renderNonEvm() {
+      const sol = STATE.solana;
+      const solTbody = document.getElementById("solTbody");
+      if (sol && sol.top_active_programs) {
+        document.getElementById("solMeta").textContent = `${fmtNum(sol.txs_scanned)} txs / ${sol.slots_scanned} slots`;
+        solTbody.innerHTML = sol.top_active_programs.map(p => `
+          <tr>
+            <td><span class="addr">${esc(p.program_id)}</span></td>
+            <td class="ltr"><strong>${fmtNum(p.calls)}</strong></td>
+            <td class="ltr">${fmtNum(p.unique_signers)}</td>
+          </tr>`).join("");
+      } else {
+        solTbody.innerHTML = `<tr><td colspan="3" class="empty-msg">لا توجد بيانات Solana بعد.</td></tr>`;
+      }
+
+      const sui = STATE.sui;
+      const suiTbody = document.getElementById("suiTbody");
+      if (sui && sui.top_move_calls) {
+        document.getElementById("suiMeta").textContent = `${fmtNum(sui.txs_scanned)} txs`;
+        suiTbody.innerHTML = sui.top_move_calls.map(m => `
+          <tr>
+            <td><span class="addr" style="word-break:break-all;">${esc(m.target)}</span></td>
+            <td class="ltr"><strong>${fmtNum(m.count)}</strong></td>
+          </tr>`).join("");
+      } else {
+        suiTbody.innerHTML = `<tr><td colspan="2" class="empty-msg">لا توجد بيانات Sui بعد.</td></tr>`;
+      }
+
+      const cosTbody = document.getElementById("cosTbody");
+      const cosList = STATE.nonEvm?.cosmos_with_txs || [];
+      document.getElementById("cosMeta").textContent = `${STATE.nonEvm?.cosmos_ok || 0} / ${STATE.nonEvm?.cosmos_scanned || 0} OK`;
+      cosTbody.innerHTML = cosList.length ? cosList.map(c => {
+        const msgs = Object.entries(c.msg_types || {}).map(([k, v]) => `<span class="fn-chip">${esc(k)}: ${v}</span>`).join("");
+        return `<tr>
+          <td><strong>${esc(c.name)}</strong><br><small class="ltr" style="color:var(--muted)">${esc(c.chain_id)}</small></td>
+          <td class="ltr">${fmtNum(c.height)}</td>
+          <td class="ltr"><strong>${fmtNum(c.txs_in_latest_block)}</strong></td>
+          <td><div class="fn-list">${msgs || "<span class='fn-chip'>Tx OK</span>"}</div></td>
+          <td><button class="btn btn-sm" onclick="inspectLiveBlock('Cosmos', '${esc(c.slug)}', '${esc(c.name)}')">لايف</button></td>
+        </tr>`;
+      }).join("") : `<tr><td colspan="5" class="empty-msg">لا توجد بيانات Cosmos بعد.</td></tr>`;
+
+      const subTbody = document.getElementById("subTbody");
+      const subList = STATE.nonEvm?.substrate_sample || [];
+      document.getElementById("subMeta").textContent = `${STATE.nonEvm?.substrate_ok || 0} / ${STATE.nonEvm?.substrate_scanned || 0} WSS`;
+      subTbody.innerHTML = subList.length ? subList.map(s => `
+        <tr>
+          <td><strong>${esc(s.name)}</strong></td>
+          <td class="ltr">${fmtNum(s.height)}</td>
+          <td class="ltr"><strong>${fmtNum(s.extrinsics_count)}</strong></td>
+          <td><button class="btn btn-sm" onclick="inspectLiveBlock('Substrate', '${esc(s.slug)}', '${esc(s.name)}')">لايف</button></td>
+        </tr>`).join("") : `<tr><td colspan="4" class="empty-msg">لا توجد بيانات Substrate بعد.</td></tr>`;
+    }
+
+    function renderPoW() {
+      const container = document.getElementById("powCards");
+      const chains = STATE.pow?.chains || [];
+      if (!chains.length) {
+        container.innerHTML = `<div class="card empty-msg">لا توجد بيانات PoW مسجلة حالياً.</div>`;
+        return;
+      }
+      container.innerHTML = chains.map(c => {
+        if (c.chain === "Bitcoin") {
+          const pct = Number(c.diff_progress_pct || 0).toFixed(1);
+          return `<div class="card">
+            <h3><span>Bitcoin (Mainnet)</span> <span class="badge b-amber">PoW SHA-256</span></h3>
+            <p>أحدث بلوك: <strong class="ltr">${fmtNum(c.latest_height)}</strong></p>
+            <p>عدد المعاملات بالبلوك: <strong class="ltr">${fmtNum(c.tx_count)}</strong></p>
+            <p>المجمّع المعدّن (Pool): <span class="badge b-green">${esc(c.miner_pool)}</span></p>
+            <p>مكافأة البلوك: <span class="ltr">${fmtNum(c.reward_sat)} sat</span></p>
+            <p>تقدم تعديل الصعوبة: <strong class="ltr">${pct}%</strong></p>
+            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+          </div>`;
+        }
+        if (c.chain === "Kaspa") {
+          return `<div class="card">
+            <h3><span>Kaspa (BlockDAG)</span> <span class="badge b-cyan">PoW kHeavyHash</span></h3>
+            <p>DAA Score: <strong class="ltr">${fmtNum(c.daa_score)}</strong></p>
+            <p>معدل الهاش (Hashrate): <strong class="ltr">${fmtNum(Math.round(c.hashrate_th || 0))} TH/s</strong></p>
+            <p>الصعوبة (Difficulty): <span class="ltr">${Number(c.difficulty || 0).toExponential(3)}</span></p>
+          </div>`;
+        }
+        return `<div class="card">
+          <h3><span>${esc(c.chain)}</span> <span class="badge b-purple">PoW Autolykos</span></h3>
+          <p>الارتفاع الحالي: <strong class="ltr">${fmtNum(c.height)}</strong></p>
+          <p>حجم البلوك الأقصى: <span class="ltr">${fmtNum(c.params?.maxBlockSize)} bytes</span></p>
+          <p>رسوم التخزين: <span class="ltr">${fmtNum(c.params?.storageFeeFactor)}</span></p>
+        </div>`;
+      }).join("");
+    }
+
+    async function inspectLiveBlock(eco, key, label) {
+      const modal = document.getElementById("liveModal");
+      const title = document.getElementById("modalTitle");
+      const sub = document.getElementById("modalSub");
+      const body = document.getElementById("modalBody");
+      modal.classList.add("open");
+      title.textContent = `قراءة مباشرة من العقدة: ${label}`;
+      sub.textContent = `Ecosystem: ${eco} | Key: ${key}`;
+      body.innerHTML = `<div class="empty-msg">جاري جلب آخر بلوك مباشر من البلوكشين...</div>`;
+
+      try {
+        const res = await fetch("/api/live-block", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ecosystem: eco, key })
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          body.innerHTML = `<div class="badge b-rose">${esc(data.error || "خطأ في الاتصال")}</div>`;
+          return;
+        }
+        let html = `<div class="kpi-grid" style="margin-bottom:12px;">
+          <div class="kpi-card"><div class="kpi-label">رقم البلوك / الارتفاع</div><div class="kpi-value" style="font-size:21px;">${fmtNum(data.height)}</div></div>
+          <div class="kpi-card"><div class="kpi-label">عدد المعاملات</div><div class="kpi-value" style="font-size:21px;">${fmtNum(data.tx_count)}</div></div>
+          <div class="kpi-card"><div class="kpi-label">زمن الاستجابة</div><div class="kpi-value" style="font-size:21px;">${data.elapsed_ms} ms</div></div>
+        </div>`;
+        if (data.hash) {
+          html += `<p>Hash: <span class="addr">${esc(data.hash)}</span></p>`;
+        }
+        if (Array.isArray(data.sample_txs) && data.sample_txs.length) {
+          html += `<div class="table-wrap" style="margin-top:10px;"><table>
+            <thead><tr><th>المعاملة (Hash / Sig)</th><th>من</th><th>إلى / العقد</th><th>القيمة</th><th>Selector</th></tr></thead>
+            <tbody>${data.sample_txs.map(t => `<tr>
+              <td><span class="addr">${esc((t.hash || "").slice(0, 18))}...</span></td>
+              <td><span class="addr">${esc((t.from || "").slice(0, 14))}</span></td>
+              <td><span class="addr">${esc((t.to || "Contract Create").slice(0, 16))}</span></td>
+              <td class="ltr">${esc(t.value ?? "0")}</td>
+              <td><span class="fn-chip">${esc(t.selector || "—")}</span></td>
+            </tr>`).join("")}</tbody></table></div>`;
+        } else {
+          html += `<pre class="code-out">${esc(JSON.stringify(data.raw_summary || data, null, 2))}</pre>`;
+        }
+        body.innerHTML = html;
+      } catch (err) {
+        body.innerHTML = `<div class="badge b-rose">${esc(err.message)}</div>`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById("liveModal").classList.remove("open");
+    }
+
+    function setConsolePreset(eco, target, method, params) {
+      document.getElementById("conEco").value = eco;
+      document.getElementById("conTarget").value = target;
+      document.getElementById("conMethod").value = method;
+      document.getElementById("conParams").value = params;
+    }
+
+    function updateConsolePresets() {
+      const eco = document.getElementById("conEco").value;
+      if (eco === "evm") setConsolePreset("evm", "8453", "eth_blockNumber", "[]");
+      if (eco === "cosmos") setConsolePreset("cosmos", "nibiru", "/cosmos/base/tendermint/v1beta1/blocks/latest", "[]");
+      if (eco === "substrate") setConsolePreset("substrate", "bittensor", "chain_getBlock", "[]");
+      if (eco === "major") setConsolePreset("major", "solana", "getSlot", "[]");
+    }
+
+    async function runConsoleCall() {
+      const eco = document.getElementById("conEco").value;
+      const target = document.getElementById("conTarget").value.trim();
+      const method = document.getElementById("conMethod").value.trim();
+      const out = document.getElementById("consoleOut");
+      out.textContent = "// جاري إرسال الطلب للعقدة...";
+      try {
+        const params = JSON.parse(document.getElementById("conParams").value || "[]");
+        let res;
+        if (eco === "evm") {
+          res = await fetch(`/evm/${encodeURIComponent(target)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params })
+          });
+        } else if (eco === "cosmos") {
+          const cleanPath = method.replace(/^\/+/, "");
+          res = await fetch(`/cosmos/${encodeURIComponent(target)}/${cleanPath}`);
+        } else if (eco === "substrate") {
+          res = await fetch(`/substrate/${encodeURIComponent(target)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params })
+          });
+        } else {
+          res = await fetch(`/major/${encodeURIComponent(target)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params })
+          });
+        }
+        const json = await res.json();
+        out.textContent = JSON.stringify(json, null, 2);
+      } catch (e) {
+        out.textContent = `Error: ${e.message}`;
+      }
+    }
+
+    async function triggerScan() {
+      const preset = document.getElementById("scanPreset").value;
+      const btn = document.getElementById("btnRunScan");
+      btn.disabled = true;
+      try {
+        await fetch("/api/scan/run", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ preset })
+        });
+        checkScanStatus();
+      } catch (e) {
+        alert("تعذر تشغيل الفحص: " + e.message);
+        btn.disabled = false;
+      }
+    }
+
+    async function checkScanStatus() {
+      try {
+        const res = await fetch("/api/scan/status");
+        const st = await res.json();
+        const banner = document.getElementById("scanBanner");
+        const btn = document.getElementById("btnRunScan");
+        if (st.running) {
+          banner.classList.add("active");
+          document.getElementById("scanStatusText").textContent = `${st.preset} — ${st.last_line || "جاري التنفيذ..."}`;
+          document.getElementById("scanElapsed").textContent = `${st.elapsed_s}s`;
+          btn.disabled = true;
+          clearTimeout(STATE.pollTimer);
+          STATE.pollTimer = setTimeout(checkScanStatus, 2500);
+        } else {
+          banner.classList.remove("active");
+          btn.disabled = false;
+          if (st.just_finished) {
+            await loadAllData();
+          }
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    loadAllData();
+  </script>
+</body>
+</html>

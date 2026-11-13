@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OmniRPC — رادار البحث التلقائي عن التعدين (كل 1 ساعة)</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-elev: #0f1626;
+      --bg-card: #131c31;
+      --bg-hover: #1a2540;
+      --border: #24314f;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.16);
+      --cyan: #38bdf8;
+      --cyan-soft: rgba(56, 189, 248, 0.14);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.16);
+      --purple: #a78bfa;
+      --purple-soft: rgba(167, 139, 250, 0.15);
+      --rose: #f43f5e;
+      --rose-soft: rgba(244, 63, 94, 0.15);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, #0d2138 0%, var(--bg) 52%);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .ltr { direction: ltr; unicode-bidi: embed; font-family: var(--mono); }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(7, 11, 20, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+
+    .logo-badge {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--amber), var(--emerald));
+      display: grid; place-items: center;
+      font-weight: 900; color: #06101d; font-family: var(--mono); font-size: 14px;
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.32);
+    }
+
+    .brand h1 { margin: 0; font-size: 18px; font-weight: 800; }
+    .brand p { margin: 0; font-size: 12px; color: var(--muted); }
+
+    .nav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: 0.15s;
+    }
+
+    .nav-link:hover { color: var(--text); border-color: var(--cyan); }
+    .nav-link.active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(16, 185, 129, 0.22));
+      border-color: var(--amber);
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+      font-family: var(--sans);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover:not(:disabled) { background: var(--bg-hover); border-color: var(--cyan); }
+    .btn:disabled { opacity: 0.55; cursor: wait; }
+    .btn-primary { background: linear-gradient(135deg, #d97706, #059669); border-color: transparent; color: #fff; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    main { max-width: 1480px; margin: 0 auto; padding: 20px 24px 60px; }
+
+    .auto-panel {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(56, 189, 248, 0.08));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 13px;
+      padding: 15px 18px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .auto-left { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulse 1.6s infinite;
+    }
+    .dot.paused { background: var(--amber); box-shadow: none; animation: none; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.8); }
+    }
+
+    .timer-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 6px 13px;
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--cyan);
+      direction: ltr;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 17px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      top: 0; right: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--amber), var(--emerald));
+    }
+
+    .kpi-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .kpi-value { font-size: 27px; font-weight: 800; font-family: var(--mono); direction: ltr; text-align: right; }
+    .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .toolbar-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+    input[type="text"], select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+      font-family: var(--sans);
+    }
+
+    input:focus, select:focus { border-color: var(--cyan); }
+
+    .pill-filter {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--sans);
+    }
+
+    .pill-filter.active { background: var(--cyan-soft); color: #bae6fd; border-color: var(--cyan); }
+
+    .table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-x: auto;
+      margin-bottom: 22px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td {
+      padding: 11px 12px;
+      text-align: right;
+      border-bottom: 1px solid rgba(36, 49, 79, 0.65);
+      vertical-align: middle;
+    }
+    th {
+      background: var(--bg-elev);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    tr:hover td { background: rgba(26, 37, 64, 0.55); }
+    tr.is-new td { background: rgba(16, 185, 129, 0.08); }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .b-new { background: var(--emerald); color: #04130d; font-weight: 900; }
+    .b-green { background: var(--emerald-soft); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .b-amber { background: var(--amber-soft); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .b-cyan { background: var(--cyan-soft); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .b-purple { background: var(--purple-soft); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .b-rose { background: var(--rose-soft); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.35); }
+
+    .addr { font-family: var(--mono); font-size: 11.5px; color: #93c5fd; direction: ltr; display: inline-block; word-break: break-all; }
+    .addr-box { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 4px; direction: ltr; }
+    .copy-btn {
+      border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+      padding: 2px 6px; border-radius: 5px; font-size: 10.5px; cursor: pointer; font-family: var(--sans);
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--cyan); }
+    .exp-links { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+    .exp-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      text-decoration: none; font-size: 11px; font-weight: 700;
+      padding: 2px 8px; border-radius: 6px;
+      background: var(--cyan-soft); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.38);
+    }
+    .exp-pill:hover { background: rgba(56, 189, 248, 0.28); color: #fff; }
+    .exp-pill.dex { background: var(--emerald-soft); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.38); }
+    .exp-pill.web { background: var(--purple-soft); color: #ddd6fe; border-color: rgba(167, 139, 250, 0.38); }
+
+    .fn-list { display: flex; flex-wrap: wrap; gap: 4px; direction: ltr; }
+    .fn-chip {
+      font-family: var(--mono); font-size: 11px;
+      background: var(--bg); border: 1px solid var(--border);
+      padding: 2px 6px; border-radius: 5px; color: #cbd5e1;
+      max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin: 8px 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(2, 6, 14, 0.78);
+      backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center;
+      z-index: 80; padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: min(880px, 100%); max-height: 86vh; overflow-y: auto;
+      background: var(--bg-elev); border: 1px solid var(--cyan); border-radius: 14px; padding: 20px;
+    }
+    .modal-head {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo-badge">MINE</div>
+      <div>
+        <h1>رادار البحث التلقائي عن التعدين والسكّ</h1>
+        <p>فحص تلقائي كل 1 ساعة • جميع الشبكات (المعروفة وغير المعروفة) • تسجيل دائم بلا تكرار</p>
+      </div>
+    </div>
+
+    <div class="nav-links">
+      <a class="nav-link" href="/">لوحة التحكم الرئيسية (807 شبكة)</a>
+      <a class="nav-link active" href="/mining">رادار التعدين التلقائي (1 ساعة)</a>
+      <a class="nav-link" href="/arbitrage">أربيتراج التعدين و NVIDIA</a>
+      <a class="btn btn-sm" href="/api/registry/csv" download="mining_registry.csv">تحميل اللائحة CSV</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="auto-panel">
+      <div class="auto-left">
+        <span class="dot" id="autoDot"></span>
+        <div>
+          <strong id="autoStatusTitle">الفحص التلقائي كل 1 ساعة شغال</strong>
+          <div style="font-size:12.5px; color:var(--muted);" id="autoStatusSub">جاري تحميل الحالة...</div>
+        </div>
+        <div class="timer-box" id="countdownBox">60:00</div>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="btn btn-primary" id="btnScanNow" onclick="triggerScanNow()">فحص وتسجيل الجديد دابا</button>
+        <button class="btn" onclick="inspectProvidersHealth()">صحة الـ 16 API</button>
+        <button class="btn" id="btnToggleAuto" onclick="toggleAutoScan()">إيقاف / تشغيل التلقائي</button>
+      </div>
+    </section>
+
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">إجمالي البروتوكولات المسجلة (بلا تكرار)</div>
+        <div class="kpi-value" id="kpiSavedTotal">—</div>
+        <div class="kpi-sub">محفوظة فـ mining_registry.json</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">بروتوكولات جديدة فـ آخر سكان</div>
+        <div class="kpi-value" style="color:var(--emerald);" id="kpiNewLast">—</div>
+        <div class="kpi-sub" id="kpiLastScanTime">آخر فحص: —</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">عدد دورات السكان المكتملة</div>
+        <div class="kpi-value" id="kpiTotalScans">—</div>
+        <div class="kpi-sub">807+ شبكة: EVM + Solana + Sui + Aptos + Near + TON + Cosmos + Substrate</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">عقود PoW / Hash & Epoch</div>
+        <div class="kpi-value" style="color:var(--amber);" id="kpiPowCategory">—</div>
+        <div class="kpi-sub" id="kpiMintCategory">عقود Mint / Claim</div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <input type="text" id="searchBox" placeholder="قلب بالسمية، النوع (Game, PoW, NFT)، العقد 0x، الدالة..." style="min-width: 280px;" oninput="renderTable()" />
+        <button class="pill-filter active" onclick="setFilter('ALL', this)">الكل</button>
+        <button class="pill-filter" onclick="setFilter('NEW', this)">الجداد فقط</button>
+        <button class="pill-filter" onclick="setFilter('GAME', this)">ألعاب GameFi</button>
+        <button class="pill-filter" onclick="setFilter('POW', this)">تعدين PoW / شبكة</button>
+        <button class="pill-filter" onclick="setFilter('DEFI', this)">DeFi / Staking</button>
+        <button class="pill-filter" onclick="setFilter('NFT', this)">NFT Mint</button>
+        <button class="pill-filter" onclick="setFilter('CLAIM', this)">Claim / إيردروب</button>
+      </div>
+      <div class="toolbar-group">
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;background:var(--bg);border:1px solid var(--border);padding:6px 10px;border-radius:8px;">
+          <input type="checkbox" id="chkHideNoise" checked onchange="renderTable()" />
+          <span>إخفاء التوكنات العادية و LP</span>
+        </label>
+        <span class="badge b-cyan" id="showingBadge">0 مسجّل</span>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>الحالة</th>
+            <th>اسم البروتوكول وروابطه</th>
+            <th>نوع البروتوكول</th>
+            <th>الشبكة + عنوان التوكن / العقد</th>
+            <th>الدوال المكتشفة (ABI)</th>
+            <th>رصد / Mint</th>
+            <th>أول / آخر ظهور</th>
+            <th>فحص</th>
+          </tr>
+        </thead>
+        <tbody id="registryTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title">
+      <span>سجل دورات الفحص التلقائي (كل 1 ساعة)</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th># الدورة</th>
+            <th>التوقيت (UTC)</th>
+            <th>المدة</th>
+            <th>الشبكات المفحوصة</th>
+            <th>البلوكات / المعاملات</th>
+            <th>تطابق فـ السكان</th>
+            <th>الجداد اللي تزادو</th>
+            <th>إجمالي اللائحة</th>
+          </tr>
+        </thead>
+        <tbody id="historyTbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="liveModal" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalTitle" style="margin:0; font-size:17px;">فحص مباشر</h2>
+          <small id="modalSub" style="color:var(--muted);"></small>
+        </div>
+        <button class="btn btn-sm" onclick="closeModal()">إغلاق ✕</button>
+      </div>
+      <div id="modalBody">جاري الاتصال...</div>
+    </div>
+  </div>
+
+  <script>
+    const STATE = {
+      items: [],
+      history: [],
+      auto: {},
+      filter: "ALL",
+      countdownSec: 3600
+    };
+
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, c => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]
+      ));
+    }
+
+    function fmtNum(n) {
+      const v = Number(n);
+      return Number.isFinite(v) ? v.toLocaleString("en-US") : String(n ?? "—");
+    }
+
+    function fmtTimer(sec) {
+      const s = Math.max(0, Math.floor(sec));
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+    }
+
+    function setFilter(mode, btn) {
+      STATE.filter = mode;
+      document.querySelectorAll(".pill-filter").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderTable();
+    }
+
+    async function loadRegistry() {
+      try {
+        const res = await fetch("/api/registry");
+        const data = await res.json();
+        const reg = data.registry || {};
+        STATE.auto = data.auto_scan || {};
+        STATE.items = Object.values(reg.items || {}).sort((a, b) => {
+          if (Boolean(b.is_new_in_last_scan) !== Boolean(a.is_new_in_last_scan)) {
+            return b.is_new_in_last_scan ? 1 : -1;
+          }
+          return String(b.last_seen_at || "").localeCompare(String(a.last_seen_at || ""));
+        });
+        STATE.history = reg.scan_history || [];
+        STATE.countdownSec = STATE.auto.seconds_until_next_scan ?? 3600;
+
+        renderStatusBanner(reg);
+        renderKPIs(reg);
+        renderTable();
+        renderHistory();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderStatusBanner(reg) {
+      const a = STATE.auto;
+      const dot = document.getElementById("autoDot");
+      const title = document.getElementById("autoStatusTitle");
+      const sub = document.getElementById("autoStatusSub");
+      const btnScan = document.getElementById("btnScanNow");
+      const btnTog = document.getElementById("btnToggleAuto");
+
+      if (a.running_now) {
+        dot.classList.remove("paused");
+        title.textContent = "جاري الآن البحث المباشر فـ 807+ شبكة (المعروفة وغير المعروفة) وتسجيل المكتشفين الجدد...";
+        sub.textContent = a.last_line || "يقرأ البلوكات الخام وأحداث Mint/Mining...";
+        btnScan.disabled = true;
+      } else if (a.enabled) {
+        dot.classList.remove("paused");
+        title.textContent = "المراقب التلقائي شغال (فحص كل 1 ساعة)";
+        sub.textContent = a.last_run_at
+          ? `آخر دورة: ${a.last_run_at} • الجداد المضافين: +${a.last_new_count ?? 0}`
+          : "الدورة الأولى غادي تبدا بعد لحظات وتزيد أي بروتوكول جديد تلقائياً";
+        btnScan.disabled = false;
+      } else {
+        dot.classList.add("paused");
+        title.textContent = "المراقب التلقائي متوقف مؤقتاً";
+        sub.textContent = "تقدر تشغلو فأي وقت أو دير فحص يدوي دابا";
+        btnScan.disabled = false;
+      }
+      btnTog.textContent = a.enabled ? "إيقاف التلقائي مؤقتاً" : "تفعيل الفحص كل 1 ساعة";
+    }
+
+    function renderKPIs(reg) {
+      document.getElementById("kpiSavedTotal").textContent = fmtNum(STATE.items.length);
+      const newCount = STATE.items.filter(x => x.is_new_in_last_scan).length;
+      document.getElementById("kpiNewLast").textContent = `+${fmtNum(newCount)}`;
+      document.getElementById("kpiLastScanTime").textContent = reg.updated_at ? `آخر تحديث: ${reg.updated_at}` : "لم يبدأ بعد";
+      document.getElementById("kpiTotalScans").textContent = fmtNum(reg.total_scans_completed || 0);
+
+      const powCnt = STATE.items.filter(x => /pow|تعدين/i.test(x.protocol_type || x.category || "")).length;
+      const gameCnt = STATE.items.filter(x => /game|لعبة/i.test(x.protocol_type || "")).length;
+      document.getElementById("kpiPowCategory").textContent = `${fmtNum(gameCnt)} / ${fmtNum(powCnt)}`;
+      document.getElementById("kpiMintCategory").textContent = "ألعاب GameFi / عقود تعدين PoW";
+    }
+
+    function typeBadgeHtml(ptype) {
+      const t = String(ptype || "");
+      if (/game|لعبة/i.test(t)) return `<span class="badge b-purple">${esc(t)}</span>`;
+      if (/pow|تعدين/i.test(t)) return `<span class="badge b-amber">${esc(t)}</span>`;
+      if (/staking|yield|ستيكينغ/i.test(t)) return `<span class="badge b-green">${esc(t)}</span>`;
+      if (/nft/i.test(t)) return `<span class="badge b-cyan">${esc(t)}</span>`;
+      if (/claim|مطالبة/i.test(t)) return `<span class="badge b-amber">${esc(t)}</span>`;
+      return `<span class="badge b-cyan">${esc(t || "غير مصنف")}</span>`;
+    }
+
+    function resolveExplorer(r) {
+      if (r.explorer_url) return { name: r.explorer_name || "Explorer", url: r.explorer_url };
+      const mkt = r.market_profile || {};
+      if (mkt.blockscout_url) return { name: "Blockscout", url: mkt.blockscout_url };
+      const eco = String(r.ecosystem || "").toLowerCase();
+      const addr = String(r.address || "").trim();
+      const cid = String(r.chain_id || "");
+      if (eco === "solana") return { name: "Solscan", url: `https://solscan.io/account/${addr}` };
+      if (eco === "sui") {
+        const pkg = addr.includes("::") ? addr.split("::")[0] : addr;
+        return { name: "SuiScan", url: `https://suiscan.xyz/mainnet/object/${pkg}` };
+      }
+      if (eco === "aptos") {
+        const acc = addr.includes("::") ? addr.split("::")[0] : addr;
+        return { name: "Aptoscan", url: `https://aptoscan.com/account/${acc}` };
+      }
+      if (eco === "near") return { name: "NearBlocks", url: `https://nearblocks.io/address/${addr}` };
+      if (eco === "ton") return { name: "Tonviewer", url: `https://tonviewer.com/${addr}` };
+      const known = {
+        "1": ["Etherscan", "https://etherscan.io"],
+        "56": ["BscScan", "https://bscscan.com"],
+        "137": ["Polygonscan", "https://polygonscan.com"],
+        "8453": ["Basescan", "https://basescan.org"],
+        "42161": ["Arbiscan", "https://arbiscan.io"],
+        "10": ["Optimism", "https://optimistic.etherscan.io"],
+        "42220": ["CeloScan", "https://celoscan.io"],
+      };
+      if (known[cid]) return { name: known[cid][0], url: `${known[cid][1]}/address/${addr}` };
+      return { name: "Blockscan", url: `https://blockscan.com/address/${addr}` };
+    }
+
+    async function copyAddress(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+        const orig = btn.textContent;
+        btn.textContent = "✓ تم النسخ";
+        setTimeout(() => { btn.textContent = orig; }, 1400);
+      } catch (e) {
+        btn.textContent = "!";
+      }
+    }
+
+    function shortAddr(addr) {
+      const s = String(addr || "");
+      if (s.length <= 20) return s;
+      return `${s.slice(0, 10)}...${s.slice(-8)}`;
+    }
+
+    function renderTable() {
+      const q = document.getElementById("searchBox").value.trim().toLowerCase();
+      const hideNoise = document.getElementById("chkHideNoise").checked;
+      const tbody = document.getElementById("registryTbody");
+      const filtered = STATE.items.filter(r => {
+        if (hideNoise && r.is_standard_token_noise) return false;
+        const ptype = `${r.protocol_type || ""} ${r.category || ""}`.toLowerCase();
+        if (STATE.filter === "NEW" && !r.is_new_in_last_scan) return false;
+        if (STATE.filter === "GAME" && !/game|لعبة/.test(ptype)) return false;
+        if (STATE.filter === "POW" && !/pow|تعدين توكن|تعدين شبكة|solana/.test(ptype)) return false;
+        if (STATE.filter === "DEFI" && !/staking|yield|ستيكينغ|سيولة/.test(ptype)) return false;
+        if (STATE.filter === "NFT" && !/nft|مقتنيات/.test(ptype)) return false;
+        if (STATE.filter === "CLAIM" && !/claim|مطالبة|airdrop/.test(ptype)) return false;
+        if (!q) return true;
+        const prof = r.onchain_profile || {};
+        const blob = `${r.protocol_name || ""} ${r.protocol_type || ""} ${prof.standard || ""} ${(prof.bytecode_hints || []).join(" ")} ${r.chain_name} ${r.chain_id} ${r.symbol} ${r.address} ${r.token_address || ""} ${r.explorer_name || ""} ${r.category} ${r.detection_reason} ${(r.decoded_functions || []).join(" ")}`.toLowerCase();
+        return blob.includes(q);
+      });
+
+      document.getElementById("showingBadge").textContent = `${filtered.length} بروتوكول مسجّل`;
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--muted);">ما كاينش نتائج فهاد الفلتر دابا.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => {
+        const prof = r.onchain_profile || {};
+        const mkt = r.market_profile || {};
+        const exp = resolveExplorer(r);
+        const fns = (r.decoded_functions || []).slice(0, 3).map(f => `<span class="fn-chip" title="${esc(f)}">${esc(f)}</span>`).join("");
+        const statusBadge = r.is_new_in_last_scan
+          ? `<span class="badge b-new">جديد #${r.discovered_in_scan}</span>`
+          : `<span class="badge b-green">مسجّل (#${r.discovered_in_scan})</span>`;
+        const ecoKey = r.ecosystem === "EVM" ? "EVM" : "Majors";
+        const blockKey = r.ecosystem === "EVM" ? r.chain_id : r.ecosystem.toLowerCase();
+        const stdTxt = prof.standard ? `${prof.standard} • ${fmtNum(prof.bytecode_bytes || 0)} B` : (r.ecosystem || "");
+        const verTag = (mkt.is_verified || mkt.sourcify_verified) ? ` <span class="badge b-green" style="font-size:10px;padding:1px 5px;">✓ Verified</span>` : "";
+        const priceTag = mkt.price_usd ? `<br><small class="ltr" style="color:#6ee7b7;">$${esc(mkt.price_usd)} • Liq $${fmtNum(Math.round(mkt.liquidity_usd || 0))}</small>` : "";
+        const sec = r.security_profile || {};
+        const secTag = sec.risk_level ? `<br>${secBadgeHtml(sec)}` : "";
+
+        const tokAddr = r.token_address && r.token_address !== r.address ? r.token_address : "";
+        const linkPills = [
+          `<a class="exp-pill" target="_blank" rel="noopener" href="${esc(exp.url)}" title="فتح البروتوكول فـ ${esc(exp.name)}">🔗 ${esc(exp.name)} ↗</a>`,
+          mkt.dex_url ? `<a class="exp-pill dex" target="_blank" rel="noopener" href="${esc(mkt.dex_url)}">📊 DEX ↗</a>` : "",
+          (mkt.websites && mkt.websites[0]) ? `<a class="exp-pill web" target="_blank" rel="noopener" href="${esc(mkt.websites[0])}">🌐 الموقع ↗</a>` : "",
+        ].filter(Boolean).join("");
+
+        const tokRow = tokAddr
+          ? `<div class="addr-box"><small style="color:#6ee7b7;">Token:</small><span class="addr" title="${esc(tokAddr)}">${esc(shortAddr(tokAddr))}</span><button class="copy-btn" onclick="copyAddress('${esc(tokAddr)}', this)">نسخ</button></div>`
+          : "";
+
+        return `<tr class="${r.is_new_in_last_scan ? "is-new" : ""}">
+          <td>${statusBadge}</td>
+          <td><strong>${esc(r.protocol_name || r.chain_name)}</strong>${verTag}<br><small class="ltr" style="color:var(--muted)">${esc(stdTxt)}</small>${priceTag}<div class="exp-links">${linkPills}</div></td>
+          <td>${typeBadgeHtml(r.protocol_type || r.category)}${secTag}<br><small style="color:var(--muted)">${esc(r.detection_reason)}</small></td>
+          <td>
+            <strong>${esc(r.chain_name)}</strong> <small class="ltr" style="color:var(--muted)">(${esc(r.symbol || r.chain_id)})</small>
+            <div class="addr-box">
+              <span class="addr" title="${esc(r.address)}">${esc(shortAddr(r.address))}</span>
+              <button class="copy-btn" onclick="copyAddress('${esc(r.address)}', this)" title="نسخ عنوان التوكن/العقد الكامل">نسخ</button>
+            </div>
+            ${tokRow}
+          </td>
+          <td><div class="fn-list">${fns || "<span class='fn-chip'>—</span>"}</div></td>
+          <td class="ltr"><strong>${fmtNum(r.seen_scans)}x</strong><br><small style="color:var(--muted)">Mint: ${fmtNum(r.cumulative_mints)} | Tx: ${fmtNum(r.cumulative_txs)}</small></td>
+          <td class="ltr"><small>1st: ${esc((r.first_seen_at || "").slice(11, 19))}</small><br><small style="color:var(--muted)">Last: ${esc((r.last_seen_at || "").slice(11, 19))}</small></td>
+          <td>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button class="btn btn-sm" onclick="inspectProtocolDetails('${esc(r.uid)}')">تفاصيل</button>
+              <button class="btn btn-sm" onclick="inspectLiveBlock('${esc(ecoKey)}','${esc(blockKey)}','${esc(r.chain_name)}')">لايف</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join("");
+    }
+
+    function secBadgeHtml(sec) {
+      const s = sec || {};
+      const v = s.verdict || "غير مفحوص";
+      if (s.risk_level === "high") return `<span class="badge b-rose">${esc(v)}</span>`;
+      if (s.risk_level === "low") return `<span class="badge b-green">${esc(v)}</span>`;
+      if (s.risk_level === "medium") return `<span class="badge b-amber">${esc(v)}</span>`;
+      return `<small style="color:var(--muted)">${esc(v)}</small>`;
+    }
+
+    function inspectProtocolDetails(uid) {
+      const r = STATE.items.find(x => x.uid === uid);
+      if (!r) return;
+      const prof = r.onchain_profile || {};
+      const mkt = r.market_profile || {};
+      const sec = r.security_profile || {};
+      const exp = resolveExplorer(r);
+      const links = [
+        `<a class="btn btn-sm btn-primary" target="_blank" rel="noopener" href="${esc(exp.url)}">🔗 فتح فـ ${esc(exp.name)} ↗</a>`,
+      ];
+      if (mkt.blockscout_url && mkt.blockscout_url !== exp.url) links.push(`<a class="btn btn-sm" target="_blank" rel="noopener" href="${esc(mkt.blockscout_url)}">Blockscout ↗</a>`);
+      if (mkt.dex_url) links.push(`<a class="btn btn-sm" target="_blank" rel="noopener" href="${esc(mkt.dex_url)}">DexScreener ↗</a>`);
+      if (r.ecosystem === "Solana") links.push(`<a class="btn btn-sm" target="_blank" rel="noopener" href="https://programwatch.dev/program/${esc(r.address)}">ProgramWatch ↗</a>`);
+      (mkt.websites || []).forEach(w => links.push(`<a class="btn btn-sm" target="_blank" rel="noopener" href="${esc(w)}">Website ↗</a>`));
+      document.getElementById("liveModal").classList.add("open");
+      document.getElementById("modalTitle").textContent = `تحليل البروتوكول (7 مصادر): ${r.protocol_name || r.address}`;
+      document.getElementById("modalSub").textContent = `${r.chain_name} • ${exp.name}`;
+      document.getElementById("modalBody").innerHTML = `
+        <div style="display:grid;gap:10px;">
+          <div style="background:var(--bg);padding:10px;border-radius:8px;border:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;">
+            <div><strong>عنوان العقد / التوكن:</strong> <span class="addr">${esc(r.address)}</span></div>
+            <button class="btn btn-sm" onclick="copyAddress('${esc(r.address)}', this)">نسخ العنوان الكامل</button>
+          </div>
+          <p><strong>النوع المكتشف:</strong> ${typeBadgeHtml(r.protocol_type || r.category)} &nbsp; <strong>الفحص الأمني (GoPlus / RugCheck):</strong> ${secBadgeHtml(sec)}</p>
+          <p><strong>المعيار (Standard):</strong> <span class="ltr">${esc(prof.standard || r.ecosystem)}</span> • <strong>حجم البايت كود:</strong> <span class="ltr">${fmtNum(prof.bytecode_bytes || 0)} bytes</span></p>
+          <p><strong>التحقق المصدري (Sourcify v2 / Blockscout):</strong> <span class="ltr">${mkt.sourcify_verified ? "Sourcify ✓ " : ""}${esc(mkt.verified_contract_name || "—")} ${mkt.is_verified ? "(✓ Verified)" : ""}</span> ${mkt.token_holders ? `• Holders: ${fmtNum(mkt.token_holders)}` : ""}</p>
+          ${sec.buy_tax_pct !== undefined ? `<p><strong>الضرائب والمخاطر:</strong> <span class="ltr">Buy Tax: ${sec.buy_tax_pct}% • Sell Tax: ${sec.sell_tax_pct}% • Mintable: ${sec.is_mintable ? "Yes" : "No"} • Holders: ${esc(sec.holder_count || "—")}</span></p>` : ""}
+          ${mkt.price_usd ? `<p><strong>بيانات السوق (DexScreener / GeckoTerminal):</strong> <span class="ltr">$${esc(mkt.price_usd)} • Liq: $${fmtNum(Math.round(mkt.liquidity_usd || 0))} • Vol 24h: $${fmtNum(Math.round(mkt.volume_24h_usd || 0))} ${mkt.dex_id ? "• DEX: " + esc(mkt.dex_id) : ""}</span></p>` : ""}
+          <p><strong>كلمات مفتاحية داخل البايت كود:</strong> <span class="ltr">${esc((prof.bytecode_hints || []).join(", ") || "لا يوجد")}</span></p>
+          ${links.length ? `<div style="display:flex;gap:8px;flex-wrap:wrap;">${links.join("")}</div>` : ""}
+          <p><strong>الدوال المستدعاة (4-Byte ABI):</strong></p>
+          <pre style="background:var(--bg);padding:10px;border-radius:8px;border:1px solid var(--border);direction:ltr;overflow:auto;">${esc(JSON.stringify(r.decoded_functions || [], null, 2))}</pre>
+        </div>`;
+    }
+
+    async function inspectProvidersHealth() {
+      document.getElementById("liveModal").classList.add("open");
+      document.getElementById("modalTitle").textContent = "حالة البنية الجديدة: جميع الـ APIs المفتوحة والـ RPC Rotator";
+      document.getElementById("modalSub").textContent = "فحص مباشر للاتصال وزمن الاستجابة (Zero API Key + Helius)";
+      const body = document.getElementById("modalBody");
+      body.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted);">جاري فحص جميع المزودات الـ 16 لايف...</div>`;
+      try {
+        const res = await fetch("/api/providers/health");
+        const d = await res.json();
+        const rot = d.rotator || {};
+        body.innerHTML = `
+          <p><strong>المزودات الشغالة:</strong> <span class="badge b-green">${d.online_providers} / ${d.total_providers} OK</span> • <strong>Helius Solana:</strong> ${rot.helius_configured ? "مفعّل ✓" : "غير مفعّل"} • <strong>RPC Success/Fail:</strong> <span class="ltr">${rot.total_success_calls || 0} / ${rot.total_failed_calls || 0}</span></p>
+          <div class="table-wrap"><table><thead><tr><th>المزود</th><th>الدور</th><th>الحالة</th><th>السرعة</th></tr></thead><tbody>` +
+          (d.providers || []).map(p => `<tr>
+            <td><strong>${esc(p.name)}</strong></td>
+            <td><span class="badge b-cyan">${esc(p.category)}</span></td>
+            <td><span class="badge ${p.ok ? "b-green" : "b-rose"}">${p.ok ? "✓ OK" : "ERR"} (${esc(p.status)})</span></td>
+            <td class="ltr">${p.ms} ms</td>
+          </tr>`).join("") + `</tbody></table></div>`;
+      } catch (e) {
+        body.innerHTML = `<span class="badge b-rose">${esc(e.message)}</span>`;
+      }
+    }
+
+    function renderHistory() {
+      const tbody = document.getElementById("historyTbody");
+      if (!STATE.history.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted);">مازال ما بداتش دورات الفحص.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = STATE.history.map(h => `<tr>
+        <td class="ltr"><strong>#${h.scan_id}</strong></td>
+        <td class="ltr">${esc(h.timestamp)}</td>
+        <td class="ltr">${h.duration_s}s</td>
+        <td class="ltr">${fmtNum(h.total_chains_scanned || h.evm_chains_scanned)} شبكة</td>
+        <td class="ltr">${fmtNum(h.raw_blocks_scanned)} / ${fmtNum(h.raw_txs_scanned)}</td>
+        <td class="ltr">${fmtNum(h.matched_in_scan)}</td>
+        <td><span class="badge ${h.newly_registered > 0 ? "b-new" : "b-purple"}">+${fmtNum(h.newly_registered)} جديد</span></td>
+        <td class="ltr"><strong>${fmtNum(h.total_registry_size)}</strong></td>
+      </tr>`).join("");
+    }
+
+    async function triggerScanNow() {
+      document.getElementById("btnScanNow").disabled = true;
+      await fetch("/api/registry/scan-now", { method: "POST" });
+      await loadRegistry();
+    }
+
+    async function toggleAutoScan() {
+      await fetch("/api/registry/toggle", { method: "POST" });
+      await loadRegistry();
+    }
+
+    async function inspectLiveBlock(eco, key, label) {
+      const modal = document.getElementById("liveModal");
+      const title = document.getElementById("modalTitle");
+      const sub = document.getElementById("modalSub");
+      const body = document.getElementById("modalBody");
+      modal.classList.add("open");
+      title.textContent = `قراءة مباشرة من العقدة: ${label}`;
+      sub.textContent = `Ecosystem: ${eco} | Key: ${key}`;
+      body.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted);">جاري جلب آخر بلوك...</div>`;
+      try {
+        const res = await fetch("/api/live-block", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ecosystem: eco, key })
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          body.innerHTML = `<span class="badge b-amber">${esc(data.error || "تعذر الاتصال")}</span>`;
+          return;
+        }
+        let html = `<p>البلوك الحالي: <strong class="ltr">${fmtNum(data.height)}</strong> • المعاملات: <strong class="ltr">${fmtNum(data.tx_count)}</strong> • السرعة: <strong class="ltr">${data.elapsed_ms} ms</strong></p>`;
+        if (Array.isArray(data.sample_txs) && data.sample_txs.length) {
+          html += `<div class="table-wrap"><table><thead><tr><th>Hash</th><th>من</th><th>إلى</th><th>القيمة</th><th>Selector</th></tr></thead><tbody>` +
+            data.sample_txs.map(t => `<tr><td><span class="addr">${esc((t.hash || "").slice(0, 16))}...</span></td><td><span class="addr">${esc((t.from || "").slice(0, 12))}</span></td><td><span class="addr">${esc((t.to || "").slice(0, 14))}</span></td><td class="ltr">${esc(t.value)}</td><td><span class="fn-chip">${esc(t.selector)}</span></td></tr>`).join("") +
+            `</tbody></table></div>`;
+        }
+        body.innerHTML = html;
+      } catch (e) {
+        body.innerHTML = `<span class="badge b-amber">${esc(e.message)}</span>`;
+      }
+    }
+
+    function closeModal() { document.getElementById("liveModal").classList.remove("open"); }
+
+    setInterval(() => {
+      if (STATE.auto.enabled && !STATE.auto.running_now && STATE.countdownSec > 0) {
+        STATE.countdownSec -= 1;
+      }
+      document.getElementById("countdownBox").textContent = STATE.auto.running_now ? "SCANNING" : fmtTimer(STATE.countdownSec);
+    }, 1000);
+
+    setInterval(loadRegistry, 5000);
+    loadRegistry();
+  </script>
+</body>
+</html>

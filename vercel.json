@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "includeFiles": "**"
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/dashboard/index.html" },
+    { "source": "/mining", "destination": "/dashboard/mining.html" },
+    { "source": "/arbitrage", "destination": "/dashboard/arbitrage.html" },
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/evm/(.*)", "destination": "/api/index" },
+    { "source": "/cosmos/(.*)", "destination": "/api/index" },
+    { "source": "/substrate/(.*)", "destination": "/api/index" },
+    { "source": "/major/(.*)", "destination": "/api/index" }
+  ]
+}

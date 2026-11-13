@@ -1,0 +1,42 @@
+﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
+1,Ethereum Mainnet,ETH,0x68e534a0122223a119980f6c394683bcd0215e71,67,54,10,0.0,30,"mintFree(), setApprovalForAll(address,bool), niceFunctionHerePlzClick943230089(address,bool), setFreeRate(uint256,uint256)",ABI Tokens: mint
+137,Polygon Mainnet,POL,0x251be3a17af4892035c37ebf5890f4a4d889dcad,8,3,3,0.0,21,"safeTransferFrom(address,address,uint256)",21 Mint Events (3 Callers)
+1,Ethereum Mainnet,ETH,0xd8f7bda66dfdcaa0c4298b3dca367c07d0d68976,1,1,1,0.0,15,"claim((uint256,address,address,uint256[]),bytes32[],address,bytes)",ABI Tokens: claim
+3068,Bifrost Mainnet,BFC,0x2101286b36839d214302a31c7112940387c31c7a,10,1,10,0.0,10,"mint(address,string)",ABI Tokens: mint
+1,Ethereum Mainnet,ETH,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,325,270,10,0.0,6,"transfer(address,uint256), transferFrom(address,address,uint256), approve(address,uint256), burn(uint256), collate_propagate_storage(bytes16), transferWithAuthorization(address,address,uint256,uint256,uint256,bytes32,bytes)",6 Mint Events (270 Callers)
+20181205,quarkblockchain,QKI,0xe8377ecb0f32f0c16025d5cf360d6c9e2ea66adf,6,4,6,0.0,6,"mint(), burn(uint256), collate_propagate_storage(bytes16)",ABI Tokens: mint
+137,Polygon Mainnet,POL,0xcaa7a3cdd61bc04efde75984112a1de261f5e5d1,4,1,1,0.0,4,"mint(address,uint256,string)",ABI Tokens: mint
+68414,Henesys,NXPC,0x658e287e9c820484f5808f687dc4863b552de37d,6,3,3,0.0,3,"multicall(bytes[]), mint((address,address,address,int24,int24,uint256,uint256,uint256,uint256,address,uint256))",ABI Tokens: mint
+8453,Base,ETH,0xa360c63e8e4e7ce584d8f41fb071bc80b56a3e93,3,2,2,0.0,3,"safeMint(address,string)","ABI Tokens: mint, safemint"
+137,Polygon Mainnet,POL,0xfa583f2cf7d050f33ad8a2d9d0cccbb7112b2df4,3,1,2,0.0,3,"mint(address,uint256,string)",ABI Tokens: mint
+1,Ethereum Mainnet,ETH,0xc36442b4a4522e871399cd717abdd847ab11fe88,4,4,2,0.0,2,"mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256)), multicall(bytes[]), increaseLiquidity((uint256,uint256,uint256,uint256,uint256,uint256)), safeTransferFrom(address,address,uint256,bytes)",ABI Tokens: mint
+1,Ethereum Mainnet,ETH,0xbd216513d74c8cf14cf4747e6aaa6420ff64ee9e,5,3,5,0.0,2,"modifyLiquidities(bytes,uint256), multicall(bytes[])",2 Mint Events (3 Callers)
+1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,2,1,2,0.0,2,mine(uint256),ABI Tokens: mine
+15,Diode Prenet,DIODE,0x5000000000000000000000000000000000000000,10,5,10,0.0,1,"blockReward(uint256,uint256)",ABI Tokens: reward
+42220,Celo Mainnet,CELO,0xbedaccbd65230ea441e7955c0f5344acfc2a45e5,56,56,10,0.0,0,"claim(address,address,address,uint256,uint256,bytes)",ABI Tokens: claim
+660279,Xai Mainnet,XAI,0x25226b3d1a63e071950f51f632041ecd244cd2ef,22,10,8,0.0,0,"mint(address,uint256), cat642998653(address,uint256)",ABI Tokens: mint
+1475,CRYMAD Chain,CMX-R,0x0000000000000000000000000000000000001000,11,10,10,0.000504,0,"deposit(address), distributeFinalityReward(address[],uint256[])",ABI Tokens: reward
+612055,ONE Chain Mainnet,ONE,0x0000000000000000000000000000000000001003,10,10,10,0.014295,0,"distributeReward(address,uint256)",ABI Tokens: reward
+314,Filecoin - Mainnet,FIL,0xbadd0b92c1c71d02e7d520f64c0876538fa2557f,23,7,8,3e-05,0,"provePossession(uint256,(bytes32,bytes32[])[]), addPieces(uint256,address,(bytes)[],bytes), schedulePieceDeletions(uint256,uint256[],bytes), nextProvingPeriod(uint256,uint256,bytes)","ABI Tokens: prove, provepossession"
+18896214,Crynux on Base,CNX,0xac4d943b41e117e9eb116aa8e13f614cd4afc13c,15,6,10,999500.0,0,"0x91a018ce, unstake(address), stake(uint256)",ABI Tokens: stake
+122,Fuse Mainnet,FUSE,0xd253a5203817225e9768c05e5996d642fb96ba86,5,5,5,0.0,0,claim(),ABI Tokens: claim
+10791,TrustBitcoin Mainnet,TBC,0xb8ee463d19b3dece62ab6b85198a786eebaded67,5,5,3,0.0,0,claimReward(),"ABI Tokens: claim, claimreward, reward"
+8911,Algen,ALG,0x8e4342d457a4ba4553e84f7c5ae3367283111824,5,5,1,0.0,0,claimTokens(),"ABI Tokens: claim, claimtokens"
+2786,Apertum,APTM,0x3ae2dfc3b795267e284cbab7eff9a0cefdab401d,5,4,5,0.0,0,"claimPendingRewards(uint256,uint256)",ABI Tokens: claim
+5333,Netsbo,NETS,0xe282bb31bc895bd2e8b8386f513457d43486c268,5,3,5,0.0,0,claimReward(uint256),"ABI Tokens: claim, claimreward, reward"
+2020,Ronin Mainnet,RON,0x20dfe4bd6b025ae6c70c5315c928e4ab5f25937e,4,3,2,0.0,0,"0xec925ae9, 0x2769fee5, claimTask()",ABI Tokens: claim
+8453,Base,ETH,0x9632495bdb93fd6b0740ab69cc6c71c9c01da4f0,3,3,2,0.000125,0,"deploy(uint8[]), claimETH()",ABI Tokens: claim
+2741,Abstract,ETH,0x569dcb79238866ba7198ee5b8c0c7a350f969218,3,3,3,0.0,0,"mintOnlyObjektEfficient(address[],uint256[],bool)",ABI Tokens: mint
+1155,Intuition Mainnet,TRUST,0x23c9f3f332262af2522f884dccf9fc1e94fc9e22,3,3,3,0.0,0,claim(uint256),ABI Tokens: claim
+42424242,GenLayer Mainnet,GEN,0x55a0e8c9e14309c82ab011ed2ef3cfbc49f43522,3,3,3,0.0,0,"approveHash(bytes32), execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",ABI Tokens: hash
+18896215,Crynux on RH,CNX,0xfc80e019d00f0d06cbebde648990a89c5a25b425,10,2,10,400000.0,0,"stake(uint256), 0x91a018ce, unstake(address)",ABI Tokens: stake
+43114,Avalanche C-Chain,AVAX,0x0b4478e810d48b5882d4019d435a2f864bab4f39,3,2,3,0.0,0,"mint((address,address,int24,int24,int24,uint256,uint256,uint256,uint256,address,uint256)), multicall(bytes[]), increaseLiquidity((uint256,uint256,uint256,uint256,uint256,uint256))",ABI Tokens: mint
+100009,VeChain,VET,0x6bee7ddab6c99d5b2af0554eaea484ce18f52631,3,2,2,0.0,0,"distributeRewardWithProof(bytes32,uint256,address,string[],string[],string[],uint256[],string), distributeRewardWithProofForRound(bytes32,uint256,address,string[],string[],string[],uint256[],string,uint256)",ABI Tokens: reward
+1130,DeFiChain EVM Network Mainnet,DFI,0xe4a958b29be6411a01922d809fc7bd8c3c8175bf,3,2,2,20000.0,0,"claim(), 0x68dff499",ABI Tokens: claim
+42220,Celo Mainnet,CELO,0x43d72ff17701b2da814620735c39c620ce0ea4a1,2,2,2,0.0,0,claim(),ABI Tokens: claim
+100009,VeChain,VET,0x062b9416d9584a15d80b3ea7ed107124cab3d058,2,2,2,0.0,0,"mintTokens(address,uint256), transfer(address,uint256)","ABI Tokens: mint, minttokens"
+204,opBNB Mainnet,BNB,0xa596e82b0e7d9f5c3e7841cf3f53f66b34d2c1d2,2,2,2,0.0,0,"submitEpoch(bytes32,uint256,string,uint256)",ABI Tokens: submitepoch
+20010,Mandala Chain,KPG,0x2a9c4e1c8137d7117ef0f1be70a6fe08c34d0f49,2,2,2,0.0,0,claimAndRestake(),ABI Tokens: claim
+42424242,GenLayer Mainnet,GEN,0x4e1dcf7ad4e460cfd30791ccc4f9c8a4f820ec67,2,2,2,0.0,0,"createProxyWithNonce(address,bytes,uint256)",ABI Tokens: nonce
+42420,Asset Chain Mainnet,RWA,0xd100a01e00000000000000000000000000000000,2,1,1,0.0,0,"sealEpoch(uint256[],uint256[],uint256[],uint256[]), sealEpochValidators(uint256[])",ABI Tokens: sealepoch
+8192,Torus Mainnet,TQF,0xd100a01e00000000000000000000000000000000,2,1,1,0.0,0,"sealEpoch(uint256[],uint256[],uint256[],uint256[]), sealEpochValidators(uint256[])",ABI Tokens: sealepoch
