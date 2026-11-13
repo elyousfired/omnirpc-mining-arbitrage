@@ -98,6 +98,8 @@ KNOWN_EVM_EXPLORERS: dict[str, tuple[str, str, str]] = {
     "80094": ("BeraScan", "https://berascan.com", "/address/{addr}"),
     "146": ("SonicScan", "https://sonicscan.org", "/address/{addr}"),
     "204": ("opBNBScan", "https://opbnbscan.com", "/address/{addr}"),
+    "369": ("PulseScan", "https://otter.pulsechain.com", "/address/{addr}"),
+    "1030": ("ConfluxScan", "https://evm.confluxscan.io", "/address/{addr}"),
     "143": ("MonadVision", "https://monadvision.com", "/address/{addr}"),
 }
 
@@ -426,6 +428,12 @@ def resolve_explorer_link(
         return ("NearBlocks", f"https://nearblocks.io/address/{addr}" if addr else "https://nearblocks.io")
     if eco == "ton":
         return ("Tonviewer", f"https://tonviewer.com/{addr}" if addr else "https://tonviewer.com")
+    if eco == "cardano":
+        return ("Cardanoscan", f"https://cardanoscan.io/token/{addr}" if addr else "https://cardanoscan.io")
+    if eco == "tron":
+        return ("Tronscan", f"https://tronscan.org/#/contract/{addr}" if addr else "https://tronscan.org")
+    if eco == "xrpl":
+        return ("XRPScan", "https://xrpscan.com")
     if eco == "cosmos":
         slug = cid.split("-")[0] if cid else (chain_name or "cosmos").lower().replace(" ", "-")
         return ("Mintscan", f"https://www.mintscan.io/{slug}")
@@ -562,7 +570,13 @@ async def _probe_evm_open_apis(
                             ds_chain_map = {
                                 1: "ethereum", 56: "bsc", 8453: "base", 250: "fantom",
                                 137: "polygon", 42161: "arbitrum", 10: "optimism",
-                                43114: "avalanche", 146: "sonic",
+                                43114: "avalanche", 146: "sonic", 369: "pulsechain",
+                                1030: "conflux", 80094: "berachain", 2741: "abstract",
+                                999: "hyperevm", 534352: "scroll", 59144: "linea",
+                                5000: "mantle", 130: "unichain", 57073: "ink",
+                                1868: "soneium", 167000: "taiko", 81457: "blast",
+                                34443: "mode", 1116: "core", 25: "cronos",
+                                100: "gnosis", 42220: "celo", 61: "ethereumclassic",
                             }
                             want_ds_chain = ds_chain_map.get(int(chain_id)) if str(chain_id).isdigit() else None
                             chain_pairs = [p for p in pairs if p.get("chainId") == want_ds_chain] if want_ds_chain else []
@@ -842,6 +856,239 @@ VERIFIED_MINING_DIRECTORY: dict[str, dict[str, Any]] = {
         "socials": ["https://x.com/coalonsolana"],
         "is_verified": True,
     },
+    # Small & Alternative Chain User-Mineable PoW / Fair-Mint Protocols
+    "369:0xff640cbd35a618df1348d861b5e47f7eab05b422": {
+        "protocol_name": "pMINT (PulseChain Proof-of-Mint)",
+        "protocol_type": "تعدين توكن PoW / Fair-Mint",
+        "token_symbol": "pMINT",
+        "token_address": "0xFf640cBd35A618Df1348D861B5e47f7eaB05b422",
+        "websites": ["https://pmint.win/"],
+        "socials": [],
+        "is_verified": True,
+    },
+    "369:0x06450dee7fd2fb8e39061434babcfc05599a6fb8": {
+        "protocol_name": "XEN Crypto (pXEN) — PulseChain Mint",
+        "protocol_type": "تعدين توكن PoW / Fair-Mint",
+        "token_symbol": "XEN",
+        "token_address": "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+        "websites": ["https://xen.network/", "https://docs.xen.network"],
+        "socials": ["https://x.com/xen_crypto"],
+        "is_verified": True,
+    },
+    "369:0x037645963aece8c5beb947da5621362c9f7db5a6": {
+        "protocol_name": "Mintables — PulseChain Mint dApp",
+        "protocol_type": "تعدين توكن PoW / Fair-Mint",
+        "token_symbol": "MINTABLES",
+        "token_address": "0x037645963Aece8C5Beb947dA5621362c9f7dB5a6",
+        "websites": ["https://mintables.pages.dev/"],
+        "socials": [],
+        "is_verified": True,
+    },
+    "137:0x71b821aa52a49f32eed535fca6eb5aa130085978": {
+        "protocol_name": "0xBitcoin (0xBTC) — Polygon PoW",
+        "protocol_type": "تعدين توكن PoW / GPU Mining",
+        "token_symbol": "0xBTC",
+        "token_address": "0x71b821aa52a49f32eed535fca6eb5aa130085978",
+        "websites": ["https://www.0xbitcoin.org/", "https://0xbtc.info/"],
+        "socials": [],
+        "is_verified": True,
+    },
+    "137:0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e": {
+        "protocol_name": "XEN Crypto (mXEN) — Polygon Mint",
+        "protocol_type": "تعدين توكن PoW / Fair-Mint",
+        "token_symbol": "mXEN",
+        "token_address": "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+        "websites": ["https://xen.network/", "https://docs.xen.network"],
+        "socials": ["https://x.com/xen_crypto"],
+        "is_verified": True,
+    },
+    "43114:0xc0c5aa69dbe4d6dddfbc89c0957686ec60f24389": {
+        "protocol_name": "XEN Crypto (aXEN) — Avalanche Mint",
+        "protocol_type": "تعدين توكن PoW / Fair-Mint",
+        "token_symbol": "aXEN",
+        "token_address": "0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389",
+        "websites": ["https://xen.network/", "https://docs.xen.network"],
+        "socials": ["https://x.com/xen_crypto"],
+        "is_verified": True,
+    },
+    "ton:eqc47093ox5xhb0xuk2lcr2rhs8rj-vul61u4w2uh5ormg_o": {
+        "protocol_name": "Gram (GRM) — TON GPU PoW Giver",
+        "protocol_type": "تعدين توكن PoW / GPU Mining",
+        "token_symbol": "GRM",
+        "token_address": "EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O",
+        "websites": ["https://gramcoin.org/"],
+        "socials": [],
+        "is_verified": True,
+    },
+    "ton:eqcymlrxp1qyxzkek4ctinckb1ey5tkyajqppalnetio54vt": {
+        "protocol_name": "Meridian (MRDN) — TON GPU PoW Giver",
+        "protocol_type": "تعدين توكن PoW / GPU Mining",
+        "token_symbol": "MRDN",
+        "token_address": "EQCymLRXp1QYxZKek4CTInckB1ey5TkyAJQpPAlNetiO54Vt",
+        "websites": ["https://meridian.wtf"],
+        "socials": [],
+        "is_verified": True,
+    },
+    "1:0xd536e7a9543cf9867a580b45cec7f748a1fe11ec": {
+        "protocol_name": "Ouroboros (ORX Minter) — Ethereum",
+        "protocol_type": "تعدين توكن PoW / Fair-Mint",
+        "token_symbol": "ORX",
+        "token_address": "0xd536E7A9543Cf9867a580B45CEC7F748a1FE11eC",
+        "websites": ["https://ouroboros.foundation/orx-minter"],
+        "socials": [],
+        "is_verified": True,
+    },
+    "1:0xfcd7ccee4071aa4ecfac1683b7cc0afecaf42a36": {
+        "protocol_name": "Titan Blaze (BLAZE) — Ethereum Mint",
+        "protocol_type": "تعدين توكن PoW / Fair-Mint",
+        "token_symbol": "BLAZE",
+        "token_address": "0xfcd7cceE4071aA4ecFAC1683b7CC0aFeCAF42A36",
+        "websites": ["https://app.titanblaze.win"],
+        "socials": [],
+        "is_verified": True,
+    },
+    "1:0x5c47902c8c80779cb99235e42c354e53f38c3b0d": {
+        "protocol_name": "X28 (Transform & Mine) — Ethereum",
+        "protocol_type": "تعدين توكن PoW / Fair-Mint",
+        "token_symbol": "X28",
+        "token_address": "0x5c47902c8C80779CB99235E42C354E53F38C3B0d",
+        "websites": ["https://app.x28.win/"],
+        "socials": [],
+        "is_verified": True,
+    },
+    # GPU Proof-of-Work Chains with Live Verified DexScreener Tokens
+    "1:0xfa704148d516b209d52c2d75f239274c8f8eaf1a": {
+        "protocol_name": "OctaSpace (OCTA) — GPU Ethash PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "OCTA",
+        "token_address": "0xfa704148d516b209d52c2d75f239274c8f8eaf1a",
+        "websites": ["https://octa.space/"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "OctaSpace",
+        "gpu_algo": "Ethash",
+    },
+    "56:0xd5d0322b6bab6a762c79f8c81a0b674778e13aed": {
+        "protocol_name": "Firo (FIRO) — GPU FiroPow PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "FIRO",
+        "token_address": "0xd5d0322b6bab6a762c79f8c81a0b674778e13aed",
+        "websites": ["https://firo.org/guide/how-to-mine-firo.html"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "Firo",
+        "gpu_algo": "FiroPow",
+    },
+    "cardano:04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247": {
+        "protocol_name": "Ergo (rsERG) — GPU Autolykos2 PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "ERG",
+        "token_address": "04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247",
+        "websites": ["https://ergoplatform.org/en/get-erg/#Mining"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "Ergo",
+        "gpu_algo": "Autolykos",
+    },
+    "56:0xe0e8a04242f35b95dc64b07e0eae23a8e43a78e4": {
+        "protocol_name": "Ergo (rsERG BSC) — GPU Autolykos2 PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "ERG",
+        "token_address": "0xe0E8a04242f35b95DC64b07E0eAe23A8e43A78e4",
+        "websites": ["https://ergoplatform.org/en/get-erg/#Mining"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "Ergo",
+        "gpu_algo": "Autolykos",
+    },
+    "1:0x9928a8600d14ac22c0be1e8d58909834d7ceaf13": {
+        "protocol_name": "Dynex (0xDNX) — GPU DynexSolve PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "DNX",
+        "token_address": "0x9928a8600d14ac22c0be1e8d58909834d7ceaf13",
+        "websites": ["https://dynexcoin.org/"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "Dynexcoin",
+        "gpu_algo": "DynexSolve",
+    },
+    "1:0xdb85f6685950e285b1e611037bebe5b34e2b7d78": {
+        "protocol_name": "Zano (WZANO) — GPU ProgPowZ PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "ZANO",
+        "token_address": "0xdb85f6685950E285b1E611037BEBe5B34e2B7d78",
+        "websites": ["https://zano.org/downloads"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "Zano",
+        "gpu_algo": "ProgPowZ",
+    },
+    "1030:0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b": {
+        "protocol_name": "Conflux (CFX) — GPU Octopus PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "CFX",
+        "token_address": "0x14b2D3bC65e74DAE1030EAFd8ac30c533c976A9b",
+        "websites": ["https://confluxnetwork.org/en/mining"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "Conflux",
+        "gpu_algo": "Octopus",
+    },
+    "56:0x3d6545b08693dae087e957cb1180ee38b9e3c25e": {
+        "protocol_name": "Ethereum Classic (ETC) — GPU Etchash PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "ETC",
+        "token_address": "0x3d6545b08693dae087e957cb1180ee38b9e3c25e",
+        "websites": ["https://ethereumclassic.org/mining"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "EthereumClassic",
+        "gpu_algo": "Etchash",
+    },
+    "8453:0xa1c0decafe3e9bf06a5f29b7015cd373a9854608": {
+        "protocol_name": "AI Power Grid (AIPG) — GPU KawPow PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "AIPG",
+        "token_address": "0xa1c0decafe3e9bf06a5f29b7015cd373a9854608",
+        "websites": ["https://aipowergrid.io/"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "",
+        "gpu_algo": "KawPow",
+    },
+    "1:0xe60201989b8628f43dc0605f585a72bcf1f1e977": {
+        "protocol_name": "Clore.ai (CLORE) — GPU KawPow PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "CLORE",
+        "token_address": "0xE60201989b8628F43dC0605f585a72Bcf1F1e977",
+        "websites": ["https://clore.ai/"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "",
+        "gpu_algo": "KawPow",
+    },
+    "56:0xaff9084f2374585879e8b434c399e29e80cce635": {
+        "protocol_name": "Flux (FLUX) — GPU ZelHash PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "FLUX",
+        "token_address": "0xaff9084f2374585879e8b434c399e29e80cce635",
+        "websites": ["https://runonflux.io/"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "",
+        "gpu_algo": "ZelHash",
+    },
+    "1:0x590f820444fa3638e022776752c5eef34e2f89a6": {
+        "protocol_name": "Alephium (ALPH) — GPU Blake3 PoW",
+        "protocol_type": "تعدين GPU Proof-of-Work",
+        "token_symbol": "ALPH",
+        "token_address": "0x590f820444fa3638e022776752c5eef34e2f89a6",
+        "websites": ["https://alephium.org/"],
+        "socials": [],
+        "is_verified": True,
+        "wtm_name": "",
+        "gpu_algo": "Blake3",
+    },
 }
 
 CURATED_MINING_SEEDS: list[dict[str, Any]] = [
@@ -971,13 +1218,326 @@ CURATED_MINING_SEEDS: list[dict[str, Any]] = [
         "cumulative_mints": 24000,
         "is_curated_miner": True,
     },
+    {
+        "uid": "evm:369:0xff640cbd35a618df1348d861b5e47f7eab05b422",
+        "ecosystem": "EVM",
+        "chain_id": 369,
+        "chain_name": "PulseChain",
+        "symbol": "PLS",
+        "address": "0xFf640cBd35A618Df1348D861B5e47f7eaB05b422",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified PulseChain pMINT Proof-of-Mint Protocol",
+        "decoded_functions": ["mine()", "mint()"],
+        "unique_callers": 410,
+        "cumulative_mints": 19500,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "evm:369:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+        "ecosystem": "EVM",
+        "chain_id": 369,
+        "chain_name": "PulseChain",
+        "symbol": "PLS",
+        "address": "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified PulseChain XEN Fair-Mint Contract",
+        "decoded_functions": ["claimRank(uint256)", "claimMintReward()"],
+        "unique_callers": 310,
+        "cumulative_mints": 21000,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "evm:369:0x037645963aece8c5beb947da5621362c9f7db5a6",
+        "ecosystem": "EVM",
+        "chain_id": 369,
+        "chain_name": "PulseChain",
+        "symbol": "PLS",
+        "address": "0x037645963Aece8C5Beb947dA5621362c9f7dB5a6",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified PulseChain Mintables Wallet-Mint dApp",
+        "decoded_functions": ["mint()"],
+        "unique_callers": 140,
+        "cumulative_mints": 8000,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "evm:137:0x71b821aa52a49f32eed535fca6eb5aa130085978",
+        "ecosystem": "EVM",
+        "chain_id": 137,
+        "chain_name": "Polygon Mainnet",
+        "symbol": "POL",
+        "address": "0x71b821aa52a49f32eed535fca6eb5aa130085978",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified Polygon 0xBitcoin ERC-918 GPU PoW Token",
+        "decoded_functions": ["mint(uint256,bytes32)", "getChallengeNumber()"],
+        "unique_callers": 180,
+        "cumulative_mints": 14000,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "evm:137:0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
+        "ecosystem": "EVM",
+        "chain_id": 137,
+        "chain_name": "Polygon Mainnet",
+        "symbol": "POL",
+        "address": "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified Polygon mXEN Fair-Mint Contract",
+        "decoded_functions": ["claimRank(uint256)", "claimMintReward()"],
+        "unique_callers": 290,
+        "cumulative_mints": 26000,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "evm:43114:0xc0c5aa69dbe4d6dddfbc89c0957686ec60f24389",
+        "ecosystem": "EVM",
+        "chain_id": 43114,
+        "chain_name": "Avalanche C-Chain",
+        "symbol": "AVAX",
+        "address": "0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified Avalanche aXEN Fair-Mint Contract",
+        "decoded_functions": ["claimRank(uint256)", "claimMintReward()"],
+        "unique_callers": 160,
+        "cumulative_mints": 12000,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "ton:mainnet:EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O",
+        "ecosystem": "TON",
+        "chain_id": "ton",
+        "chain_name": "TON Mainnet",
+        "symbol": "TON",
+        "address": "EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O",
+        "category": "PoW / GPU Mining Giver",
+        "detection_reason": "Verified TON GPU OpenCL/CUDA PoW Jetton (Gram)",
+        "decoded_functions": ["pow_mine()", "gpu_hash()"],
+        "unique_callers": 900,
+        "cumulative_mints": 85000,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "ton:mainnet:EQCymLRXp1QYxZKek4CTInckB1ey5TkyAJQpPAlNetiO54Vt",
+        "ecosystem": "TON",
+        "chain_id": "ton",
+        "chain_name": "TON Mainnet",
+        "symbol": "TON",
+        "address": "EQCymLRXp1QYxZKek4CTInckB1ey5TkyAJQpPAlNetiO54Vt",
+        "category": "PoW / GPU Mining Giver",
+        "detection_reason": "Verified TON GPU OpenCL/CUDA PoW Jetton (Meridian)",
+        "decoded_functions": ["pow_mine()", "gpu_hash()"],
+        "unique_callers": 620,
+        "cumulative_mints": 42000,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "evm:1:0xd536e7a9543cf9867a580b45cec7f748a1fe11ec",
+        "ecosystem": "EVM",
+        "chain_id": 1,
+        "chain_name": "Ethereum Mainnet",
+        "symbol": "ETH",
+        "address": "0xd536E7A9543Cf9867a580B45CEC7F748a1FE11eC",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified Ouroboros ORX Minter (attachMinter + mint)",
+        "decoded_functions": ["mint()", "attachMinter()"],
+        "unique_callers": 190,
+        "cumulative_mints": 9500,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "evm:1:0xfcd7ccee4071aa4ecfac1683b7cc0afecaf42a36",
+        "ecosystem": "EVM",
+        "chain_id": 1,
+        "chain_name": "Ethereum Mainnet",
+        "symbol": "ETH",
+        "address": "0xfcd7cceE4071aA4ecFAC1683b7CC0aFeCAF42A36",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified Titan Blaze Miner UI (app.titanblaze.win)",
+        "decoded_functions": ["mintReward()"],
+        "unique_callers": 170,
+        "cumulative_mints": 8400,
+        "is_curated_miner": True,
+    },
+    {
+        "uid": "evm:1:0x5c47902c8c80779cb99235e42c354e53f38c3b0d",
+        "ecosystem": "EVM",
+        "chain_id": 1,
+        "chain_name": "Ethereum Mainnet",
+        "symbol": "ETH",
+        "address": "0x5c47902c8C80779CB99235E42C354E53F38C3B0d",
+        "category": "PoW / Hash & Epoch Mining",
+        "detection_reason": "Verified X28 Miner UI (app.x28.win)",
+        "decoded_functions": ["mintX28withTitanX()"],
+        "unique_callers": 210,
+        "cumulative_mints": 11000,
+        "is_curated_miner": True,
+    },
+    # GPU Proof-of-Work Small & Major Chains (RTX 4090 / 4070 / 5090 + Verified DexScreener)
+    {
+        "uid": "evm:1:0xfa704148d516b209d52c2d75f239274c8f8eaf1a",
+        "ecosystem": "EVM",
+        "chain_id": 1,
+        "chain_name": "OctaSpace (Ethash)",
+        "symbol": "ETH",
+        "address": "0xfa704148d516b209d52c2d75f239274c8f8eaf1a",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "Small L1 GPU Ethash PoW + Verified wOCTA on DexScreener",
+        "decoded_functions": ["gpu_pow(Ethash)", "mine()"],
+        "unique_callers": 350,
+        "cumulative_mints": 25000,
+        "is_curated_miner": True,
+        "wtm_name": "OctaSpace",
+        "gpu_algo": "Ethash",
+    },
+    {
+        "uid": "evm:56:0xd5d0322b6bab6a762c79f8c81a0b674778e13aed",
+        "ecosystem": "EVM",
+        "chain_id": 56,
+        "chain_name": "Firo (BSC Bridge)",
+        "symbol": "BNB",
+        "address": "0xd5d0322b6bab6a762c79f8c81a0b674778e13aed",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU FiroPow L1 + Verified FIRO on DexScreener",
+        "decoded_functions": ["gpu_pow(FiroPow)", "mine()"],
+        "unique_callers": 480,
+        "cumulative_mints": 30000,
+        "is_curated_miner": True,
+        "wtm_name": "Firo",
+        "gpu_algo": "FiroPow",
+    },
+    {
+        "uid": "cardano:mainnet:04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247",
+        "ecosystem": "Cardano",
+        "chain_id": "cardano",
+        "chain_name": "Ergo / Cardano (rsERG)",
+        "symbol": "ADA",
+        "address": "04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU Autolykos2 L1 + Verified Rosen Bridge rsERG on DexScreener",
+        "decoded_functions": ["gpu_pow(Autolykos)", "mine()"],
+        "unique_callers": 640,
+        "cumulative_mints": 45000,
+        "is_curated_miner": True,
+        "wtm_name": "Ergo",
+        "gpu_algo": "Autolykos",
+    },
+    {
+        "uid": "evm:1:0x9928a8600d14ac22c0be1e8d58909834d7ceaf13",
+        "ecosystem": "EVM",
+        "chain_id": 1,
+        "chain_name": "Dynex (ETH Bridge)",
+        "symbol": "ETH",
+        "address": "0x9928a8600d14ac22c0be1e8d58909834d7ceaf13",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU DynexSolve PoW L1 + Verified 0xDNX on DexScreener",
+        "decoded_functions": ["gpu_pow(DynexSolve)", "mine()"],
+        "unique_callers": 410,
+        "cumulative_mints": 32000,
+        "is_curated_miner": True,
+        "wtm_name": "Dynexcoin",
+        "gpu_algo": "DynexSolve",
+    },
+    {
+        "uid": "evm:1:0xdb85f6685950e285b1e611037bebe5b34e2b7d78",
+        "ecosystem": "EVM",
+        "chain_id": 1,
+        "chain_name": "Zano (ETH Bridge)",
+        "symbol": "ETH",
+        "address": "0xdb85f6685950E285b1E611037BEBe5B34e2B7d78",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU ProgPowZ L1 + Verified WZANO on DexScreener",
+        "decoded_functions": ["gpu_pow(ProgPowZ)", "mine()"],
+        "unique_callers": 390,
+        "cumulative_mints": 29000,
+        "is_curated_miner": True,
+        "wtm_name": "Zano",
+        "gpu_algo": "ProgPowZ",
+    },
+    {
+        "uid": "evm:1030:0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b",
+        "ecosystem": "EVM",
+        "chain_id": 1030,
+        "chain_name": "Conflux eSpace",
+        "symbol": "CFX",
+        "address": "0x14b2D3bC65e74DAE1030EAFd8ac30c533c976A9b",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU Octopus PoW L1 + Verified WCFX on DexScreener",
+        "decoded_functions": ["gpu_pow(Octopus)", "mine()"],
+        "unique_callers": 720,
+        "cumulative_mints": 55000,
+        "is_curated_miner": True,
+        "wtm_name": "Conflux",
+        "gpu_algo": "Octopus",
+    },
+    {
+        "uid": "evm:56:0x3d6545b08693dae087e957cb1180ee38b9e3c25e",
+        "ecosystem": "EVM",
+        "chain_id": 56,
+        "chain_name": "Ethereum Classic (BSC)",
+        "symbol": "BNB",
+        "address": "0x3d6545b08693dae087e957cb1180ee38b9e3c25e",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU Etchash L1 + Verified BSC ETC on DexScreener",
+        "decoded_functions": ["gpu_pow(Etchash)", "mine()"],
+        "unique_callers": 900,
+        "cumulative_mints": 75000,
+        "is_curated_miner": True,
+        "wtm_name": "EthereumClassic",
+        "gpu_algo": "Etchash",
+    },
+    {
+        "uid": "evm:8453:0xa1c0decafe3e9bf06a5f29b7015cd373a9854608",
+        "ecosystem": "EVM",
+        "chain_id": 8453,
+        "chain_name": "AI Power Grid (Base)",
+        "symbol": "ETH",
+        "address": "0xa1c0decafe3e9bf06a5f29b7015cd373a9854608",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU KawPow AI Inference PoW + Verified Base AIPG on DexScreener",
+        "decoded_functions": ["gpu_pow(KawPow)", "mine()"],
+        "unique_callers": 320,
+        "cumulative_mints": 21000,
+        "is_curated_miner": True,
+        "gpu_algo": "KawPow",
+    },
+    {
+        "uid": "evm:1:0xe60201989b8628f43dc0605f585a72bcf1f1e977",
+        "ecosystem": "EVM",
+        "chain_id": 1,
+        "chain_name": "Clore.ai (ETH)",
+        "symbol": "ETH",
+        "address": "0xE60201989b8628F43dC0605f585a72Bcf1F1e977",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU KawPow PoW + GPU Marketplace on DexScreener",
+        "decoded_functions": ["gpu_pow(KawPow)", "mine()"],
+        "unique_callers": 340,
+        "cumulative_mints": 22000,
+        "is_curated_miner": True,
+        "gpu_algo": "KawPow",
+    },
+    {
+        "uid": "evm:56:0xaff9084f2374585879e8b434c399e29e80cce635",
+        "ecosystem": "EVM",
+        "chain_id": 56,
+        "chain_name": "Flux (BSC Bridge)",
+        "symbol": "BNB",
+        "address": "0xaff9084f2374585879e8b434c399e29e80cce635",
+        "category": "GPU Proof-of-Work",
+        "detection_reason": "GPU ZelHash PoW L1 + Verified BSC FLUX on DexScreener",
+        "decoded_functions": ["gpu_pow(ZelHash)", "mine()"],
+        "unique_callers": 440,
+        "cumulative_mints": 28000,
+        "is_curated_miner": True,
+        "gpu_algo": "ZelHash",
+    },
 ]
 
 
 def _apply_verified_directory(item: dict[str, Any]) -> None:
     """Enforce verified names, websites, symbols, and token addresses for known real mining protocols."""
     addr_l = str(item.get("address") or "").strip().lower()
-    meta = VERIFIED_MINING_DIRECTORY.get(addr_l)
+    cid_l = str(item.get("chain_id") or "").strip().lower()
+    meta = VERIFIED_MINING_DIRECTORY.get(f"{cid_l}:{addr_l}") or VERIFIED_MINING_DIRECTORY.get(addr_l)
     if not meta:
         return
     mkt = item.setdefault("market_profile", {"probed": True})
@@ -987,6 +1547,10 @@ def _apply_verified_directory(item: dict[str, Any]) -> None:
     item["is_standard_token_noise"] = False
     item["is_curated_miner"] = True
     item["token_address"] = meta["token_address"]
+    if meta.get("wtm_name"):
+        item["wtm_name"] = meta["wtm_name"]
+    if meta.get("gpu_algo"):
+        item["gpu_algo"] = meta["gpu_algo"]
     mkt["resolved_token_address"] = meta["token_address"]
     mkt["reward_token_symbol"] = meta["token_symbol"]
     mkt["websites"] = list(meta["websites"])
@@ -1031,6 +1595,11 @@ async def enrich_registry_items_onchain(items: list[dict[str, Any]]) -> None:
             or (item.get("is_curated_miner") and not item.get("market_profile", {}).get("price_usd"))
         )
     ]
+    to_probe_other_dex = [
+        item for item in items
+        if item.get("ecosystem") not in ("EVM", "Solana")
+        and not item.get("market_profile", {}).get("price_usd")
+    ]
 
     connector = aiohttp.TCPConnector(limit=35, ssl=False)
     headers = {"User-Agent": "OmniRPC-ArchV2/2.0"}
@@ -1057,6 +1626,13 @@ async def enrich_registry_items_onchain(items: list[dict[str, Any]]) -> None:
                 for item in to_probe_ext
             ))
             for item, (mkt, sec) in zip(to_probe_ext, ext_results):
+                old_mkt = item.get("market_profile") or {}
+                merged_sites = filter_project_urls(list(mkt.get("websites") or []) + list(old_mkt.get("websites") or []))
+                if merged_sites:
+                    mkt["websites"] = merged_sites
+                for k in ("price_usd", "liquidity_usd", "volume_24h_usd", "dex_url", "dex_base_token", "reward_token_symbol", "blockscout_token_name"):
+                    if not mkt.get(k) and old_mkt.get(k):
+                        mkt[k] = old_mkt[k]
                 item["market_profile"] = mkt
                 item["security_profile"] = sec
 
@@ -1068,8 +1644,9 @@ async def enrich_registry_items_onchain(items: list[dict[str, Any]]) -> None:
                 for item in to_probe_sol
             ))
             for item, (mkt, sec) in zip(to_probe_sol, sol_results):
+                old_mkt = item.get("market_profile") or {}
                 # Also enrich DexScreener price for Solana/SVM tokens
-                tok = (item.get("market_profile") or {}).get("resolved_token_address") or item.get("token_address") or item["address"]
+                tok = old_mkt.get("resolved_token_address") or item.get("token_address") or item["address"]
                 try:
                     async with session.get(f"https://api.dexscreener.com/latest/dex/tokens/{tok}", timeout=aiohttp.ClientTimeout(total=7)) as rds:
                         if rds.status == 200:
@@ -1083,8 +1660,38 @@ async def enrich_registry_items_onchain(items: list[dict[str, Any]]) -> None:
                                 mkt["dex_url"] = top.get("url") or ""
                 except Exception:
                     pass
+                merged_sites = filter_project_urls(list(mkt.get("websites") or []) + list(old_mkt.get("websites") or []))
+                if merged_sites:
+                    mkt["websites"] = merged_sites
                 item["market_profile"] = mkt
                 item["security_profile"] = sec
+
+        if to_probe_other_dex:
+            async def _probe_other(item: dict[str, Any]) -> None:
+                mkt = item.setdefault("market_profile", {"probed": True})
+                tok = mkt.get("resolved_token_address") or item.get("token_address") or item.get("address") or ""
+                if not tok:
+                    return
+                try:
+                    async with session.get(f"https://api.dexscreener.com/latest/dex/tokens/{tok}", timeout=aiohttp.ClientTimeout(total=7)) as rds:
+                        if rds.status == 200:
+                            dds = await rds.json(content_type=None)
+                            pairs = [p for p in (dds.get("pairs") or []) if p.get("chainId") not in ("robinhood", "arc")]
+                            if pairs:
+                                cid_l = str(item.get("chain_id") or "").lower()
+                                same_ch = [p for p in pairs if str(p.get("chainId") or "").lower() == cid_l]
+                                pool_list = same_ch or pairs
+                                top = max(pool_list, key=lambda p: float((p.get("liquidity") or {}).get("usd") or 0))
+                                mkt["price_usd"] = top.get("priceUsd")
+                                mkt["liquidity_usd"] = (top.get("liquidity") or {}).get("usd")
+                                mkt["volume_24h_usd"] = (top.get("volume") or {}).get("h24")
+                                mkt["dex_url"] = top.get("url") or ""
+                                base = top.get("baseToken") or {}
+                                if base.get("symbol") and not mkt.get("reward_token_symbol"):
+                                    mkt["reward_token_symbol"] = base.get("symbol")
+                except Exception:
+                    pass
+            await asyncio.gather(*(_probe_other(it) for it in to_probe_other_dex))
 
     for item in items:
         eco = item.get("ecosystem", "EVM")
@@ -1121,9 +1728,15 @@ async def enrich_registry_items_onchain(items: list[dict[str, Any]]) -> None:
             item["protocol_type"] = "حركة Sui Move (Mining/Mint)"
             item["protocol_name"] = item.get("address", "")
             item["is_standard_token_noise"] = False
-        elif eco in ("Aptos", "Near", "TON", "Cosmos", "Substrate"):
+        elif eco in ("Aptos", "Near", "TON", "Cosmos", "Substrate", "Cardano", "Tron", "XRPL"):
             cat = item.get("category") or f"{eco} Mining/Mint"
-            item["protocol_type"] = "تعدين توكن PoW / Fair-Mint" if "pow" in cat.lower() else f"بروتوكول {eco} (Mining/Mint)"
+            cat_l = cat.lower()
+            if "gpu proof-of-work" in cat_l:
+                item["protocol_type"] = "تعدين GPU Proof-of-Work"
+            elif "pow" in cat_l:
+                item["protocol_type"] = "تعدين توكن PoW / Fair-Mint"
+            else:
+                item["protocol_type"] = f"بروتوكول {eco} (Mining/Mint)"
             item["protocol_name"] = item.get("protocol_name") or f"{eco}: {str(item.get('address', ''))[:24]}"
             item["is_standard_token_noise"] = False
         _apply_verified_directory(item)

@@ -177,8 +177,8 @@
     <div class="brand">
       <div class="logo-badge">ARB</div>
       <div>
-        <h1>رادار وأربيتراج التعدين والـ Mint</h1>
-        <p>فقط البروتوكولات اللي تقدر تخدمها بنفسك (واجهة Mint / التعدين + توكن حي على DexScreener)</p>
+        <h1>رادار وأربيتراج تعدين GPU PoW والـ Fair-Mint</h1>
+        <p>فحص كل الشبكات (الصغيرة والكبيرة) • فقط مشاريع تقدر تعدّنها بـ GPU أو تمنتيها من الموقع الرسمي + DexScreener</p>
       </div>
     </div>
 
@@ -252,10 +252,10 @@
       <div class="toolbar">
         <div class="toolbar-group">
           <input type="text" id="searchBox" placeholder="ابحث بالاسم، التوكن، الموقع، العنوان 0x... أو الشبكة..." style="min-width:250px;" oninput="renderOnchainTable()" />
-          <button class="pill-filter active" onclick="setFilter('ALL', this)">الكل (تعدين وموقع رسمي)</button>
+          <button class="pill-filter active" onclick="setFilter('ALL', this)">الكل (GPU PoW + Fair-Mint)</button>
+          <button class="pill-filter" onclick="setFilter('GPU_POW', this)">تعدين GPU PoW فقط</button>
+          <button class="pill-filter" onclick="setFilter('MINT_TX', this)">واجهة Mint / On-Chain فقط</button>
           <button class="pill-filter" onclick="setFilter('VERIFIED', this)">موثّق فقط (Verified)</button>
-          <button class="pill-filter" onclick="setFilter('CUDA', this)">PoW / CLI / GPU فقط</button>
-          <button class="pill-filter" onclick="setFilter('PRICED', this)">عندها سعر وسيولة</button>
           <button class="pill-filter" onclick="setFilter('STRONG', this)">فرص عالية (Score &gt;= 60)</button>
         </div>
         <span class="badge b-cyan" id="onchainCountBadge">0 بروتوكول</span>
@@ -378,6 +378,8 @@
       const rows = (STATE.data && STATE.data.onchain_protocols) || [];
       const q = document.getElementById("searchBox").value.trim().toLowerCase();
       const filtered = rows.filter(r => {
+        if (STATE.filter === "GPU_POW" && !r.is_gpu_pow) return false;
+        if (STATE.filter === "MINT_TX" && r.is_gpu_pow) return false;
         if (STATE.filter === "VERIFIED" && r.verification_level !== "verified") return false;
         if (STATE.filter === "CUDA" && !r.is_cuda_pow) return false;
         if (STATE.filter === "PRICED" && !r.price_usd) return false;
@@ -413,7 +415,13 @@
           : `<span style="color:var(--muted);">بدون سعر DEX بعد</span>`;
 
         let beHtml = "";
-        if (r.breakeven_tokens_tx !== null && r.breakeven_tokens_tx !== undefined) {
+        if (r.is_gpu_pow && r.est_coins_day !== null && r.est_coins_day !== undefined) {
+          const coinsStr = r.est_coins_day < 0.01 ? r.est_coins_day.toFixed(5) : fmtNum(r.est_coins_day, 3);
+          const netCls = (r.net_day_usd ?? 0) >= 0 ? "#6ee7b7" : "#fb7185";
+          const netSign = (r.net_day_usd ?? 0) >= 0 ? "+" : "";
+          const bePxStr = r.breakeven_coin_price_usd ? `$${r.breakeven_coin_price_usd < 0.01 ? r.breakeven_coin_price_usd.toPrecision(3) : fmtNum(r.breakeven_coin_price_usd, 3)}` : "—";
+          beHtml = `<strong class="ltr" style="color:${netCls};">Net: ${netSign}$${fmtNum(r.net_day_usd, 2)} / يوم</strong><br><small class="ltr" style="color:var(--muted);">${coinsStr} ${esc(r.token_symbol)}/day ($${fmtNum(r.gross_day_usd, 2)}) • BE: ${bePxStr}</small>`;
+        } else if (r.breakeven_tokens_tx !== null && r.breakeven_tokens_tx !== undefined) {
           const beTxStr = r.breakeven_tokens_tx > 0 && r.breakeven_tokens_tx < 0.01 ? r.breakeven_tokens_tx.toFixed(4) : fmtNum(r.breakeven_tokens_tx, 3);
           const beHrStr = r.breakeven_tokens_hr > 0 && r.breakeven_tokens_hr < 0.1 ? r.breakeven_tokens_hr.toFixed(4) : fmtNum(r.breakeven_tokens_hr, 2);
           beHtml = `<strong class="ltr" style="color:#6ee7b7;">${beTxStr} ${esc(r.token_symbol)} / tx</strong><br><small class="ltr" style="color:var(--muted);">${beHrStr} / hr ($${fmtNum(r.breakeven_usd_tx, 5)}/tx)</small>`;

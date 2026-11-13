@@ -51,6 +51,11 @@ GPU_PROFILES: dict[str, dict[str, Any]] = {
             "FishHash": ("MH/s", 32.0),
             "KarlsenHash": ("GH/s", 0.85),
             "QPoW": ("MH/s", 1.3),
+            "Ethash": ("MH/s", 62.0),
+            "FiroPow": ("MH/s", 32.0),
+            "ProgPowZ": ("MH/s", 33.0),
+            "DynexSolve": ("H/s", 6500.0),
+            "Blake3": ("GH/s", 1.8),
         },
     },
     "rtx4090": {
@@ -69,6 +74,11 @@ GPU_PROFILES: dict[str, dict[str, Any]] = {
             "FishHash": ("MH/s", 68.0),
             "KarlsenHash": ("GH/s", 2.15),
             "QPoW": ("MH/s", 2.8),
+            "Ethash": ("MH/s", 128.0),
+            "FiroPow": ("MH/s", 70.0),
+            "ProgPowZ": ("MH/s", 72.0),
+            "DynexSolve": ("H/s", 13200.0),
+            "Blake3": ("GH/s", 3.6),
         },
     },
     "rtx5090": {
@@ -87,6 +97,11 @@ GPU_PROFILES: dict[str, dict[str, Any]] = {
             "FishHash": ("MH/s", 96.0),
             "KarlsenHash": ("GH/s", 3.1),
             "QPoW": ("MH/s", 4.0),
+            "Ethash": ("MH/s", 185.0),
+            "FiroPow": ("MH/s", 98.0),
+            "ProgPowZ": ("MH/s", 102.0),
+            "DynexSolve": ("H/s", 19000.0),
+            "Blake3": ("GH/s", 5.2),
         },
     },
     "rig6x3060ti": {
@@ -105,6 +120,11 @@ GPU_PROFILES: dict[str, dict[str, Any]] = {
             "FishHash": ("MH/s", 144.0),
             "KarlsenHash": ("GH/s", 3.3),
             "QPoW": ("MH/s", 6.0),
+            "Ethash": ("MH/s", 360.0),
+            "FiroPow": ("MH/s", 155.0),
+            "ProgPowZ": ("MH/s", 160.0),
+            "DynexSolve": ("H/s", 28000.0),
+            "Blake3": ("GH/s", 7.5),
         },
     },
 }
@@ -141,6 +161,13 @@ NATIVE_SYMBOL_TO_BINANCE: dict[str, str] = {
     "CRO": "CROUSDT",
     "BERA": "BERAUSDT",
     "SEI": "SEIUSDT",
+    "ADA": "ADAUSDT",
+    "TRX": "TRXUSDT",
+    "CFX": "CFXUSDT",
+    "ETC": "ETCUSDT",
+    "XRP": "XRPUSDT",
+    "GLMR": "GLMRUSDT",
+    "CELO": "CELOUSDT",
 }
 
 _MARKET_CACHE: dict[str, Any] = {"ts": 0.0, "prices": {}, "wtm": {}, "gas_gwei": {}}
@@ -190,7 +217,48 @@ async def _fetch_live_market_inputs(session: aiohttp.ClientSession, omni: OmniRP
             pass
 
     async def load_wtm() -> None:
-        return
+        try:
+            async with session.get(
+                "https://whattomine.com/coins.json",
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=aiohttp.ClientTimeout(total=8),
+            ) as r:
+                if r.status == 200:
+                    data = await r.json(content_type=None)
+                    coins_obj = data.get("coins") if isinstance(data, dict) else {}
+                    if isinstance(coins_obj, dict):
+                        for cname, meta in coins_obj.items():
+                            if not isinstance(meta, dict) or meta.get("lagging"):
+                                continue
+                            entry = {"name": cname, **meta}
+                            wtm_coins[cname.lower()] = entry
+                            tag = str(meta.get("tag") or "").upper()
+                            if tag and tag not in wtm_coins:
+                                wtm_coins[tag] = entry
+        except Exception:
+            pass
+        try:
+            async with session.get(
+                "https://api.woolypooly.com/api/stats",
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=aiohttp.ClientTimeout(total=7),
+            ) as rw:
+                if rw.status == 200:
+                    wp = await rw.json(content_type=None)
+                    if isinstance(wp, dict) and isinstance(wp.get("alph-1"), dict):
+                        ap = wp["alph-1"]
+                        alph_entry = {
+                            "name": "Alephium",
+                            "tag": "ALPH",
+                            "algorithm": "Blake3",
+                            "nethash": ap.get("netHashrate"),
+                            "block_time": ap.get("blockTime"),
+                            "block_reward": ap.get("blockReward"),
+                        }
+                        wtm_coins.setdefault("alephium", alph_entry)
+                        wtm_coins.setdefault("ALPH", alph_entry)
+        except Exception:
+            pass
 
     async def probe_gas(cid: str) -> None:
         try:
@@ -265,12 +333,21 @@ def _estimate_tx_gas_usd(item: dict[str, Any], prices: dict[str, float], gas_gwe
     if eco == "near":
         near_px = prices.get("NEAR", 4.0)
         return round(0.001 * near_px, 6)
+    if eco == "cardano":
+        return round(0.17 * prices.get("ADA", 0.5), 5)
+    if eco == "tron":
+        return round(1.0 * prices.get("TRX", 0.25), 5)
+    if eco == "xrpl":
+        return round(0.0001 * prices.get("XRP", 1.5), 6)
     if eco == "cosmos":
         return 0.005
 
     cid = str(item.get("chain_id") or "")
     sym = (item.get("symbol") or "ETH").upper()
-    nat_px = prices.get(sym, prices.get("ETH", 2500.0) if sym == "ETH" else 0.5)
+    if cid == "369" or sym == "PLS":
+        nat_px = 0.00004
+    else:
+        nat_px = prices.get(sym, prices.get("ETH", 2500.0) if sym == "ETH" else 0.2)
     gwei = gas_gwei.get(cid)
     if gwei is None:
         gwei = 15.0 if cid == "1" else 0.05
@@ -300,7 +377,10 @@ def _compute_verification(item: dict[str, Any]) -> tuple[str, str, bool]:
     mkt = item.get("market_profile") or {}
     bc_bytes = int(prof.get("bytecode_bytes") or 0)
     is_src_verified = bool(mkt.get("is_verified") or mkt.get("sourcify_verified"))
-    has_onchain_code = bc_bytes > 0 if eco == "EVM" else (int(item.get("unique_callers") or 0) >= 2 or bool(mkt.get("verified_contract_name")))
+    has_non_evm_proof = bool(mkt.get("verified_contract_name")) or (
+        bool(item.get("is_curated_miner")) and bool(mkt.get("dex_url"))
+    )
+    has_onchain_code = bc_bytes > 0 if eco == "EVM" else (int(item.get("unique_callers") or 0) >= 2 or has_non_evm_proof)
 
     if is_src_verified and has_onchain_code:
         return ("verified", "✅ موثّق ومؤكد", True)
@@ -339,11 +419,22 @@ async def compute_arbitrage_snapshot(
             _load_blockscout_map(session),
         )
         prices = mkt_cache["prices"]
+        wtm_map = mkt_cache.get("wtm") or {}
         btc_usd = prices.get("BTC", 80000.0)
+
+    def _unit_mult(u: str) -> float:
+        ul = u.lower()
+        if ul.startswith("gh"):
+            return 1e9
+        if ul.startswith("mh"):
+            return 1e6
+        if ul.startswith("kh"):
+            return 1e3
+        return 1.0
 
     gpu_coins: list[dict[str, Any]] = []
 
-    # Evaluate On-Chain Mining Protocols (from 1h scanner registry)
+    # Evaluate On-Chain Mining & GPU PoW Protocols (from 1h scanner registry)
     onchain_rows: list[dict[str, Any]] = []
     gas_gwei = mkt_cache.get("gas_gwei") or {}
 
@@ -357,16 +448,73 @@ async def compute_arbitrage_snapshot(
         prof = item.get("onchain_profile") or {}
         ptype = str(item.get("protocol_type") or item.get("category") or "")
         fns_blob = " ".join(item.get("decoded_functions") or []).lower()
+        token_sym = _extract_token_symbol(item)
+        wtm_name = str(item.get("wtm_name") or "").strip()
+        gpu_algo_pref = str(item.get("gpu_algo") or "").strip()
 
-        is_cuda_pow = (
+        wtm_entry = None
+        if wtm_name and wtm_name.lower() in wtm_map:
+            wtm_entry = wtm_map[wtm_name.lower()]
+        elif token_sym.upper() in wtm_map and ("gpu" in ptype.lower() or "pow" in ptype.lower() or gpu_algo_pref):
+            wtm_entry = wtm_map[token_sym.upper()]
+
+        matched_algo = gpu_algo_pref or (str(wtm_entry.get("algorithm") or "") if wtm_entry else "")
+        is_gpu_pow = bool(
+            matched_algo
+            or wtm_entry
+            or "gpu proof-of-work" in ptype.lower()
+            or "gpu proof-of-work" in str(item.get("category") or "").lower()
+        )
+        is_cuda_pow = is_gpu_pow or (
             "pow" in ptype.lower()
             or "epoch" in ptype.lower()
             or any(
                 k in fns_blob
-                for k in ("mine(", "log: mine", "drill", "nonce", "pow", "difficulty", "sealepoch", "submitepoch", "provepossession", "glaze", "giver", "mine_ore", "claim_coal", "bitz")
+                for k in ("mine(", "log: mine", "drill", "nonce", "pow", "difficulty", "sealepoch", "submitepoch", "provepossession", "glaze", "giver", "mine_ore", "claim_coal", "bitz", "proof_of_work")
             )
         )
-        if eco == "Solana" or "eclipse" in cname.lower():
+
+        # Look up exact GPU hashrate & compute WhatToMine live daily PoW yield
+        algo_spec = gpu["algos"].get(matched_algo)
+        if not algo_spec and matched_algo:
+            for k_alg, v_alg in gpu["algos"].items():
+                if k_alg.lower() == matched_algo.lower():
+                    algo_spec = v_alg
+                    matched_algo = k_alg
+                    break
+
+        px = _to_float(mkt.get("price_usd"))
+        liq = _to_float(mkt.get("liquidity_usd"))
+        vol24 = _to_float(mkt.get("volume_24h_usd"))
+        gas_tx = _estimate_tx_gas_usd(item, prices, gas_gwei)
+        gas_hr = gas_tx * tx_per_hr
+
+        est_coins_day = None
+        gross_day_usd = None
+        net_day_usd = None
+        breakeven_coin_px = None
+        gpu_hashrate_label = ""
+
+        if is_gpu_pow and algo_spec and wtm_entry:
+            unit, hr_val = algo_spec
+            gpu_hashrate_label = f"{hr_val} {unit}"
+            nethash = _to_float(wtm_entry.get("nethash"))
+            blk_time = _to_float(wtm_entry.get("block_time"))
+            blk_rew = _to_float(wtm_entry.get("block_reward"))
+            if nethash > 0 and blk_time > 0 and blk_rew > 0:
+                our_hps = hr_val * _unit_mult(unit)
+                est_coins_day = (our_hps / nethash) * (86400.0 / blk_time) * blk_rew * 0.99
+                if px > 0 and est_coins_day > 0:
+                    gross_day_usd = est_coins_day * px
+                    net_day_usd = gross_day_usd - machine_cost_day
+                    breakeven_coin_px = machine_cost_day / est_coins_day
+                    gpu_coins.append({"symbol": token_sym, "net_day_usd": net_day_usd})
+
+        if is_gpu_pow and gpu_hashrate_label:
+            mining_mode = f"GPU {matched_algo} ({gpu_hashrate_label})"
+        elif is_gpu_pow:
+            mining_mode = f"GPU {matched_algo or 'PoW'} Miner"
+        elif eco == "Solana" or "eclipse" in cname.lower():
             mining_mode = "CLI / GPU Miner (PoW)" if is_cuda_pow else "SVM Mint / Miner"
         elif any(k in ptype.lower() for k in ("node", "storage", "depin")) or any(k in fns_blob for k in ("provepossession", "submitepoch", "sealepoch")):
             mining_mode = "Node / Epoch Miner"
@@ -375,19 +523,18 @@ async def compute_arbitrage_snapshot(
         else:
             mining_mode = "RPC Bot / Fair Mint"
 
-        px = _to_float(mkt.get("price_usd"))
-        liq = _to_float(mkt.get("liquidity_usd"))
-        vol24 = _to_float(mkt.get("volume_24h_usd"))
-        gas_tx = _estimate_tx_gas_usd(item, prices, gas_gwei)
-        gas_hr = gas_tx * tx_per_hr
-        # For CUDA PoW, include GPU rental/electricity cost; for RPC Bot/Mint, mostly gas + tiny VPS/PC cost
+        # For GPU PoW, use full selected GPU hourly cost; for RPC Bot/Mint, mostly gas + tiny VPS/PC cost
         effective_machine_hr = machine_cost_hr if is_cuda_pow else (0.02 if mode == "cloud" else 0.01)
-        total_cost_hr = effective_machine_hr + gas_hr
+        total_cost_hr = effective_machine_hr + (0.0 if is_gpu_pow else gas_hr)
 
         breakeven_usd_hr = round(total_cost_hr, 4)
         breakeven_usd_tx = round(total_cost_hr / tx_per_hr, 5) if tx_per_hr > 0 else round(total_cost_hr, 5)
         breakeven_tokens_hr = round(total_cost_hr / px, 4) if px > 0 else None
-        breakeven_tokens_tx = round((total_cost_hr / tx_per_hr) / px, 4) if (px > 0 and tx_per_hr > 0) else None
+        breakeven_tokens_tx = (
+            round(machine_cost_day / px, 4)
+            if (is_gpu_pow and px > 0)
+            else (round((total_cost_hr / tx_per_hr) / px, 4) if (px > 0 and tx_per_hr > 0) else None)
+        )
 
         ver_level, ver_label, is_code_ok = _compute_verification(item)
         websites = [w for w in (mkt.get("websites") or []) if isinstance(w, str) and w.startswith(("http://", "https://"))]
@@ -433,6 +580,10 @@ async def compute_arbitrage_snapshot(
 
         if risk == "high":
             verdict = "🔴 خطر / Honeypot"
+        elif is_gpu_pow and net_day_usd is not None and net_day_usd > 0:
+            verdict = "🟢 تعدين GPU مربح لايف"
+        elif is_gpu_pow and gross_day_usd is not None and gross_day_usd > 0:
+            verdict = "🟡 تعدين GPU (دخل < كلفة)"
         elif score >= 60 and liq >= 5000:
             verdict = "🟢 فرصة أربيتراج قوية"
         elif px > 0 and liq >= 1000:
@@ -443,10 +594,10 @@ async def compute_arbitrage_snapshot(
             verdict = "⚪ غير مسعّر / بلا سيولة"
 
         exp_name, exp_url = resolve_explorer_link(eco, cid, cname, addr, chainid_map, bs_map)
-        token_sym = _extract_token_symbol(item)
 
         onchain_rows.append({
             "uid": item.get("uid"),
+            "kind": "gpu_pow" if is_gpu_pow else "mint_tx",
             "protocol_name": item.get("protocol_name") or addr[:14],
             "token_symbol": token_sym,
             "address": addr,
@@ -459,6 +610,13 @@ async def compute_arbitrage_snapshot(
             "standard": prof.get("standard") or eco,
             "mining_mode": mining_mode,
             "is_cuda_pow": is_cuda_pow,
+            "is_gpu_pow": is_gpu_pow,
+            "gpu_algo": matched_algo,
+            "gpu_hashrate": gpu_hashrate_label,
+            "est_coins_day": round(est_coins_day, 5) if est_coins_day is not None else None,
+            "gross_day_usd": round(gross_day_usd, 3) if gross_day_usd is not None else None,
+            "net_day_usd": round(net_day_usd, 3) if net_day_usd is not None else None,
+            "breakeven_coin_price_usd": round(breakeven_coin_px, 6) if breakeven_coin_px is not None else None,
             "verification_level": ver_level,
             "verification_label": ver_label,
             "is_code_confirmed": is_code_ok,
@@ -487,7 +645,12 @@ async def compute_arbitrage_snapshot(
         })
 
     onchain_rows.sort(
-        key=lambda r: (r["price_usd"] is not None, r["arbitrage_score"], r["is_cuda_pow"], r["liquidity_usd"], r["unique_callers"]),
+        key=lambda r: (
+            r["price_usd"] is not None,
+            r["net_day_usd"] if r["net_day_usd"] is not None else -9999.0,
+            r["arbitrage_score"],
+            r["liquidity_usd"],
+        ),
         reverse=True,
     )
 

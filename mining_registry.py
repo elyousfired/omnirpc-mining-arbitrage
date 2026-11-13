@@ -54,6 +54,9 @@ NON_MINING_KEYWORDS = (
     "ct3keys", "toy-story", "astroverse", "strands trade", "ubischeme",
     "claim / airdrop", "test strategy", "seadrop", "ethereum name service",
     "gnosis", "safe proxy", "bananaminer", "banana miner", "stkaave", "swbera",
+    "copper miners", "copxon", "jetton", "mtonga", "ton cat", "ton inu",
+    "the virus", "proof of karl", "bonk", "edenorex", "mint club", "mint token", "proof of bagwork",
+    "dragon coin", "zendawg", "never give up", "antminer", "minted hub",
     "staking / yield", "سيولة defi", "سكّ nft", "توكن عادي", "لعبة ويب 3",
     "مطالبة ومكافآت", "ستيكينغ",
 )
@@ -84,6 +87,12 @@ def is_actionable_mining_protocol(item: dict[str, Any]) -> bool:
     if addr_l in NON_MINING_ADDRESSES:
         return False
     mkt = item.get("market_profile") or {}
+    chain_l = str(item.get("chain_name") or "").lower()
+    cid_l = str(item.get("chain_id") or "").lower()
+    if cid_l in ("arc", "robinhood", "46630") or any(
+        t in chain_l for t in ("testnet", "sepolia", "goerli", "holesky", "amoy", "devnet", "robinhood")
+    ) or "arc " in chain_l or chain_l == "arc":
+        return False
     pname = str(item.get("protocol_name") or "").lower()
     ptype = str(item.get("protocol_type") or "").lower()
     vname = str(mkt.get("verified_contract_name") or "").lower()
@@ -98,7 +107,7 @@ def is_actionable_mining_protocol(item: dict[str, Any]) -> bool:
         w for w in (mkt.get("websites") or [])
         if isinstance(w, str) and w.startswith(("http://", "https://"))
     ]
-    ui_sites = [w for w in websites if "github.com" not in w.lower()]
+    ui_sites = [w for w in websites if "github.com" not in w.lower() and "mint.club" not in w.lower()]
     if not ui_sites:
         return False
 

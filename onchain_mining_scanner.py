@@ -582,17 +582,30 @@ async def scan_pow_l1_summary(session: aiohttp.ClientSession) -> dict[str, Any]:
     return {"pow_l1_ok": len(chains), "chains": chains}
 
 
-async def run_scan(max_evm_chains: int = 650, blocks_back: int = 10, all_ecosystems: bool = True) -> dict[str, Any]:
+async def run_scan(max_evm_chains: int = 650, blocks_back: int = 10, all_ecosystems: bool = True, evm_offset: int = 0) -> dict[str, Any]:
     t0 = time.perf_counter()
     omni = OmniRPC()
-    evm_chains = omni.pool.get("evm", [])
+    evm_chains = [
+        c for c in omni.pool.get("evm", [])
+        if c.get("chain_id") != 46630 and not any(
+            bad in str(c.get("name") or "").lower()
+            for bad in ("testnet", "sepolia", "goerli", "holesky", "amoy", "devnet", "robinhood")
+        )
+    ]
     cosmos_chains = omni.pool.get("cosmos", []) if all_ecosystems else []
     sub_chains = omni.pool.get("substrate", []) if all_ecosystems else []
 
-    # Prioritize diverse active chains + obscure chains (including Robinhood, Monad, Base, HyperEVM, Abstract, etc.)
-    priority_ids = {1, 8453, 42161, 10, 56, 137, 43114, 143, 999, 4663, 2741, 57073, 130, 146, 80094, 534352, 59144, 5000, 167000, 1088, 1890, 252, 360, 19, 14, 25}
+    # Prioritize diverse active chains + small/obscure PoW & alt EVM chains (excluding testnets)
+    priority_ids = {
+        1, 8453, 42161, 10, 56, 137, 43114, 143, 999, 2741, 57073, 130, 146,
+        80094, 534352, 59144, 5000, 167000, 1088, 1890, 252, 360, 19, 14, 25,
+        369, 1030, 61, 2000, 10001, 1284, 100, 42220, 1116, 30, 800001,
+    }
     prioritized = [c for c in evm_chains if c["chain_id"] in priority_ids]
     others = [c for c in evm_chains if c["chain_id"] not in priority_ids]
+    if others and evm_offset:
+        off = evm_offset % len(others)
+        others = others[off:] + others[:off]
     selected_evm = (prioritized + others)[:max_evm_chains]
 
     connector = aiohttp.TCPConnector(limit=55, ssl=False)
