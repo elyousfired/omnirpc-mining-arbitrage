@@ -58,12 +58,23 @@
       "category": "directive",
       "text": "الرفض الصارم لشبكات التجربة (testnets: robinhood, arc, sepolia)، ألعاب النقرات (idle clickers)، مخططات AI-agent-only (amber, jagent)، صناديق ETF، مواقع القمار، والميم كوينز بدون عقود حقيقية.",
       "active": true
+    },
+    {
+      "timestamp": "2026-11-13T21:52:00Z",
+      "category": "directive",
+      "text": "فين ما تلقى شي بروتوكول جديد ديال تعدين GPU PoW أو Fair-Mint، صيفطو لينا هنا فوراً بجميع التفاصيل ديالو عبر صندوق التنبيهات (notifications_queue).",
+      "active": true
     }
   ],
   "conversation_notes": [
     {
       "timestamp": "2026-11-13T21:44:43Z",
       "summary": "تفعيل الذاكرة التراكمية الدائمة (user_directives, conversation_notes, priority_chains, watchlist_queries, rejected_patterns) + بحث Google Search أضاف عملتين GPU PoW مؤكدتين: Tari (wXTM) و Quai Network (QUAI) مع كشف فخ neox.so و Alephium Blake3 ASIC و ETHW CEX-only.",
+      "applied": true
+    },
+    {
+      "timestamp": "2026-11-13T21:53:09Z",
+      "summary": "إضافة قاعدة التنبيه الفوري ونظام صندوق التنبيهات (notifications_queue) مع أوامر --show-alerts و --ack-alerts لإرسال أي بروتوكول GPU PoW أو Fair-Mint جديد فوراً بالتفاصيل الكاملة.",
       "applied": true
     }
   ],
@@ -103,5 +114,6 @@
     "idle clicker",
     "mint.club",
     "pump.fun"
-  ]
+  ],
+  "notifications_queue": []
 }

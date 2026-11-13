@@ -69,6 +69,12 @@ DEFAULT_USER_DIRECTIVES: list[dict[str, Any]] = [
         "text": "الرفض الصارم لشبكات التجربة (testnets: robinhood, arc, sepolia)، ألعاب النقرات (idle clickers)، مخططات AI-agent-only (amber, jagent)، صناديق ETF، مواقع القمار، والميم كوينز بدون عقود حقيقية.",
         "active": True,
     },
+    {
+        "timestamp": "2026-11-13T21:52:00Z",
+        "category": "directive",
+        "text": "فين ما تلقى شي بروتوكول جديد ديال تعدين GPU PoW أو Fair-Mint، صيفطو لينا هنا فوراً بجميع التفاصيل ديالو عبر صندوق التنبيهات (notifications_queue).",
+        "active": True,
+    },
 ]
 
 DEFAULT_PRIORITY_CHAINS: list[str] = [
@@ -153,6 +159,9 @@ def _ensure_long_term_memory(mem: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(mem.get("conversation_notes"), list):
         mem["conversation_notes"] = []
 
+    if not isinstance(mem.get("notifications_queue"), list):
+        mem["notifications_queue"] = []
+
     existing_chains = mem.get("priority_chains")
     if not isinstance(existing_chains, list) or not existing_chains:
         mem["priority_chains"] = list(DEFAULT_PRIORITY_CHAINS)
@@ -226,6 +235,61 @@ def record_user_directive(
 
     save_agent_memory(mem, path=path)
     return mem
+
+
+def _build_discovery_alert(item: dict[str, Any], cycle_num: int, discovered_at: str) -> dict[str, Any]:
+    """Create a structured notification alert payload for a newly discovered protocol."""
+    mkt = item.get("market_profile") or {}
+    ptype_l = str(item.get("protocol_type") or "").lower()
+    cat_l = str(item.get("category") or "").lower()
+    kind = "gpu_pow" if ("gpu" in ptype_l or "gpu" in cat_l) else "mint_tx"
+    websites = [w for w in (mkt.get("websites") or []) if isinstance(w, str) and w.startswith(("http://", "https://"))]
+    uid = str(item.get("uid") or f"{item.get('chain_id')}:{str(item.get('address') or '').strip().lower()}")
+    return {
+        "id": f"alert-{cycle_num}-{uid}",
+        "discovered_at": discovered_at,
+        "cycle_id": cycle_num,
+        "uid": uid,
+        "protocol_name": str(item.get("protocol_name") or uid),
+        "token_symbol": str(mkt.get("token_symbol") or item.get("symbol") or ""),
+        "chain_name": str(item.get("chain_name") or ""),
+        "kind": kind,
+        "price_usd": mkt.get("price_usd"),
+        "liquidity_usd": mkt.get("liquidity_usd"),
+        "website": websites[0] if websites else "",
+        "dex_url": str(mkt.get("dex_url") or ""),
+        "explorer_url": str(item.get("explorer_url") or ""),
+        "reported_to_chat": False,
+    }
+
+
+def get_unreported_alerts(path: Path = AGENT_MEMORY_PATH) -> list[dict[str, Any]]:
+    """Return all queued discovery alerts that have not yet been reported to chat."""
+    mem = load_agent_memory(path)
+    return [
+        a for a in (mem.get("notifications_queue") or [])
+        if isinstance(a, dict) and not a.get("reported_to_chat")
+    ]
+
+
+def acknowledge_alerts(alert_ids: list[str] | None = None, path: Path = AGENT_MEMORY_PATH) -> int:
+    """Mark unreported alerts (or specific alert IDs) as reported_to_chat=True."""
+    mem = load_agent_memory(path)
+    queue = list(mem.get("notifications_queue") or [])
+    target_set = {str(aid) for aid in (alert_ids or []) if str(aid).strip()}
+    now_iso = utc_now_iso()
+    acked = 0
+    for alert in queue:
+        if not isinstance(alert, dict) or alert.get("reported_to_chat"):
+            continue
+        if not target_set or str(alert.get("id") or "") in target_set:
+            alert["reported_to_chat"] = True
+            alert["reported_at"] = now_iso
+            acked += 1
+    if acked:
+        mem["notifications_queue"] = queue
+        save_agent_memory(mem, path=path)
+    return acked
 
 
 def _matches_rejected_patterns(item: dict[str, Any], rejected_patterns: list[str]) -> str | None:
@@ -508,6 +572,7 @@ async def run_agent_cycle(
             pruned_old += 1
 
     new_added_names: list[str] = []
+    new_alerts: list[dict[str, Any]] = []
     updated_count = 0
 
     for it in verified_this_cycle:
@@ -541,6 +606,15 @@ async def run_agent_cycle(
             it["agent_reasoning"] = f"{kind_tag} • موثّق على {it.get('chain_name')}"
 
         merged_items[uid] = it
+        if is_brand_new:
+            alert = _build_discovery_alert(it, cycle_num, now_iso)
+            new_alerts.append(alert)
+            print(
+                f"[NEW_DISCOVERY_ALERT] {alert['protocol_name']} ({alert['token_symbol']}) "
+                f"on {alert['chain_name']} | kind={alert['kind']} | price=${alert['price_usd']} "
+                f"| liq=${alert['liquidity_usd']} | site={alert['website']} | dex={alert['dex_url']}",
+                flush=True,
+            )
 
     duration_s = round(time.perf_counter() - t0, 1)
     evm_scanned = int(onchain_report.get("evm_chains_scanned") or 0)
@@ -619,6 +693,14 @@ async def run_agent_cycle(
     mem["priority_chains"] = priority_chains
     mem["watchlist_queries"] = watchlist_queries
     mem["rejected_patterns"] = rejected_patterns
+    existing_queue = [a for a in (mem.get("notifications_queue") or []) if isinstance(a, dict)]
+    if new_alerts:
+        seen_uids = {str(a.get("uid") or "") for a in existing_queue}
+        for alert in new_alerts:
+            if alert["uid"] not in seen_uids:
+                existing_queue.append(alert)
+                seen_uids.add(alert["uid"])
+    mem["notifications_queue"] = existing_queue[-50:]
     save_agent_memory(mem)
 
     return {"registry": out_reg, "agent_memory": mem}
@@ -639,7 +721,30 @@ def main() -> None:
         choices=["directive", "note", "conversation_note", "priority_chain", "watchlist_query", "rejected_pattern"],
         help="Category for --remember",
     )
+    parser.add_argument("--show-alerts", action="store_true", help="Print unreported discovery alerts from notifications_queue")
+    parser.add_argument("--ack-alerts", action="store_true", help="Mark all unreported alerts as reported_to_chat=True")
     args = parser.parse_args()
+
+    if args.show_alerts:
+        mem = load_agent_memory()
+        unreported = get_unreported_alerts()
+        print(
+            json.dumps(
+                {
+                    "unreported_count": len(unreported),
+                    "total_alerts": len(mem.get("notifications_queue") or []),
+                    "alerts": unreported,
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
+        return
+
+    if args.ack_alerts:
+        acked = acknowledge_alerts()
+        print(json.dumps({"status": "acknowledged", "acknowledged_count": acked}, indent=2, ensure_ascii=False))
+        return
 
     if args.remember.strip():
         mem = record_user_directive(args.remember.strip(), category=args.category)
