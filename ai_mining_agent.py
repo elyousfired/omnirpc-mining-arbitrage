@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import re
 import time
 from typing import Any
 
@@ -43,34 +44,215 @@ ADAPTIVE_QUERY_POOL = [
     ["epoch mine", "proof of useful work", "gpu mine", "fair launch pow", "titan", "pulsechain pow", "ton pow"],
 ]
 
+DEFAULT_USER_DIRECTIVES: list[dict[str, Any]] = [
+    {
+        "timestamp": "2026-11-13T21:40:00Z",
+        "category": "directive",
+        "text": "عدم تصفير mining_registry.json أبداً؛ الحفاظ على كل البروتوكولات القديمة (first_seen_at, seen_scans) وإضافة البروتوكولات الجديدة فقط كل ساعة.",
+        "active": True,
+    },
+    {
+        "timestamp": "2026-11-13T21:40:00Z",
+        "category": "directive",
+        "text": "التركيز على بروتوكولات GPU PoW القابلة للتعدين ببطاقات NVIDIA وبروتوكولات Fair-Mint ذات واجهة Web3 رسمية حقيقية + سعر وسيولة موثقين على DexScreener.",
+        "active": True,
+    },
+    {
+        "timestamp": "2026-11-13T21:40:00Z",
+        "category": "directive",
+        "text": "تغطية الشبكات الصغيرة والمغمورة (PulseChain, Conflux, TON, Cardano, Base, Polygon, Arbitrum, Solana, Cosmos, Substrate) بالإضافة للشبكات الكبيرة.",
+        "active": True,
+    },
+    {
+        "timestamp": "2026-11-13T21:40:00Z",
+        "category": "directive",
+        "text": "الرفض الصارم لشبكات التجربة (testnets: robinhood, arc, sepolia)، ألعاب النقرات (idle clickers)، مخططات AI-agent-only (amber, jagent)، صناديق ETF، مواقع القمار، والميم كوينز بدون عقود حقيقية.",
+        "active": True,
+    },
+]
+
+DEFAULT_PRIORITY_CHAINS: list[str] = [
+    "PulseChain",
+    "Conflux eSpace",
+    "TON",
+    "Cardano",
+    "Base",
+    "Polygon",
+    "Arbitrum",
+    "Solana",
+    "Cosmos",
+    "Substrate",
+    "BNB Smart Chain",
+    "Ethereum",
+]
+
+DEFAULT_WATCHLIST_QUERIES: list[str] = [
+    "tari wxtm",
+    "quai network",
+    "neoxa",
+    "karlsen",
+    "xelis",
+    "pulsechain pow",
+    "conflux mine",
+    "fair mint pow",
+]
+
+DEFAULT_REJECTED_PATTERNS: list[str] = [
+    "neox.so",
+    "robinhood",
+    "arc",
+    "sepolia",
+    "amber",
+    "jagent",
+    "ethereumpow.org",
+    "tap to earn",
+    "idle clicker",
+    "mint.club",
+    "pump.fun",
+]
+
+
+def _dedupe_str_list(values: list[Any]) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for v in values:
+        s = str(v or "").strip()
+        if s and s.lower() not in seen:
+            seen.add(s.lower())
+            out.append(s)
+    return out
+
+
+def _ensure_long_term_memory(mem: dict[str, Any]) -> dict[str, Any]:
+    """Backfill persistent long-term memory fields without erasing existing user data."""
+    mem.setdefault("agent_name", "OmniRPC Autonomous Mining Agent")
+    mem.setdefault("version", "1.1")
+    mem.setdefault("total_cycles", 0)
+    mem.setdefault("cursor_evm_offset", 0)
+    mem.setdefault("cursor_bs_offset", 0)
+    mem.setdefault("cursor_query_batch", 0)
+    mem.setdefault("last_cycle_at", None)
+    mem.setdefault("known_protocols_count", 0)
+    mem.setdefault("newly_added_last_cycle", 0)
+    mem.setdefault("ai_llm_enabled", bool(os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")))
+    mem.setdefault("last_agent_brief_ar", "جاهز لبدء أول دورة بحث وتجميع تلقائي للبروتوكولات.")
+    mem.setdefault("cycle_logs", [])
+
+    existing_directives = mem.get("user_directives")
+    if not isinstance(existing_directives, list) or not existing_directives:
+        mem["user_directives"] = [dict(d) for d in DEFAULT_USER_DIRECTIVES]
+    else:
+        seen_dir = {
+            (d.get("text", "") if isinstance(d, dict) else str(d)).strip().lower()
+            for d in existing_directives
+        }
+        for d in DEFAULT_USER_DIRECTIVES:
+            if d["text"].strip().lower() not in seen_dir:
+                existing_directives.append(dict(d))
+
+    if not isinstance(mem.get("conversation_notes"), list):
+        mem["conversation_notes"] = []
+
+    existing_chains = mem.get("priority_chains")
+    if not isinstance(existing_chains, list) or not existing_chains:
+        mem["priority_chains"] = list(DEFAULT_PRIORITY_CHAINS)
+    else:
+        mem["priority_chains"] = _dedupe_str_list(existing_chains)
+
+    existing_watch = mem.get("watchlist_queries")
+    if not isinstance(existing_watch, list) or not existing_watch:
+        mem["watchlist_queries"] = list(DEFAULT_WATCHLIST_QUERIES)
+    else:
+        mem["watchlist_queries"] = _dedupe_str_list(existing_watch)
+
+    existing_rej = mem.get("rejected_patterns")
+    if not isinstance(existing_rej, list) or not existing_rej:
+        mem["rejected_patterns"] = list(DEFAULT_REJECTED_PATTERNS)
+    else:
+        mem["rejected_patterns"] = _dedupe_str_list(existing_rej)
+
+    return mem
+
 
 def load_agent_memory(path: Path = AGENT_MEMORY_PATH) -> dict[str, Any]:
     if path.exists():
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
             if isinstance(data, dict):
-                data.setdefault("cycle_logs", [])
-                return data
+                return _ensure_long_term_memory(data)
         except Exception:
             pass
-    return {
-        "agent_name": "OmniRPC Autonomous Mining Agent",
-        "version": "1.0",
-        "total_cycles": 0,
-        "cursor_evm_offset": 0,
-        "cursor_bs_offset": 0,
-        "cursor_query_batch": 0,
-        "last_cycle_at": None,
-        "known_protocols_count": 0,
-        "newly_added_last_cycle": 0,
-        "ai_llm_enabled": bool(os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")),
-        "last_agent_brief_ar": "جاهز لبدء أول دورة بحث وتجميع تلقائي للبروتوكولات.",
-        "cycle_logs": [],
-    }
+    return _ensure_long_term_memory({})
 
 
 def save_agent_memory(mem: dict[str, Any], path: Path = AGENT_MEMORY_PATH) -> None:
+    _ensure_long_term_memory(mem)
     path.write_text(json.dumps(mem, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def record_user_directive(
+    text: str,
+    category: str = "directive",
+    path: Path = AGENT_MEMORY_PATH,
+) -> dict[str, Any]:
+    """Persist a user directive, conversation note, priority chain, watchlist query, or rejected pattern."""
+    clean = str(text or "").strip()
+    if not clean:
+        raise ValueError("Directive text cannot be empty.")
+    mem = load_agent_memory(path)
+    cat = str(category or "directive").strip().lower()
+    now_iso = utc_now_iso()
+
+    if cat in ("note", "conversation", "conversation_note"):
+        notes = list(mem.get("conversation_notes") or [])
+        if not notes or str((notes[-1] or {}).get("summary") or "").strip() != clean:
+            notes.append({"timestamp": now_iso, "summary": clean, "applied": True})
+        mem["conversation_notes"] = notes[-100:]
+    elif cat in ("priority_chain", "chain"):
+        mem["priority_chains"] = _dedupe_str_list(list(mem.get("priority_chains") or []) + [clean])
+    elif cat in ("watchlist", "watchlist_query", "query"):
+        mem["watchlist_queries"] = _dedupe_str_list(list(mem.get("watchlist_queries") or []) + [clean])
+    elif cat in ("reject", "rejected", "rejected_pattern"):
+        mem["rejected_patterns"] = _dedupe_str_list(list(mem.get("rejected_patterns") or []) + [clean])
+    else:
+        directives = list(mem.get("user_directives") or [])
+        existing_texts = {
+            (d.get("text", "") if isinstance(d, dict) else str(d)).strip().lower()
+            for d in directives
+        }
+        if clean.lower() not in existing_texts:
+            directives.append({"timestamp": now_iso, "category": cat, "text": clean, "active": True})
+        mem["user_directives"] = directives
+
+    save_agent_memory(mem, path=path)
+    return mem
+
+
+def _matches_rejected_patterns(item: dict[str, Any], rejected_patterns: list[str]) -> str | None:
+    """Return the matching rejected pattern if a candidate matches long-term memory exclusions."""
+    if not rejected_patterns:
+        return None
+    mkt = item.get("market_profile") or {}
+    chain_l = str(item.get("chain_name") or "").lower()
+    cid_l = str(item.get("chain_id") or "").lower()
+    pname_l = str(item.get("protocol_name") or "").lower()
+    addr_l = str(item.get("address") or "").lower()
+    urls = [str(u).lower() for u in (mkt.get("websites") or [])]
+    dex_url = str(mkt.get("dex_url") or "").lower()
+    blob = " ".join([chain_l, cid_l, pname_l, addr_l, dex_url] + urls)
+
+    for pat in rejected_patterns:
+        p = str(pat or "").strip().lower()
+        if not p:
+            continue
+        if len(p) <= 4 and "." not in p and " " not in p:
+            # Short token like 'arc': require exact chain/id match or whole-word match
+            if cid_l == p or chain_l == p or re.search(rf"\b{re.escape(p)}\b", f"{chain_l} {pname_l}"):
+                return pat
+        else:
+            if p in blob:
+                return pat
+    return None
 
 
 async def _gemini_verify_candidates(
@@ -202,19 +384,23 @@ async def run_agent_cycle(
 
     t0 = time.perf_counter()
 
-    # 1. OBSERVE: Load existing accumulated protocols + AI Agent memory
+    # 1. OBSERVE: Load existing accumulated protocols + AI Agent persistent long-term memory
     prev_reg = load_registry()
     prev_items: dict[str, dict[str, Any]] = dict(prev_reg.get("items") or {})
     mem = load_agent_memory()
     cycle_num = int(mem.get("total_cycles") or prev_reg.get("total_scans_completed") or 0) + 1
 
-    # 2. PLAN: Compute adaptive rotation windows across chains, Blockscout, & query batches
+    # 2. PLAN: Read long-term memory (priority_chains, watchlist_queries, rejected_patterns) + rotating windows
+    priority_chains = _dedupe_str_list(mem.get("priority_chains") or [])
+    watchlist_queries = _dedupe_str_list(mem.get("watchlist_queries") or [])
+    rejected_patterns = _dedupe_str_list(mem.get("rejected_patterns") or [])
+
     omni = OmniRPC()
     evm_pool_size = max(1, len(omni.pool.get("evm") or []))
     evm_offset = int(mem.get("cursor_evm_offset") or 0) % evm_pool_size
     bs_offset = int(mem.get("cursor_bs_offset") or 0) % 90
     q_idx = int(mem.get("cursor_query_batch") or 0) % len(ADAPTIVE_QUERY_POOL)
-    cycle_queries = list(dict.fromkeys(SEARCH_QUERIES + ADAPTIVE_QUERY_POOL[q_idx]))
+    cycle_queries = list(dict.fromkeys(SEARCH_QUERIES + ADAPTIVE_QUERY_POOL[q_idx] + watchlist_queries))
     chain_resolver = _build_chain_resolver(omni)
 
     # 3. ACT: Execute RPC block scan + WhatToMine/WoolyPooly + Blockscout + DexScreener discovery
@@ -235,7 +421,7 @@ async def run_agent_cycle(
             _discover_blockscout_small_chains(session, max_explorers=28, offset=bs_offset),
             _refresh_existing_market_prices(session, prev_items),
         )
-        # Temporarily expand module SEARCH_QUERIES during discovery
+        # Temporarily expand module SEARCH_QUERIES during discovery (including watchlist_queries)
         import hourly_mint_scanner as _hms
         orig_queries = list(_hms.SEARCH_QUERIES)
         _hms.SEARCH_QUERIES = cycle_queries
@@ -249,11 +435,15 @@ async def run_agent_cycle(
     # Collect curated + newly discovered + live on-chain candidates
     raw_candidates: list[dict[str, Any]] = []
     seen_cand: set[tuple[str, str]] = set()
+    priority_chains_l = [c.lower() for c in priority_chains]
 
     def push_cand(it: dict[str, Any], source_label: str) -> None:
         cid = str(it.get("chain_id") or "")
+        cname = str(it.get("chain_name") or "")
         addr = str(it.get("address") or "").strip().lower()
-        if not addr or _is_testnet_chain(str(it.get("chain_name") or ""), cid):
+        if not addr or _is_testnet_chain(cname, cid):
+            return
+        if _matches_rejected_patterns(it, rejected_patterns):
             return
         k = (cid, addr)
         if k in seen_cand:
@@ -261,6 +451,8 @@ async def run_agent_cycle(
         seen_cand.add(k)
         rec = dict(it)
         rec.setdefault("discovery_source", source_label)
+        if any(pc in cname.lower() for pc in priority_chains_l):
+            rec["priority_chain_match"] = True
         raw_candidates.append(rec)
 
     for seed in CURATED_MINING_SEEDS:
@@ -296,7 +488,10 @@ async def run_agent_cycle(
 
     # 4. REASON & ENRICH
     await enrich_registry_items_onchain(raw_candidates)
-    verified_this_cycle = [it for it in raw_candidates if is_actionable_mining_protocol(it)]
+    verified_this_cycle = [
+        it for it in raw_candidates
+        if is_actionable_mining_protocol(it) and not _matches_rejected_patterns(it, rejected_patterns)
+    ]
 
     # 5. MEMORIZE (NON-DESTRUCTIVE CUMULATIVE MERGE: Keep ALL valid old protocols + add new ones!)
     now_iso = utc_now_iso()
@@ -361,6 +556,9 @@ async def run_agent_cycle(
         "blockscout_hits": len(bs_hits),
         "dex_discovered_verified": len(discovered_dex),
         "refreshed_existing_prices": refreshed_old,
+        "watchlist_queries_used": len(watchlist_queries),
+        "priority_chains_count": len(priority_chains),
+        "rejected_patterns_count": len(rejected_patterns),
         "verified_this_cycle": len(verified_this_cycle),
         "newly_registered": len(new_added_names),
         "total_accumulated_protocols": len(merged_items),
@@ -394,7 +592,7 @@ async def run_agent_cycle(
     }
     save_registry(out_reg)
 
-    # 6. REPORT & UPDATE AGENT LONG-TERM MEMORY
+    # 6. REPORT & UPDATE AGENT LONG-TERM MEMORY (preserve all directives, notes, chains, watchlist, rejections)
     if new_added_names:
         brief = (
             f"الدورة #{cycle_num}: فحص الإيجنت {total_chains} شبكة، زاد +{len(new_added_names)} بروتوكولات جديدة "
@@ -407,7 +605,7 @@ async def run_agent_cycle(
         )
 
     mem["agent_name"] = "OmniRPC Autonomous Mining Agent"
-    mem["version"] = "1.0"
+    mem["version"] = "1.1"
     mem["total_cycles"] = cycle_num
     mem["cursor_evm_offset"] = (evm_offset + 90) % evm_pool_size
     mem["cursor_bs_offset"] = (bs_offset + 14) % 90
@@ -418,6 +616,9 @@ async def run_agent_cycle(
     mem["ai_llm_enabled"] = bool(os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
     mem["last_agent_brief_ar"] = brief
     mem["cycle_logs"] = ([history_entry] + list(mem.get("cycle_logs") or []))[:40]
+    mem["priority_chains"] = priority_chains
+    mem["watchlist_queries"] = watchlist_queries
+    mem["rejected_patterns"] = rejected_patterns
     save_agent_memory(mem)
 
     return {"registry": out_reg, "agent_memory": mem}
@@ -430,7 +631,34 @@ def main() -> None:
     parser.add_argument("--no-blocks", action="store_true")
     parser.add_argument("--loop", action="store_true", help="Run continuously every 3600s")
     parser.add_argument("--interval", type=int, default=3600)
+    parser.add_argument("--remember", type=str, default="", help="Persist a new directive/note/chain/query/rejection to agent_memory.json")
+    parser.add_argument(
+        "--category",
+        type=str,
+        default="directive",
+        choices=["directive", "note", "conversation_note", "priority_chain", "watchlist_query", "rejected_pattern"],
+        help="Category for --remember",
+    )
     args = parser.parse_args()
+
+    if args.remember.strip():
+        mem = record_user_directive(args.remember.strip(), category=args.category)
+        print(
+            json.dumps(
+                {
+                    "status": "remembered",
+                    "category": args.category,
+                    "user_directives_count": len(mem.get("user_directives") or []),
+                    "conversation_notes_count": len(mem.get("conversation_notes") or []),
+                    "priority_chains_count": len(mem.get("priority_chains") or []),
+                    "watchlist_queries_count": len(mem.get("watchlist_queries") or []),
+                    "rejected_patterns_count": len(mem.get("rejected_patterns") or []),
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
+        return
 
     if not args.loop:
         res = asyncio.run(run_agent_cycle(max_evm_chains=args.max_evm, blocks_back=args.blocks, no_blocks=args.no_blocks))

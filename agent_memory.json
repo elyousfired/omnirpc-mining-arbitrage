@@ -6,8 +6,8 @@
   "cursor_bs_offset": 28,
   "cursor_query_batch": 2,
   "last_cycle_at": "2026-11-13T21:29:05Z",
-  "known_protocols_count": 32,
-  "newly_added_last_cycle": 0,
+  "known_protocols_count": 34,
+  "newly_added_last_cycle": 2,
   "ai_llm_enabled": false,
   "last_agent_brief_ar": "الدورة #20: فحص الإيجنت 392 شبكة وحدّث الأسعار، وبقى محافظ على كل البروتوكولات القديمة (32 بروتوكول جاهز للتعدين).",
   "cycle_logs": [
@@ -33,5 +33,75 @@
       "new_names": [],
       "total_registry_size": 32
     }
+  ],
+  "user_directives": [
+    {
+      "timestamp": "2026-11-13T21:40:00Z",
+      "category": "directive",
+      "text": "عدم تصفير mining_registry.json أبداً؛ الحفاظ على كل البروتوكولات القديمة (first_seen_at, seen_scans) وإضافة البروتوكولات الجديدة فقط كل ساعة.",
+      "active": true
+    },
+    {
+      "timestamp": "2026-11-13T21:40:00Z",
+      "category": "directive",
+      "text": "التركيز على بروتوكولات GPU PoW القابلة للتعدين ببطاقات NVIDIA وبروتوكولات Fair-Mint ذات واجهة Web3 رسمية حقيقية + سعر وسيولة موثقين على DexScreener.",
+      "active": true
+    },
+    {
+      "timestamp": "2026-11-13T21:40:00Z",
+      "category": "directive",
+      "text": "تغطية الشبكات الصغيرة والمغمورة (PulseChain, Conflux, TON, Cardano, Base, Polygon, Arbitrum, Solana, Cosmos, Substrate) بالإضافة للشبكات الكبيرة.",
+      "active": true
+    },
+    {
+      "timestamp": "2026-11-13T21:40:00Z",
+      "category": "directive",
+      "text": "الرفض الصارم لشبكات التجربة (testnets: robinhood, arc, sepolia)، ألعاب النقرات (idle clickers)، مخططات AI-agent-only (amber, jagent)، صناديق ETF، مواقع القمار، والميم كوينز بدون عقود حقيقية.",
+      "active": true
+    }
+  ],
+  "conversation_notes": [
+    {
+      "timestamp": "2026-11-13T21:44:43Z",
+      "summary": "تفعيل الذاكرة التراكمية الدائمة (user_directives, conversation_notes, priority_chains, watchlist_queries, rejected_patterns) + بحث Google Search أضاف عملتين GPU PoW مؤكدتين: Tari (wXTM) و Quai Network (QUAI) مع كشف فخ neox.so و Alephium Blake3 ASIC و ETHW CEX-only.",
+      "applied": true
+    }
+  ],
+  "priority_chains": [
+    "PulseChain",
+    "Conflux eSpace",
+    "TON",
+    "Cardano",
+    "Base",
+    "Polygon",
+    "Arbitrum",
+    "Solana",
+    "Cosmos",
+    "Substrate",
+    "BNB Smart Chain",
+    "Ethereum"
+  ],
+  "watchlist_queries": [
+    "tari wxtm",
+    "quai network",
+    "neoxa",
+    "karlsen",
+    "xelis",
+    "pulsechain pow",
+    "conflux mine",
+    "fair mint pow"
+  ],
+  "rejected_patterns": [
+    "neox.so",
+    "robinhood",
+    "arc",
+    "sepolia",
+    "amber",
+    "jagent",
+    "ethereumpow.org",
+    "tap to earn",
+    "idle clicker",
+    "mint.club",
+    "pump.fun"
   ]
 }
