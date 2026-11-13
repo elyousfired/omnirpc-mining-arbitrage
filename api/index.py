@@ -80,17 +80,23 @@ class handler(BaseHTTPRequestHandler):
         raw = self.rfile.read(length).decode("utf-8", errors="replace")
         return json.loads(raw) if raw.strip() else {}
 
-    def do_GET(self) -> None:  # noqa: N802
+    def _resolve_route(self) -> tuple[str, dict[str, str]]:
         parsed = urlparse(self.path)
-        path = parsed.path or "/"
         qs = {k: v[0] for k, v in parse_qs(parsed.query).items() if v}
+        path = qs.pop("__path", None) or parsed.path or "/"
+        if not path.startswith("/"):
+            path = "/" + path
+        return path, qs
+
+    def do_GET(self) -> None:  # noqa: N802
+        path, qs = self._resolve_route()
 
         try:
-            if path in ("/", "/index.html"):
+            if path in ("/", "/index.html", "/dashboard/index.html"):
                 return self._send_text(DASHBOARD_HTML.read_text(encoding="utf-8"))
-            if path in ("/mining", "/mining.html"):
+            if path in ("/mining", "/mining.html", "/dashboard/mining.html"):
                 return self._send_text(MINING_HTML.read_text(encoding="utf-8"))
-            if path in ("/arbitrage", "/arbitrage.html"):
+            if path in ("/arbitrage", "/arbitrage.html", "/dashboard/arbitrage.html"):
                 return self._send_text(ARBITRAGE_HTML.read_text(encoding="utf-8"))
 
             if path == "/api/arbitrage":
@@ -207,8 +213,7 @@ class handler(BaseHTTPRequestHandler):
             return self._send_json({"error": str(exc)}, status=500)
 
     def do_POST(self) -> None:  # noqa: N802
-        parsed = urlparse(self.path)
-        path = parsed.path or "/"
+        path, _qs = self._resolve_route()
         try:
             omni = _get_omni()
             body = self._read_json_body()

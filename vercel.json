@@ -7,13 +7,13 @@
     }
   },
   "rewrites": [
-    { "source": "/", "destination": "/dashboard/index.html" },
-    { "source": "/mining", "destination": "/dashboard/mining.html" },
-    { "source": "/arbitrage", "destination": "/dashboard/arbitrage.html" },
-    { "source": "/api/(.*)", "destination": "/api/index" },
-    { "source": "/evm/(.*)", "destination": "/api/index" },
-    { "source": "/cosmos/(.*)", "destination": "/api/index" },
-    { "source": "/substrate/(.*)", "destination": "/api/index" },
-    { "source": "/major/(.*)", "destination": "/api/index" }
+    { "source": "/", "destination": "/api/index?__path=/" },
+    { "source": "/mining", "destination": "/api/index?__path=/mining" },
+    { "source": "/arbitrage", "destination": "/api/index?__path=/arbitrage" },
+    { "source": "/api/:path*", "destination": "/api/index?__path=/api/:path*" },
+    { "source": "/evm/:path*", "destination": "/api/index?__path=/evm/:path*" },
+    { "source": "/cosmos/:path*", "destination": "/api/index?__path=/cosmos/:path*" },
+    { "source": "/substrate/:path*", "destination": "/api/index?__path=/substrate/:path*" },
+    { "source": "/major/:path*", "destination": "/api/index?__path=/major/:path*" }
   ]
 }
