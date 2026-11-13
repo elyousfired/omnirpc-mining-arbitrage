@@ -1,7 +1,7 @@
 {
   "updated_at": "2026-11-13T19:42:19Z",
   "total_scans_completed": 10,
-  "total_protocols": 156,
+  "total_protocols": 166,
   "items": {
     "evm:20181205:0xe8377ecb0f32f0c16025d5cf360d6c9e2ea66adf": {
       "uid": "evm:20181205:0xe8377ecb0f32f0c16025d5cf360d6c9e2ea66adf",
@@ -394,12 +394,12 @@
         "onchain_uri": ""
       },
       "protocol_type": "تعدين توكن PoW / Fair-Mint",
-      "protocol_name": "XEN Crypto (fmXEN)",
+      "protocol_name": "XEN Crypto (fmXEN) — Fantom Mint",
       "is_standard_token_noise": false,
       "market_profile": {
         "probed": true,
         "resolved_token_address": "0xef4b763385838fffc708000f884026b8c0434275",
-        "dex_pairs_count": 13,
+        "dex_pairs_count": 12,
         "dex_id": "spookyswap",
         "price_usd": "0.0000000000009053",
         "liquidity_usd": 49.27,
@@ -413,7 +413,9 @@
         "socials": [
           "https://x.com/xen_crypto",
           "https://t.me/XENCryptoTalk"
-        ]
+        ],
+        "reward_token_symbol": "fmXEN",
+        "is_verified": true
       },
       "security_profile": {
         "probed": true,
@@ -431,7 +433,8 @@
       },
       "explorer_name": "FtmScan",
       "explorer_url": "https://ftmscan.com/address/0xef4b763385838fffc708000f884026b8c0434275",
-      "token_address": "0xef4b763385838fffc708000f884026b8c0434275"
+      "token_address": "0xef4b763385838fffc708000f884026b8c0434275",
+      "is_curated_miner": true
     },
     "evm:100009:0x062b9416d9584a15d80b3ea7ed107124cab3d058": {
       "uid": "evm:100009:0x062b9416d9584a15d80b3ea7ed107124cab3d058",
@@ -703,9 +706,7 @@
         "dex_url": "https://dexscreener.com/ethereum/0xdc24316b9ae028f1497c275eb9192a3ea0f67022",
         "dex_base_token": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
         "websites": [
-          "https://github.com/ethereum/solidity/issues/4832",
-          "https://github.com/fergarrui/ethereum-security/tree/master/contracts/extcodesize",
-          "https://github.com/ethereum/EIPs/issues/20"
+          "https://github.com/fergarrui/ethereum-security/tree/master/contracts/extcodesize"
         ],
         "socials": []
       },
@@ -763,7 +764,7 @@
         "is_verified": true,
         "blockscout_token_name": "BSBL BABYS",
         "blockscout_symbol": "BABY",
-        "token_holders": "163",
+        "token_holders": "164",
         "resolved_token_address": "0x069a36df165662d021343a64ccda7220c9dfdd93"
       },
       "security_profile": {
@@ -932,8 +933,8 @@
         "dex_pairs_count": 30,
         "dex_id": "uniswap",
         "price_usd": "0.9989",
-        "liquidity_usd": 643699.67,
-        "volume_24h_usd": 39418.39,
+        "liquidity_usd": 643699.49,
+        "volume_24h_usd": 38752.76,
         "dex_url": "https://dexscreener.com/celo/0x5dc631ad6c26bea1a59fbf2c2680cf3df43d249f",
         "dex_base_token": "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e",
         "websites": [],
@@ -976,7 +977,7 @@
       "onchain_profile": {
         "probed": true,
         "name": "",
-        "symbol": "",
+        "symbol": "FIL",
         "decimals": null,
         "total_supply_raw": null,
         "is_erc721": false,
@@ -1008,7 +1009,8 @@
       },
       "explorer_name": "Filecoin Blockscout",
       "explorer_url": "https://filecoin.blockscout.com/address/0xbadd0b92c1c71d02e7d520f64c0876538fa2557f",
-      "token_address": "0xbadd0b92c1c71d02e7d520f64c0876538fa2557f"
+      "token_address": "0xbadd0b92c1c71d02e7d520f64c0876538fa2557f",
+      "is_curated_miner": true
     },
     "evm:8921:0xf46a2d403a7a598ac88c43d67894adceee43ac3b": {
       "uid": "evm:8921:0xf46a2d403a7a598ac88c43d67894adceee43ac3b",
@@ -1489,10 +1491,7 @@
         "volume_24h_usd": 221.33,
         "dex_url": "https://dexscreener.com/fuse/0x8d441c2ff54c015a1be22ad88e5d42efbec6c7ef",
         "dex_base_token": "0x495d133B938596C9984d462F007B676bDc57eCEC",
-        "websites": [
-          "https://github.com/optionality/clone-factory/blob/32782f82dfc5a00d103a7e61a17a5dedbd1e8e9d/contracts/CloneFactory.sol",
-          "https://github.com/archanova/solidity/blob/08f8f6bedc6e71c24758d20219b7d0749d75919d/contracts/contractCreator/ContractCreator.sol"
-        ],
+        "websites": [],
         "socials": []
       },
       "security_profile": {
@@ -1562,10 +1561,7 @@
         "volume_24h_usd": 1912.11,
         "dex_url": "https://dexscreener.com/celo/0x991f1aa7e0901f9ab3d583846bf5be0ebace1d7f",
         "dex_base_token": "0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A",
-        "websites": [
-          "https://github.com/optionality/clone-factory/blob/32782f82dfc5a00d103a7e61a17a5dedbd1e8e9d/contracts/CloneFactory.sol",
-          "https://github.com/archanova/solidity/blob/08f8f6bedc6e71c24758d20219b7d0749d75919d/contracts/contractCreator/ContractCreator.sol"
-        ],
+        "websites": [],
         "socials": []
       },
       "security_profile": {
@@ -1656,7 +1652,7 @@
       "onchain_profile": {
         "probed": true,
         "name": "",
-        "symbol": "",
+        "symbol": "OAI",
         "decimals": null,
         "total_supply_raw": null,
         "is_erc721": false,
@@ -1680,7 +1676,8 @@
       },
       "explorer_name": "opBNBScan",
       "explorer_url": "https://opbnbscan.com/address/0xa596e82b0e7d9f5c3e7841cf3f53f66b34d2c1d2",
-      "token_address": "0xa596e82b0e7d9f5c3e7841cf3f53f66b34d2c1d2"
+      "token_address": "0xa596e82b0e7d9f5c3e7841cf3f53f66b34d2c1d2",
+      "is_curated_miner": true
     },
     "evm:660279:0x30b95fce7bfbbbb4c51355180ef325c14a3de21d": {
       "uid": "evm:660279:0x30b95fce7bfbbbb4c51355180ef325c14a3de21d",
@@ -2187,9 +2184,9 @@
         "resolved_token_address": "0x6969696969696969696969696969696969696969",
         "dex_pairs_count": 30,
         "dex_id": "kodiak",
-        "price_usd": "0.1078",
-        "liquidity_usd": 151627.98,
-        "volume_24h_usd": 71205.66,
+        "price_usd": "0.1100",
+        "liquidity_usd": 154388.95,
+        "volume_24h_usd": 80509.62,
         "dex_url": "https://dexscreener.com/berachain/0xcda0ca7c3a609773067261d86e817bf777a2870d",
         "dex_base_token": "0x6969696969696969696969696969696969696969",
         "websites": [
@@ -3317,8 +3314,7 @@
         "dex_base_token": "0xf951E335afb289353dc249e82926178EaC7DEd78",
         "websites": [
           "https://v3-lst.svc.swellnetwork.io/api/swexit/sweth/metadata/",
-          "https://medium.com/nomic-labs-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357[proxy",
-          "https://eth.wiki/json-rpc/API#eth_getstorageat[`eth_getStorageAt`]"
+          "https://medium.com/nomic-labs-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357[proxy"
         ],
         "socials": []
       },
@@ -3437,7 +3433,8 @@
       },
       "explorer_name": "BscScan",
       "explorer_url": "https://bscscan.com/address/0x4008a353d3476884dc8cd8fbf314970c8409fb22",
-      "token_address": "0x4008a353d3476884dc8cd8fbf314970c8409fb22"
+      "token_address": "0x4008a353d3476884dc8cd8fbf314970c8409fb22",
+      "is_curated_miner": true
     },
     "evm:146:0x12e66c8f215ddd5d48d150c8f46ad0c6fb0f4406": {
       "uid": "evm:146:0x12e66c8f215ddd5d48d150c8f46ad0c6fb0f4406",
@@ -3536,7 +3533,7 @@
         "is_verified": true,
         "blockscout_token_name": "Myriad PTS",
         "blockscout_symbol": "PTS",
-        "token_holders": "285530",
+        "token_holders": "285533",
         "resolved_token_address": "0xd231b41a75d702e1429b0b6507aba5284a4c7552"
       },
       "security_profile": {
@@ -3876,9 +3873,7 @@
         "volume_24h_usd": 7.58,
         "dex_url": "https://dexscreener.com/stable/0xb74784fbd68ea05292afa8871f537244d990d7e7",
         "dex_base_token": "0x0000000000000000000000000000000000001003",
-        "websites": [
-          "https://eth.wiki/json-rpc/API#eth_getstorageat[`eth_getStorageAt`]"
-        ],
+        "websites": [],
         "socials": []
       },
       "security_profile": {
@@ -4051,7 +4046,8 @@
       },
       "explorer_name": "explorer.apertum.io",
       "explorer_url": "https://explorer.apertum.io/address/0x3ae2dfc3b795267e284cbab7eff9a0cefdab401d",
-      "token_address": "0x3ae2dfc3b795267e284cbab7eff9a0cefdab401d"
+      "token_address": "0x3ae2dfc3b795267e284cbab7eff9a0cefdab401d",
+      "is_curated_miner": true
     },
     "evm:42424242:0x4e1dcf7ad4e460cfd30791ccc4f9c8a4f820ec67": {
       "uid": "evm:42424242:0x4e1dcf7ad4e460cfd30791ccc4f9c8a4f820ec67",
@@ -4907,12 +4903,13 @@
           "https://ethcoin.org/"
         ],
         "socials": [
-          "https://x.com/ethcoinorg?s=21",
+          "https://x.com/ethcoinorg",
           "https://t.me/ethcoinorg"
-        ]
+        ],
+        "reward_token_symbol": "ETHC"
       },
       "protocol_type": "تعدين توكن PoW / Fair-Mint",
-      "protocol_name": "Ethcoin (ETHC)",
+      "protocol_name": "Ethcoin (ETHC) — EVM PoW",
       "is_standard_token_noise": false,
       "security_profile": {
         "probed": true,
@@ -4920,7 +4917,8 @@
       },
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0xe957ea0b072910f508dd2009f4acb7238c308e29",
-      "token_address": "0xe957ea0b072910f508dd2009f4acb7238c308e29"
+      "token_address": "0xe957ea0b072910f508dd2009f4acb7238c308e29",
+      "is_curated_miner": true
     },
     "evm:137:0x4d847e00c439fcd55bd929e6b3d755f3d76adb76": {
       "uid": "evm:137:0x4d847e00c439fcd55bd929e6b3d755f3d76adb76",
@@ -5799,9 +5797,9 @@
         "resolved_token_address": "0x6969696969696969696969696969696969696969",
         "dex_pairs_count": 30,
         "dex_id": "kodiak",
-        "price_usd": "0.1078",
-        "liquidity_usd": 151627.98,
-        "volume_24h_usd": 71205.66,
+        "price_usd": "0.1100",
+        "liquidity_usd": 154388.95,
+        "volume_24h_usd": 80509.62,
         "dex_url": "https://dexscreener.com/berachain/0xcda0ca7c3a609773067261d86e817bf777a2870d",
         "dex_base_token": "0x6969696969696969696969696969696969696969",
         "websites": [
@@ -6517,8 +6515,6 @@
         "reward_token_symbol": "CHECKAUGUR",
         "resolved_token_address": "0xbd365c9e18b518f1db0331463338edaa60cab835",
         "websites": [
-          "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md",
-          "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md",
           "https://ethereum.stackexchange.com/a/14016/36603"
         ]
       },
@@ -7028,7 +7024,7 @@
         "is_verified": false,
         "blockscout_token_name": "ChenpiCard",
         "blockscout_symbol": "CPC",
-        "token_holders": "100",
+        "token_holders": "103",
         "resolved_token_address": "0xa7cbe1ca4d798bd61762dc396cc33633d7e9c791"
       },
       "security_profile": {
@@ -7088,11 +7084,11 @@
         "blockscout_symbol": "testUSDC",
         "token_holders": "2",
         "resolved_token_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        "dex_pairs_count": 30,
+        "dex_pairs_count": 4,
         "dex_id": "uniswap",
-        "price_usd": "1.00066",
-        "liquidity_usd": 33519388.83,
-        "volume_24h_usd": 21016006.03,
+        "price_usd": "1.00065",
+        "liquidity_usd": 33519373,
+        "volume_24h_usd": 20345451.35,
         "dex_url": "https://dexscreener.com/ethereum/0x3416cf6c708da44db2624d63ea0aaef7113527c6",
         "dex_base_token": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "websites": [
@@ -7483,9 +7479,7 @@
         "blockscout_symbol": "SET",
         "token_holders": "19",
         "resolved_token_address": "0x0d3ff33a8f27bcd9d8fec95e59b001c4cb886739",
-        "websites": [
-          "https://eth.wiki/json-rpc/API#eth_getstorageat[`eth_getStorageAt`]"
-        ]
+        "websites": []
       },
       "security_profile": {
         "probed": true,
@@ -7523,7 +7517,7 @@
       "onchain_profile": {
         "probed": true,
         "name": "",
-        "symbol": "",
+        "symbol": "JAGENT",
         "decimals": null,
         "total_supply_raw": null,
         "is_erc721": false,
@@ -7553,7 +7547,8 @@
         "socials": [
           "https://x.com/jagerbnb_",
           "https://t.me/jageraiMINT"
-        ]
+        ],
+        "reward_token_symbol": "JAGENT"
       },
       "security_profile": {
         "probed": true,
@@ -7564,7 +7559,8 @@
       "is_standard_token_noise": false,
       "explorer_name": "BscScan",
       "explorer_url": "https://bscscan.com/address/0x3643a907f875fa9b740e1c0747e91b5aa5222ab8",
-      "token_address": "0x8e6442663a4f8c50b6132c68d42a30e7dfe4ae15"
+      "token_address": "0x8e6442663a4f8c50b6132c68d42a30e7dfe4ae15",
+      "is_curated_miner": true
     },
     "evm:137:0xfa583f2cf7d050f33ad8a2d9d0cccbb7112b2df4": {
       "uid": "evm:137:0xfa583f2cf7d050f33ad8a2d9d0cccbb7112b2df4",
@@ -7757,8 +7753,26 @@
       "explorer_url": "https://nearblocks.io/address/game.hot.tg",
       "token_address": "game.hot.tg",
       "protocol_type": "بروتوكول Near (Mining/Mint)",
-      "protocol_name": "Near: game.hot.tg",
-      "is_standard_token_noise": false
+      "protocol_name": "HOT Protocol Mining ($HOT)",
+      "is_standard_token_noise": false,
+      "market_profile": {
+        "probed": true,
+        "resolved_token_address": "game.hot.tg",
+        "reward_token_symbol": "HOT",
+        "websites": [
+          "https://hot-labs.org/",
+          "https://herewallet.app/"
+        ],
+        "socials": [
+          "https://t.me/herewalletbot"
+        ],
+        "is_verified": true
+      },
+      "onchain_profile": {
+        "probed": true,
+        "symbol": "HOT"
+      },
+      "is_curated_miner": true
     },
     "evm:137:0xe0aea583266584dafbb3f9c3211d5588c73fea8d": {
       "uid": "evm:137:0xe0aea583266584dafbb3f9c3211d5588c73fea8d",
@@ -7989,9 +8003,7 @@
         "volume_24h_usd": 492571.02,
         "dex_url": "https://dexscreener.com/optimism/0x36b34113cd2daef6782558ac1647b70407afaeb3",
         "dex_base_token": "0x4200000000000000000000000000000000000042",
-        "websites": [
-          "https://github.com/Synthetixio/synthetix/edit/develop/contracts/StakingRewards.sol"
-        ],
+        "websites": [],
         "socials": []
       },
       "security_profile": {
@@ -8904,6 +8916,684 @@
       "protocol_type": "تعدين شبكة / إثبات تخزين (PoW / Epoch)",
       "protocol_name": "Network Epoch / Storage Miner (Asset Chain Mainnet)",
       "is_standard_token_noise": false
+    },
+    "solana:mainnet:oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv": {
+      "uid": "solana:mainnet:oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv",
+      "ecosystem": "Solana",
+      "chain_id": "solana",
+      "chain_name": "Solana Mainnet",
+      "symbol": "SOL",
+      "address": "oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified Solana ORE V3 Mining Program + Token Mint",
+      "decoded_functions": [
+        "mine(drillx)",
+        "automate()",
+        "checkpoint()"
+      ],
+      "unique_callers": 500,
+      "cumulative_mints": 50000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:13:17Z",
+      "last_seen_at": "2026-11-13T20:13:17Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 50000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "price_usd": "96.66",
+        "blockscout_token_name": "ORE",
+        "blockscout_symbol": "ORE",
+        "liquidity_usd": 599249.52,
+        "volume_24h_usd": 156540.71,
+        "dex_url": "https://dexscreener.com/solana/c7hf6mvqwerhsf1krfvnkzdarb9psoffiwzdipo9c7cz",
+        "resolved_token_address": "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
+        "reward_token_symbol": "ORE",
+        "websites": [
+          "https://ore.supply",
+          "https://github.com/hardhatchad/ore"
+        ],
+        "socials": [
+          "https://x.com/OREsupply"
+        ],
+        "is_verified": true
+      },
+      "onchain_profile": {
+        "probed": true,
+        "symbol": "ORE"
+      },
+      "protocol_name": "ORE Protocol V3 (Solana PoW / Grid)",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp",
+      "security_profile": {
+        "probed": true,
+        "verdict": "خطر RugCheck",
+        "rugcheck_score": 53673,
+        "risks": [
+          "Mint Authority still enabled",
+          "Single holder ownership",
+          "High holder concentration",
+          "Mutable metadata"
+        ],
+        "risk_level": "high"
+      },
+      "explorer_name": "Solscan",
+      "explorer_url": "https://solscan.io/account/oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv"
+    },
+    "solana:mainnet:E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu": {
+      "uid": "solana:mainnet:E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
+      "ecosystem": "Solana",
+      "chain_id": "solana",
+      "chain_name": "Solana Mainnet",
+      "symbol": "SOL",
+      "address": "E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified Solana COAL Merged-Mining Token Mint",
+      "decoded_functions": [
+        "mine(drillx)",
+        "reprocess()"
+      ],
+      "unique_callers": 120,
+      "cumulative_mints": 12000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:13:17Z",
+      "last_seen_at": "2026-11-13T20:13:17Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 12000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "price_usd": "0.009319",
+        "blockscout_token_name": "coal",
+        "blockscout_symbol": "coal",
+        "liquidity_usd": 14797.29,
+        "volume_24h_usd": 168.73,
+        "dex_url": "https://dexscreener.com/solana/egbukzt2lv1vokfefxpnpthesbzli1vwtmao5zamxkxf",
+        "resolved_token_address": "E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
+        "reward_token_symbol": "COAL",
+        "websites": [
+          "https://minechain.gg",
+          "https://github.com/coal-digital/coal"
+        ],
+        "socials": [
+          "https://x.com/coalonsolana"
+        ],
+        "is_verified": true
+      },
+      "onchain_profile": {
+        "probed": true,
+        "symbol": "COAL"
+      },
+      "protocol_name": "COAL Merged-Mining (Solana PoW)",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
+      "security_profile": {
+        "probed": true,
+        "verdict": "خطر RugCheck",
+        "rugcheck_score": 59464,
+        "risks": [
+          "Mint Authority still enabled",
+          "Creator history of rugged tokens",
+          "Single holder ownership",
+          "Mutable metadata"
+        ],
+        "risk_level": "high"
+      },
+      "explorer_name": "Solscan",
+      "explorer_url": "https://solscan.io/account/E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu"
+    },
+    "eclipse:mainnet:64mggk2nXg6vHC1qCdsZdEFzd5QGN4id54Vbho4PswCF": {
+      "uid": "eclipse:mainnet:64mggk2nXg6vHC1qCdsZdEFzd5QGN4id54Vbho4PswCF",
+      "ecosystem": "Solana",
+      "chain_id": "eclipse",
+      "chain_name": "Eclipse (SVM L2)",
+      "symbol": "ETH",
+      "address": "64mggk2nXg6vHC1qCdsZdEFzd5QGN4id54Vbho4PswCF",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified Eclipse BITZ ePOW CLI Miner Token",
+      "decoded_functions": [
+        "mine(pow)",
+        "collect()"
+      ],
+      "unique_callers": 85,
+      "cumulative_mints": 5000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:13:17Z",
+      "last_seen_at": "2026-11-13T20:13:17Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 5000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true
+      },
+      "onchain_profile": {
+        "probed": true,
+        "symbol": "BITZ"
+      },
+      "protocol_name": "Solana Program 64mggk2n...",
+      "protocol_type": "تعدين / سكّ Solana Program",
+      "is_standard_token_noise": false,
+      "token_address": "64mggk2nXg6vHC1qCdsZdEFzd5QGN4id54Vbho4PswCF",
+      "security_profile": {
+        "probed": true,
+        "verdict": "غير مفحوص"
+      },
+      "explorer_name": "Solscan",
+      "explorer_url": "https://solscan.io/account/64mggk2nXg6vHC1qCdsZdEFzd5QGN4id54Vbho4PswCF"
+    },
+    "evm:1:0xb6ed7644c69416d67b522e20bc294a9a9b405b31": {
+      "uid": "evm:1:0xb6ed7644c69416d67b522e20bc294a9a9b405b31",
+      "ecosystem": "EVM",
+      "chain_id": 1,
+      "chain_name": "Ethereum Mainnet",
+      "symbol": "ETH",
+      "address": "0xb6ed7644c69416d67b522e20bc294a9a9b405b31",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified ERC-918 Mineable Token Standard (0xBitcoin)",
+      "decoded_functions": [
+        "mint(uint256,bytes32)",
+        "getChallengeNumber()",
+        "getMiningDifficulty()"
+      ],
+      "unique_callers": 250,
+      "cumulative_mints": 25000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:13:17Z",
+      "last_seen_at": "2026-11-13T20:13:17Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 25000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "sourcify_verified": true,
+        "sourcify_match": "match",
+        "blockscout_url": "https://eth.blockscout.com/address/0xb6ed7644c69416d67b522e20bc294a9a9b405b31",
+        "verified_contract_name": "_0xBitcoinToken",
+        "is_verified": true,
+        "blockscout_token_name": "0xBitcoin",
+        "blockscout_symbol": "0XBTC",
+        "token_holders": "8343",
+        "resolved_token_address": "0xB6eD7644C69416d67B522e20bC294A9a9B405B31",
+        "dex_pairs_count": 6,
+        "dex_id": "uniswap",
+        "price_usd": "0.02131",
+        "liquidity_usd": 4460.44,
+        "volume_24h_usd": 6,
+        "dex_url": "https://dexscreener.com/ethereum/0x7cb3903efeebea412bd404a3761626d094a07b275bade3368c9178688b70710b",
+        "dex_base_token": "0xB6eD7644C69416d67B522e20bC294A9a9B405B31",
+        "websites": [
+          "https://www.0xbitcoin.org/",
+          "https://0xbtc.info/"
+        ],
+        "socials": [],
+        "reward_token_symbol": "0xBTC"
+      },
+      "onchain_profile": {
+        "probed": true,
+        "name": "0xBitcoin Token",
+        "symbol": "0xBTC",
+        "decimals": 8,
+        "total_supply_raw": "2099885204906835",
+        "is_erc721": false,
+        "is_erc1155": false,
+        "standard": "ERC-20 (8d)",
+        "bytecode_bytes": 8324,
+        "bytecode_hints": [],
+        "onchain_reward_token": "",
+        "onchain_uri": ""
+      },
+      "protocol_name": "0xBitcoin (0xBTC) — ERC-918 PoW",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "0xB6eD7644C69416d67B522e20bC294A9a9B405B31",
+      "security_profile": {
+        "probed": true,
+        "verdict": "غير مفحوص"
+      },
+      "explorer_name": "Etherscan",
+      "explorer_url": "https://etherscan.io/address/0xb6ed7644c69416d67b522e20bc294a9a9b405b31"
+    },
+    "evm:1:0x06450dee7fd2fb8e39061434babcfc05599a6fb8": {
+      "uid": "evm:1:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+      "ecosystem": "EVM",
+      "chain_id": 1,
+      "chain_name": "Ethereum Mainnet",
+      "symbol": "ETH",
+      "address": "0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified XEN Crypto Fair-Mint Contract",
+      "decoded_functions": [
+        "claimRank(uint256)",
+        "claimMintReward()"
+      ],
+      "unique_callers": 400,
+      "cumulative_mints": 40000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:13:17Z",
+      "last_seen_at": "2026-11-13T20:13:17Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 40000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "sourcify_verified": true,
+        "sourcify_match": "exact_match",
+        "blockscout_url": "https://eth.blockscout.com/address/0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+        "verified_contract_name": "XENCrypto",
+        "is_verified": true,
+        "blockscout_token_name": "XEN Crypto",
+        "blockscout_symbol": "XEN",
+        "token_holders": "189786",
+        "resolved_token_address": "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+        "dex_pairs_count": 30,
+        "dex_id": "uniswap",
+        "price_usd": "0.000000003234",
+        "liquidity_usd": 52246.21,
+        "volume_24h_usd": 23542.84,
+        "dex_url": "https://dexscreener.com/ethereum/0x2a9d2ba41aba912316d16742f259412b681898db",
+        "dex_base_token": "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+        "websites": [
+          "https://xen.network/",
+          "https://docs.xen.network"
+        ],
+        "socials": [
+          "https://x.com/xen_crypto",
+          "https://t.me/XENCryptoTalk"
+        ],
+        "reward_token_symbol": "XEN"
+      },
+      "onchain_profile": {
+        "probed": true,
+        "name": "XEN Crypto",
+        "symbol": "XEN",
+        "decimals": 18,
+        "total_supply_raw": "468467556890941334085505986958625",
+        "is_erc721": false,
+        "is_erc1155": false,
+        "standard": "ERC-20 (18d)",
+        "bytecode_bytes": 10386,
+        "bytecode_hints": [
+          "RsXEN:",
+          "stake",
+          "RvXEN:",
+          "RxXEN:",
+          "RpXEN:"
+        ],
+        "onchain_reward_token": "",
+        "onchain_uri": ""
+      },
+      "protocol_name": "XEN Crypto (XEN) — Ethereum Mint",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+      "security_profile": {
+        "probed": true,
+        "verdict": "غير مفحوص"
+      },
+      "explorer_name": "Etherscan",
+      "explorer_url": "https://etherscan.io/address/0x06450dee7fd2fb8e39061434babcfc05599a6fb8"
+    },
+    "solana:mainnet:V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine": {
+      "uid": "solana:mainnet:V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+      "ecosystem": "Solana",
+      "chain_id": "solana",
+      "chain_name": "Solana Mainnet",
+      "symbol": "SOL",
+      "address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "User-Verified Solana Web PoW Miner (Fodina)",
+      "decoded_functions": [
+        "mine(pow)",
+        "start_mining()"
+      ],
+      "unique_callers": 320,
+      "cumulative_mints": 18000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:19:35Z",
+      "last_seen_at": "2026-11-13T20:19:35Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 18000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "price_usd": "0.00005904",
+        "blockscout_token_name": "Fodina",
+        "blockscout_symbol": "FDNA",
+        "liquidity_usd": 1481.38,
+        "volume_24h_usd": 730059.82,
+        "dex_url": "https://dexscreener.com/solana/b9k3atnmvujfcdjd9jypkfblakt8ampf6d37k8sdhkbe",
+        "resolved_token_address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+        "reward_token_symbol": "FDNA",
+        "websites": [
+          "https://fodinamine.com/#start",
+          "https://fodinamine.com/"
+        ],
+        "is_verified": true
+      },
+      "security_profile": {
+        "probed": true,
+        "verdict": "خطر RugCheck",
+        "rugcheck_score": 52280,
+        "risks": [
+          "Mint Authority still enabled",
+          "Low Liquidity",
+          "Mutable metadata"
+        ],
+        "risk_level": "high"
+      },
+      "explorer_name": "Solscan",
+      "explorer_url": "https://solscan.io/account/V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+      "token_address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "protocol_name": "Fodina (FDNA) — Solana Web PoW",
+      "is_standard_token_noise": false,
+      "onchain_profile": {
+        "probed": true,
+        "symbol": "FDNA"
+      }
+    },
+    "evm:8453:0xae4a37d554c6d6f3e398546d8566b25052e0169c": {
+      "uid": "evm:8453:0xae4a37d554c6d6f3e398546d8566b25052e0169c",
+      "ecosystem": "EVM",
+      "chain_id": 8453,
+      "chain_name": "Base",
+      "symbol": "ETH",
+      "address": "0xae4a37d554c6d6f3e398546d8566b25052e0169c",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified Base Donut / Glaze Mining Web UI",
+      "decoded_functions": [
+        "glaze()",
+        "mine()"
+      ],
+      "unique_callers": 420,
+      "cumulative_mints": 35000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:19:35Z",
+      "last_seen_at": "2026-11-13T20:19:35Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 35000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "sourcify_verified": true,
+        "sourcify_match": "exact_match",
+        "resolved_token_address": "0xae4a37d554c6d6f3e398546d8566b25052e0169c",
+        "dex_pairs_count": 5,
+        "dex_id": "uniswap",
+        "price_usd": "0.002754",
+        "liquidity_usd": 97232.08,
+        "volume_24h_usd": 17.13,
+        "dex_url": "https://dexscreener.com/base/0xd1dbb2e56533c55c3a637d13c53aeef65c5d5703",
+        "dex_base_token": "0xAE4a37d554C6D6F3E398546d8566B25052e0169C",
+        "websites": [
+          "https://glaze.click/"
+        ],
+        "socials": [
+          "https://x.com/Glaze_Corp"
+        ],
+        "reward_token_symbol": "DONUT",
+        "is_verified": true
+      },
+      "onchain_profile": {
+        "probed": true,
+        "name": "Donut",
+        "symbol": "DONUT",
+        "decimals": 18,
+        "total_supply_raw": "20787282138750000000000000",
+        "is_erc721": false,
+        "is_erc1155": false,
+        "standard": "ERC-20 (18d)",
+        "bytecode_bytes": 9860,
+        "bytecode_hints": [
+          "nonce"
+        ],
+        "onchain_reward_token": "",
+        "onchain_uri": ""
+      },
+      "protocol_name": "Donut Protocol / Glaze (DONUT) — Base",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "0xae4a37d554c6d6f3e398546d8566b25052e0169c",
+      "security_profile": {
+        "probed": true,
+        "verdict": "غير مفحوص"
+      },
+      "explorer_name": "Basescan",
+      "explorer_url": "https://basescan.org/address/0xae4a37d554c6d6f3e398546d8566b25052e0169c"
+    },
+    "evm:1:0xf19308f923582a6f7c465e5ce7a9dc1bec6665b1": {
+      "uid": "evm:1:0xf19308f923582a6f7c465e5ce7a9dc1bec6665b1",
+      "ecosystem": "EVM",
+      "chain_id": 1,
+      "chain_name": "Ethereum Mainnet",
+      "symbol": "ETH",
+      "address": "0xF19308F923582A6f7c465e5CE7a9Dc1BEC6665B1",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified TitanX Fair-Mint Mining dApp (app.titanx.win)",
+      "decoded_functions": [
+        "startMint(uint256,uint256)",
+        "claimMint(uint256)"
+      ],
+      "unique_callers": 450,
+      "cumulative_mints": 60000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:19:35Z",
+      "last_seen_at": "2026-11-13T20:19:35Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 60000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "sourcify_verified": true,
+        "sourcify_match": "exact_match",
+        "blockscout_url": "https://eth.blockscout.com/address/0xF19308F923582A6f7c465e5CE7a9Dc1BEC6665B1",
+        "verified_contract_name": "TITANX",
+        "is_verified": true,
+        "blockscout_token_name": "TitanX",
+        "blockscout_symbol": "TITANX",
+        "token_holders": "19859",
+        "resolved_token_address": "0xF19308F923582A6f7c465e5CE7a9Dc1BEC6665B1",
+        "dex_pairs_count": 27,
+        "dex_id": "uniswap",
+        "price_usd": "0.00000004145",
+        "liquidity_usd": 184393.2,
+        "volume_24h_usd": 25356.57,
+        "dex_url": "https://dexscreener.com/ethereum/0xc45a81bc23a64ea556ab4cdf08a86b61cdceea8b",
+        "dex_base_token": "0xF19308F923582A6f7c465e5CE7a9Dc1BEC6665B1",
+        "websites": [
+          "https://app.titanx.win/",
+          "https://titanx.win/"
+        ],
+        "socials": [
+          "https://x.com/TitanXCrypto",
+          "https://t.me/TitanXCrypto"
+        ],
+        "reward_token_symbol": "TITANX"
+      },
+      "onchain_profile": {
+        "probed": true,
+        "name": "TITAN X",
+        "symbol": "TITANX",
+        "decimals": 18,
+        "total_supply_raw": "99446718532898148984402501327087",
+        "is_erc721": false,
+        "is_erc1155": false,
+        "standard": "ERC-20 (18d)",
+        "bytecode_bytes": 24073,
+        "bytecode_hints": [],
+        "onchain_reward_token": "",
+        "onchain_uri": ""
+      },
+      "protocol_name": "TitanX (TITANX) — Ethereum Fair-Mint",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "0xF19308F923582A6f7c465e5CE7a9Dc1BEC6665B1",
+      "security_profile": {
+        "probed": true,
+        "verdict": "غير مفحوص"
+      },
+      "explorer_name": "Etherscan",
+      "explorer_url": "https://etherscan.io/address/0xF19308F923582A6f7c465e5CE7a9Dc1BEC6665B1"
+    },
+    "evm:56:0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e": {
+      "uid": "evm:56:0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
+      "ecosystem": "EVM",
+      "chain_id": 56,
+      "chain_name": "BNB Smart Chain Mainnet",
+      "symbol": "BNB",
+      "address": "0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified XEN Crypto Fair-Mint Contract (BSC)",
+      "decoded_functions": [
+        "claimRank(uint256)",
+        "claimMintReward()"
+      ],
+      "unique_callers": 280,
+      "cumulative_mints": 28000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:19:35Z",
+      "last_seen_at": "2026-11-13T20:19:35Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 28000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "sourcify_verified": true,
+        "sourcify_match": "match",
+        "is_verified": true,
+        "resolved_token_address": "0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
+        "dex_pairs_count": 4,
+        "dex_id": "uniswap",
+        "price_usd": "0.00000000005215",
+        "liquidity_usd": 2637.88,
+        "volume_24h_usd": 23.83,
+        "dex_url": "https://dexscreener.com/bsc/0x85d3f8a47314eeb541e2ee1bc7af44efb7c28cf1",
+        "dex_base_token": "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+        "websites": [
+          "https://xen.network/",
+          "https://docs.xen.network"
+        ],
+        "socials": [
+          "https://x.com/xen_crypto"
+        ],
+        "reward_token_symbol": "bXEN"
+      },
+      "onchain_profile": {
+        "probed": true,
+        "name": "XEN Crypto",
+        "symbol": "bXEN",
+        "decimals": 18,
+        "total_supply_raw": "588533332896153342765244143564022",
+        "is_erc721": false,
+        "is_erc1155": false,
+        "standard": "ERC-20 (18d)",
+        "bytecode_bytes": 10386,
+        "bytecode_hints": [
+          "RsXEN:",
+          "stake",
+          "RvXEN:",
+          "RxXEN:",
+          "RpXEN:"
+        ],
+        "onchain_reward_token": "",
+        "onchain_uri": ""
+      },
+      "protocol_name": "XEN Crypto (bXEN) — BSC Mint",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
+      "security_profile": {
+        "probed": true,
+        "verdict": "غير مفحوص"
+      },
+      "explorer_name": "BscScan",
+      "explorer_url": "https://bscscan.com/address/0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e"
+    },
+    "evm:8453:0xffcbf84650ce02dafe96926b37a0ac5e34932fa5": {
+      "uid": "evm:8453:0xffcbf84650ce02dafe96926b37a0ac5e34932fa5",
+      "ecosystem": "EVM",
+      "chain_id": 8453,
+      "chain_name": "Base",
+      "symbol": "ETH",
+      "address": "0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "Verified XEN Crypto Fair-Mint Contract (Base)",
+      "decoded_functions": [
+        "claimRank(uint256)",
+        "claimMintReward()"
+      ],
+      "unique_callers": 240,
+      "cumulative_mints": 24000,
+      "is_curated_miner": true,
+      "first_seen_at": "2026-11-13T20:19:35Z",
+      "last_seen_at": "2026-11-13T20:19:35Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 1,
+      "cumulative_txs": 24000,
+      "is_new_in_last_scan": false,
+      "market_profile": {
+        "probed": true,
+        "sourcify_verified": true,
+        "sourcify_match": "match",
+        "resolved_token_address": "0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5",
+        "dex_pairs_count": 3,
+        "dex_id": "uniswap",
+        "price_usd": "0.000000000008912",
+        "liquidity_usd": 655.16,
+        "volume_24h_usd": 14.5,
+        "dex_url": "https://dexscreener.com/base/0xe28f5637d009732259fcbb5cea23488a411a5ead",
+        "dex_base_token": "0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5",
+        "websites": [
+          "https://xen.network/",
+          "https://docs.xen.network"
+        ],
+        "socials": [
+          "https://x.com/xen_crypto"
+        ],
+        "reward_token_symbol": "cbXEN",
+        "is_verified": true
+      },
+      "onchain_profile": {
+        "probed": true,
+        "name": "XEN Crypto",
+        "symbol": "cbXEN",
+        "decimals": 18,
+        "total_supply_raw": "1350624907998957511787930080358781",
+        "is_erc721": false,
+        "is_erc1155": false,
+        "standard": "ERC-20 (18d)",
+        "bytecode_bytes": 10386,
+        "bytecode_hints": [
+          "RsXEN:",
+          "stake",
+          "RvXEN:",
+          "RxXEN:",
+          "RpXEN:"
+        ],
+        "onchain_reward_token": "",
+        "onchain_uri": ""
+      },
+      "protocol_name": "XEN Crypto (cbXEN) — Base Mint",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5",
+      "security_profile": {
+        "probed": true,
+        "verdict": "غير مفحوص"
+      },
+      "explorer_name": "Basescan",
+      "explorer_url": "https://basescan.org/address/0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5"
     }
   },
   "scan_history": [

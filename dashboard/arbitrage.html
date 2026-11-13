@@ -154,9 +154,9 @@
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 12px; overflow-x: auto; margin-bottom: 20px;
     }
-    table { width: 100%; border-collapse: collapse; font-size: 12.8px; }
-    th, td { padding: 10px 11px; text-align: right; border-bottom: 1px solid rgba(36, 49, 79, 0.65); vertical-align: middle; }
-    th { background: var(--bg-elev); color: var(--muted); font-size: 11.8px; font-weight: 700; white-space: nowrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.2px; }
+    th, td { padding: 9px 8px; text-align: right; border-bottom: 1px solid rgba(36, 49, 79, 0.65); vertical-align: middle; }
+    th { background: var(--bg-elev); color: var(--muted); font-size: 11.4px; font-weight: 700; white-space: nowrap; }
     tr:hover td { background: rgba(26, 37, 64, 0.55); }
 
     .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; }
@@ -166,8 +166,8 @@
     .b-purple { background: var(--purple-soft); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.35); }
     .b-rose { background: var(--rose-soft); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.35); }
 
-    .addr-box { display: flex; align-items: center; gap: 6px; direction: ltr; }
-    .addr { font-family: var(--mono); font-size: 11.5px; color: #93c5fd; word-break: break-all; max-width: 240px; }
+    .addr-box { display: flex; align-items: center; gap: 5px; direction: ltr; }
+    .addr { font-family: var(--mono); font-size: 11px; color: #93c5fd; white-space: nowrap; }
     .panel { display: none; }
     .panel.active { display: block; }
   </style>
@@ -256,17 +256,17 @@
     </section>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('onchain', this)">بروتوكولات الشبكات المكتشفة (الاسم + التوكن + العنوان)</button>
+      <button class="tab-btn active" onclick="switchTab('onchain', this)">بروتوكولات التعدين الحقيقية (موقع واجهة Mint + توكن على DexScreener)</button>
       <button class="tab-btn" onclick="switchTab('gpupow', this)">عملات NVIDIA CUDA المباشرة (حساب ربح/خسارة السحابة)</button>
     </div>
 
     <div id="tab-onchain" class="panel active">
       <div class="toolbar">
         <div class="toolbar-group">
-          <input type="text" id="searchBox" placeholder="ابحث بالاسم، التوكن، الموقع، العنوان 0x... أو الشبكة..." style="min-width:280px;" oninput="renderOnchainTable()" />
-          <button class="pill-filter active" onclick="setFilter('ALL', this)">الكل</button>
+          <input type="text" id="searchBox" placeholder="ابحث بالاسم، التوكن، الموقع، العنوان 0x... أو الشبكة..." style="min-width:250px;" oninput="renderOnchainTable()" />
+          <button class="pill-filter active" onclick="setFilter('ALL', this)">الكل (تعدين وموقع رسمي)</button>
           <button class="pill-filter" onclick="setFilter('VERIFIED', this)">موثّق فقط (Verified)</button>
-          <button class="pill-filter" onclick="setFilter('CUDA', this)">NVIDIA CUDA / PoW فقط</button>
+          <button class="pill-filter" onclick="setFilter('CUDA', this)">PoW / CLI / GPU فقط</button>
           <button class="pill-filter" onclick="setFilter('PRICED', this)">عندها سعر وسيولة</button>
           <button class="pill-filter" onclick="setFilter('STRONG', this)">فرص عالية (Score &gt;= 60)</button>
         </div>
@@ -277,14 +277,12 @@
         <table>
           <thead>
             <tr>
-              <th>التقييم</th>
-              <th>سمية البروتوكول والموقع</th>
+              <th>التقييم والأمان</th>
+              <th>البروتوكول والموقع الرسمي</th>
               <th>التوكن والسعر والسيولة</th>
-              <th>عقد البروتوكول + عنوان التوكن</th>
-              <th>الشبكة ونوع التعدين</th>
-              <th>كلفة الغاز / الماكينة</th>
+              <th>العناوين (Protocol &amp; Token)</th>
+              <th>الشبكة والماكينة والكلفة</th>
               <th>نقطة التعادل (Break-Even)</th>
-              <th>الأمان</th>
             </tr>
           </thead>
           <tbody id="onchainTbody"></tbody>
@@ -406,9 +404,15 @@
       }
 
       document.getElementById("kpiOnchainPow").textContent = `${s.cuda_pow_protocols} PoW / ${s.total_onchain_protocols}`;
-      document.getElementById("kpiOnchainSub").textContent = `فرص قوية (>=60): ${s.strong_onchain_opportunities} بروتوكول`;
+      const excluded = s.excluded_non_mining_count || 0;
+      document.getElementById("kpiOnchainSub").textContent = `فرص قوية: ${s.strong_onchain_opportunities} • مستبعدة (غير تعدينية/بلا موقع): ${excluded}`;
       document.getElementById("kpiBtcPrice").textContent = `$${fmtNum(d.btc_usd, 0)}`;
       document.getElementById("kpiUpdatedAt").textContent = `آخر حساب: ${d.updated_at}`;
+    }
+
+    function shortAddr(a) {
+      if (!a || a.length <= 14) return a || "";
+      return `${a.slice(0, 6)}...${a.slice(-4)}`;
     }
 
     function renderOnchainTable() {
@@ -427,7 +431,7 @@
       document.getElementById("onchainCountBadge").textContent = `${filtered.length} بروتوكول`;
       const tbody = document.getElementById("onchainTbody");
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">ما كاينش نتائج فهاد الفلتر.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted);">ما كاينش نتائج فهاد الفلتر.</td></tr>`;
         return;
       }
 
@@ -435,13 +439,13 @@
         const scoreCls = r.arbitrage_score >= 60 ? "b-green" : (r.arbitrage_score >= 35 ? "b-amber" : "b-cyan");
         const modeBadge = r.is_cuda_pow ? `<span class="badge b-amber">${esc(r.mining_mode)}</span>` : `<span class="badge b-purple">${esc(r.mining_mode)}</span>`;
         const verCls = r.verification_level === "verified" ? "b-green" : (r.verification_level === "onchain_confirmed" ? "b-cyan" : "b-rose");
-        const verBadge = r.verification_label ? `<span class="badge ${verCls}" style="margin-top:4px;">${esc(r.verification_label)}</span>` : "";
+        const verBadge = r.verification_label ? `<span class="badge ${verCls}" style="margin-top:3px;">${esc(r.verification_label)}</span>` : "";
 
         const websitesHtml = (r.websites || []).slice(0, 2).map(u =>
           `<a class="btn btn-sm" style="border-color:rgba(16,185,129,0.45);color:#6ee7b7;" target="_blank" href="${esc(u)}">🌐 الموقع الرسمي</a>`
         ).join("");
-        const socialsHtml = (r.socials || []).slice(0, 2).map((u, idx) => {
-          const label = u.includes("twitter") || u.includes("x.com") ? "𝕏 / Twitter" : (u.includes("t.me") ? "Telegram" : (u.includes("discord") ? "Discord" : `رابط ${idx + 1}`));
+        const socialsHtml = (r.socials || []).slice(0, 1).map((u, idx) => {
+          const label = u.includes("twitter") || u.includes("x.com") ? "𝕏" : (u.includes("t.me") ? "TG" : (u.includes("discord") ? "DC" : `رابط`));
           return `<a class="btn btn-sm" target="_blank" href="${esc(u)}">${esc(label)}</a>`;
         }).join("");
 
@@ -457,39 +461,45 @@
         }
 
         const tokenAddrHtml = r.token_differs_from_protocol && r.token_address
-          ? `<div class="addr-box" style="margin-top:5px;">
-               <span style="font-size:10px;color:#6ee7b7;">Token:</span>
-               <span class="addr" style="color:#6ee7b7;">${esc(r.token_address)}</span>
+          ? `<div class="addr-box" style="margin-top:4px;">
+               <span style="font-size:10px;color:#6ee7b7;">Tok:</span>
+               <span class="addr" style="color:#6ee7b7;" title="${esc(r.token_address)}">${esc(shortAddr(r.token_address))}</span>
                <button class="btn btn-sm" onclick="copyText('${esc(r.token_address)}', this)">نسخ</button>
              </div>`
-          : `<div style="font-size:10px;color:var(--muted);margin-top:3px;">التوكن = نفس عقد البروتوكول</div>`;
+          : `<div style="font-size:10px;color:var(--muted);margin-top:3px;">التوكن = نفس العقد</div>`;
 
         const secCls = r.risk_level === "high" ? "b-rose" : (r.risk_level === "low" ? "b-green" : "b-cyan");
 
         return `<tr>
-          <td><span class="badge ${scoreCls}">${r.arbitrage_score}/100</span><br><small>${esc(r.verdict)}</small></td>
-          <td><strong>${esc(r.protocol_name)}</strong>${r.is_new ? ' <span class="badge b-green">جديد</span>' : ''}<br>
+          <td>
+            <span class="badge ${scoreCls}">${r.arbitrage_score}/100</span><br>
+            <small style="display:block;margin:3px 0;">${esc(r.verdict)}</small>
+            <span class="badge ${secCls}">${esc(r.security_verdict)}</span>
+          </td>
+          <td>
+            <strong>${esc(r.protocol_name)}</strong>${r.is_new ? ' <span class="badge b-green">جديد</span>' : ''}<br>
             ${verBadge}
             <div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;">
               ${websitesHtml}
               ${socialsHtml}
               <a class="btn btn-sm" target="_blank" href="${esc(r.explorer_url)}">${esc(r.explorer_name)}</a>
-              ${r.dex_url ? `<a class="btn btn-sm" target="_blank" href="${esc(r.dex_url)}">DexScreener</a>` : ""}
+              ${r.dex_url ? `<a class="btn btn-sm" target="_blank" href="${esc(r.dex_url)}">DEX</a>` : ""}
             </div>
           </td>
           <td><span class="badge b-cyan">${esc(r.token_symbol)}</span><br>${priceHtml}</td>
           <td>
             <div class="addr-box">
-              <span style="font-size:10px;color:var(--muted);">Protocol:</span>
-              <span class="addr">${esc(r.address)}</span>
+              <span style="font-size:10px;color:var(--muted);">Prot:</span>
+              <span class="addr" title="${esc(r.address)}">${esc(shortAddr(r.address))}</span>
               <button class="btn btn-sm" onclick="copyText('${esc(r.address)}', this)">نسخ</button>
             </div>
             ${tokenAddrHtml}
           </td>
-          <td><strong>${esc(r.chain_name)}</strong><br>${modeBadge}<br><small style="color:var(--muted);">Callers: ${r.unique_callers} | Mint: ${r.cumulative_mints}</small></td>
-          <td class="ltr">Gas: $${fmtNum(r.gas_cost_tx_usd, 5)}/tx<br><small style="color:var(--muted);">Total: $${fmtNum(r.total_cost_hr_usd, 3)}/hr</small></td>
+          <td>
+            <strong>${esc(r.chain_name)}</strong><br>${modeBadge}<br>
+            <small class="ltr" style="color:var(--muted);">Gas: $${fmtNum(r.gas_cost_tx_usd, 5)}/tx | Total: $${fmtNum(r.total_cost_hr_usd, 3)}/hr</small>
+          </td>
           <td>${beHtml}</td>
-          <td><span class="badge ${secCls}">${esc(r.security_verdict)}</span></td>
         </tr>`;
       }).join("");
     }

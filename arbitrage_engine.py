@@ -10,7 +10,7 @@ from typing import Any
 
 import aiohttp
 
-from mining_registry import load_registry
+from mining_registry import is_actionable_mining_protocol, load_registry
 from omnirpc_client import OmniRPC
 from protocol_profiler import _load_blockscout_map, _load_chainid_explorers, resolve_explorer_link
 
@@ -335,7 +335,9 @@ async def compute_arbitrage_snapshot(
     machine_cost_day = round(machine_cost_hr * 24.0, 4)
 
     reg = load_registry()
-    raw_items = [x for x in (reg.get("items") or {}).values() if not x.get("is_standard_token_noise")]
+    all_reg_items = list((reg.get("items") or {}).values())
+    raw_items = [x for x in all_reg_items if is_actionable_mining_protocol(x)]
+    excluded_non_mining_count = len(all_reg_items) - len(raw_items)
     active_cids = [str(x.get("chain_id")) for x in raw_items if x.get("ecosystem") == "EVM"]
 
     omni = OmniRPC()
@@ -441,10 +443,17 @@ async def compute_arbitrage_snapshot(
             or "epoch" in ptype.lower()
             or any(
                 k in fns_blob
-                for k in ("mine(", "log: mine", "drill", "nonce", "pow", "difficulty", "sealepoch", "submitepoch", "provepossession", "glaze", "giver")
+                for k in ("mine(", "log: mine", "drill", "nonce", "pow", "difficulty", "sealepoch", "submitepoch", "provepossession", "glaze", "giver", "mine_ore", "claim_coal", "bitz")
             )
         )
-        mining_mode = "NVIDIA CUDA / PoW" if is_cuda_pow else "RPC Bot / Mint / Claim"
+        if eco == "Solana" or "eclipse" in cname.lower():
+            mining_mode = "CLI / GPU Miner (PoW)" if is_cuda_pow else "SVM Mint / Miner"
+        elif any(k in ptype.lower() for k in ("node", "storage", "depin")) or any(k in fns_blob for k in ("provepossession", "submitepoch", "sealepoch")):
+            mining_mode = "Node / Epoch Miner"
+        elif is_cuda_pow:
+            mining_mode = "NVIDIA CUDA / EVM PoW"
+        else:
+            mining_mode = "RPC Bot / Fair Mint"
 
         px = _to_float(mkt.get("price_usd"))
         liq = _to_float(mkt.get("liquidity_usd"))
@@ -466,6 +475,11 @@ async def compute_arbitrage_snapshot(
         resolved_tok_addr = (mkt.get("resolved_token_address") or item.get("token_address") or mkt.get("dex_base_token") or addr)
 
         risk = sec.get("risk_level") or "unknown"
+        sec_verdict = sec.get("verdict") or "غير مفحوص"
+        if risk == "high" and item.get("is_curated_miner") and sec_verdict == "خطر RugCheck":
+            # PoW/Mint Solana tokens keep Mint Authority enabled on their mining program PDA by design
+            risk = "medium"
+            sec_verdict = "PoW Mintable (عادي للتعدين)"
         score = 0
         if is_cuda_pow:
             score += 25
@@ -541,7 +555,7 @@ async def compute_arbitrage_snapshot(
             "breakeven_tokens_tx": breakeven_tokens_tx,
             "unique_callers": callers,
             "cumulative_mints": int(item.get("cumulative_mints") or 0),
-            "security_verdict": sec.get("verdict") or "غير مفحوص",
+            "security_verdict": sec_verdict,
             "risk_level": risk,
             "arbitrage_score": score,
             "verdict": verdict,
@@ -581,6 +595,7 @@ async def compute_arbitrage_snapshot(
         ],
         "summary": {
             "total_onchain_protocols": len(onchain_rows),
+            "excluded_non_mining_count": excluded_non_mining_count,
             "cuda_pow_protocols": sum(1 for r in onchain_rows if r["is_cuda_pow"]),
             "strong_onchain_opportunities": strong_onchain_count,
             "total_gpu_l1_coins": len(gpu_coins),

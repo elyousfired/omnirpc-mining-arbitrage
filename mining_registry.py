@@ -13,21 +13,50 @@ OUT_DIR = Path(__file__).resolve().parent
 REGISTRY_JSON = OUT_DIR / "mining_registry.json"
 REGISTRY_CSV = OUT_DIR / "mining_registry.csv"
 
-# Exact function/camelCase token keywords indicating genuine mining, minting, PoW, or reward claims
+# Exact function/camelCase token keywords indicating genuine mining, PoW, or fair-mint protocols
 MINING_TOKENS = {
-    "mine", "miner", "mining", "mint", "minter", "safemint", "minttokens",
-    "claim", "claimreward", "claimrewards", "claimtokens", "claimmintreward",
-    "claimmintrewardandshare", "harvest", "dig", "drill", "glaze", "forge",
-    "hatch", "prove", "provepossession", "sealepoch", "submitepoch",
-    "nonce", "pow", "difficulty", "grid", "checkpoint", "automate",
-    "hash", "giver", "reward", "stake",
+    "mine", "minebatch", "miner", "mining", "dig", "drill", "drillx", "glaze",
+    "prove", "provepossession", "submitepoch", "claimmintreward",
+    "claimmintrewardandshare", "nonce", "pow", "difficulty", "checkpoint",
+    "automate", "giver", "commithash", "blockreward", "challenge", "l2_claim",
 }
 
 POW_STRICT_TOKENS = {
-    "mine", "miner", "mining", "dig", "drill", "glaze", "nonce", "pow",
-    "difficulty", "prove", "provepossession", "sealepoch", "submitepoch",
-    "grid", "checkpoint", "automate", "giver",
+    "mine", "minebatch", "miner", "mining", "dig", "drill", "drillx", "glaze",
+    "nonce", "pow", "difficulty", "prove", "provepossession", "submitepoch",
+    "claimmintreward", "claimmintrewardandshare", "blockreward", "commithash",
+    "automate", "giver", "challenge",
 }
+
+NON_MINING_ADDRESSES = {
+    "0x00005ea00ac477b1030ce78506496e8c2de24bf5",  # SeaDrop NFT drop
+    "0x0000000000000000000000000000000000001000",  # Validator system precompile
+    "0x0000000000000000000000000000000000001003",  # ERC1967Proxy precompile
+    "0x0000000000000000000000000000000000000300",  # Energi system contract
+    "0xd100a01e00000000000000000000000000000000",  # SFC consensus sealEpoch precompile
+    "0x4e1dcf7ad4e460cfd30791ccc4f9c8a4f820ec67",  # Gnosis Safe Proxy Factory (createProxyWithNonce)
+    "0x55a0e8c9e14309c82ab011ed2ef3cfbc49f43522",  # Gnosis Safe Multisig
+    "0x68e534a0122223a119980f6c394683bcd0215e71",  # BananaMiner ERC-721 farm (not PoW mining)
+    "0x4008a353d3476884dc8cd8fbf314970c8409fb22",  # Amber (AI Agent .ai ID gated, protocol agents mine it & no DexScreener)
+    "0x3643a907f875fa9b740e1c0747e91b5aa5222ab8",  # JAGENT Mint Pass (Agent .ai ID gated)
+    "0xbadd0b92c1c71d02e7d520f64c0876538fa2557f",  # Filecoin PDPVerifier infra (no web mint / no DexScreener token)
+    "0xa596e82b0e7d9f5c3e7841cf3f53f66b34d2c1d2",  # OptimAI Epoch Node (no DexScreener token)
+    "0x3ae2dfc3b795267e284cbab7eff9a0cefdab401d",  # Apertum Virtual Miner (no DexScreener token)
+    "6ef8rrecthr5dkzon8nwu78hrvfckubj14m5ubewf6p",  # Pump.fun bonding-curve launchpad
+    "6vo3245eszab5wuqemw8mgdbfrudkbhhdhp5lcagutab", # Pump app launchpad router
+}
+
+NON_MINING_KEYWORDS = (
+    "uniswap", "positions nft", "algebra positions", "pharaoh v3", "shadow v3",
+    "slipstream v3", "nest positions", "liquid staked", "staked aave", "steth",
+    "wrapped ", "usd coin", "usdc", "eure", "erc1967proxy", "pump.fun",
+    "gacha", "game contract", "false punks", "ghoulstation", "courtyard",
+    "ct3keys", "toy-story", "astroverse", "strands trade", "ubischeme",
+    "claim / airdrop", "test strategy", "seadrop", "ethereum name service",
+    "gnosis", "safe proxy", "bananaminer", "banana miner", "stkaave", "swbera",
+    "staking / yield", "سيولة defi", "سكّ nft", "توكن عادي", "لعبة ويب 3",
+    "مطالبة ومكافآت", "ستيكينغ",
+)
 
 ADMIN_NOISE_PREFIXES = (
     "adminmint", "ownermint", "setminter", "addminter", "removeminter",
@@ -42,7 +71,55 @@ NOISE_FUNC_NAMES = {
     "approvehash", "deposit", "withdraw", "latestrounddata", "submitsignatures",
     "submitandpass", "submitretryable", "submittransactionschecked",
     "blacklist", "increaseliquidity", "deploy", "deployandexecute",
+    "createproxywithnonce", "sealepoch", "sealepochvalidators", "mintpublic",
+    "mintonlyobjektefficient",
 }
+
+
+def is_actionable_mining_protocol(item: dict[str, Any]) -> bool:
+    """Strict filter: user-mineable / fair-mint protocols with BOTH a real mint UI website AND a live DexScreener token."""
+    if item.get("is_standard_token_noise"):
+        return False
+    addr_l = str(item.get("address") or "").strip().lower()
+    if addr_l in NON_MINING_ADDRESSES:
+        return False
+    mkt = item.get("market_profile") or {}
+    pname = str(item.get("protocol_name") or "").lower()
+    ptype = str(item.get("protocol_type") or "").lower()
+    vname = str(mkt.get("verified_contract_name") or "").lower()
+    blob = f"{pname} {ptype} {vname}"
+    if any(bad in blob for bad in NON_MINING_KEYWORDS):
+        return False
+    if "amber" in blob or "jagent" in blob:
+        return False
+
+    # 1. Must have a real non-GitHub Mint / Mine interface website
+    websites = [
+        w for w in (mkt.get("websites") or [])
+        if isinstance(w, str) and w.startswith(("http://", "https://"))
+    ]
+    ui_sites = [w for w in websites if "github.com" not in w.lower()]
+    if not ui_sites:
+        return False
+
+    # 2. Must have a live token listed & priced on DexScreener
+    dex_url = str(mkt.get("dex_url") or "").lower()
+    try:
+        px = float(mkt.get("price_usd") or 0)
+    except Exception:
+        px = 0.0
+    if "dexscreener.com" not in dex_url or px <= 0:
+        return False
+
+    fns = " ".join(item.get("decoded_functions") or []).lower()
+    has_mining_signal = bool(item.get("is_curated_miner")) or any(
+        k in f"{ptype} {fns}"
+        for k in (
+            "pow", "mine", "drill", "nonce", "difficulty", "glaze",
+            "claimmintreward", "claimrank", "l2_claim", "blockreward", "fair-mint",
+        )
+    )
+    return has_mining_signal
 
 
 def utc_now_iso() -> str:
@@ -75,36 +152,22 @@ def classify_evm_candidate(
             fn_names.append(fn_lower)
             all_tokens |= toks
 
-    # Explicit exclusion if every decoded function is routine DEX/ERC20/oracle/bridge noise
-    non_noise_fns = [f for f in fn_names if f not in NOISE_FUNC_NAMES and not f.startswith("0x")]
-    has_only_noise = bool(fn_names) and all(
-        (f in NOISE_FUNC_NAMES or (f.startswith("0x") and len(fn_names) == 1))
-        for f in fn_names
-    ) and not (all_tokens & MINING_TOKENS)
-
-    # Filter out single-caller admin/owner/bridge mints unless strict PoW signals exist
+    # Explicit exclusion if every decoded function is routine DEX/ERC20/oracle/bridge/multisig noise
     has_pow_strict = bool(all_tokens & POW_STRICT_TOKENS)
     is_admin_only = (
         bool(fn_names)
         and all(any(f.startswith(p) for p in ADMIN_NOISE_PREFIXES) for f in fn_names)
         and not has_pow_strict
     )
-    if is_admin_only or (unique_callers <= 1 and not has_pow_strict and mint_events < 3):
+    only_noise = bool(fn_names) and all(f in NOISE_FUNC_NAMES for f in fn_names) and not has_pow_strict
+    if is_admin_only or only_noise or (unique_callers <= 1 and not has_pow_strict and mint_events < 3):
         return False, "", ""
 
     mining_hits = sorted(all_tokens & MINING_TOKENS)
     if mining_hits:
         if has_pow_strict:
             return True, "PoW / Hash & Epoch Mining", f"ABI Tokens: {', '.join(mining_hits[:4])}"
-        return True, "On-Chain Mint / Claim Mining", f"ABI Tokens: {', '.join(mining_hits[:4])}"
-
-    # Multi-caller Mint(Transfer 0x0) pattern ONLY when not known pure ERC20 approve/transfer noise
-    only_erc20_ops = bool(fn_names) and all(f in NOISE_FUNC_NAMES for f in fn_names)
-    if mint_events >= 2 and unique_callers >= 2 and not only_erc20_ops and not has_only_noise:
-        return True, "Multi-Caller Public Mint", f"{mint_events} Mint Events ({unique_callers} Callers)"
-
-    if non_noise_fns and mint_events >= 1 and not only_erc20_ops:
-        return True, "Contract Mint Activity", f"{mint_events} Mint Events"
+        return True, "On-Chain Fair-Mint Mining", f"ABI Tokens: {', '.join(mining_hits[:4])}"
 
     return False, "", ""
 
