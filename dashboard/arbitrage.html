@@ -177,15 +177,13 @@
     <div class="brand">
       <div class="logo-badge">ARB</div>
       <div>
-        <h1>حاسبة أربيتراج التعدين وماكينات NVIDIA</h1>
-        <p>مقارنة مباشرة بين كلفة كراء ماكينة السحابة / الكهرباء مقابل عائد التعدين والسيولة</p>
+        <h1>رادار وأربيتراج التعدين والـ Mint</h1>
+        <p>فقط البروتوكولات اللي تقدر تخدمها بنفسك (واجهة Mint / التعدين + توكن حي على DexScreener)</p>
       </div>
     </div>
 
     <div class="nav-links">
-      <a class="nav-link" href="/">لوحة التحكم (807+ شبكة)</a>
-      <a class="nav-link" href="/mining">رادار التعدين (كل 1 ساعة)</a>
-      <a class="nav-link active" href="/arbitrage">أربيتراج التعدين و NVIDIA</a>
+      <span class="badge b-green" style="padding:8px 12px;font-size:12px;">⚡ فحص وتحديث تلقائي كل 1 ساعة</span>
     </div>
   </header>
 
@@ -239,26 +237,16 @@
         <div class="kpi-sub" id="kpiMachineSub">—</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">أفضل عملة NVIDIA PoW حالياً</div>
-        <div class="kpi-value" id="kpiBestCoin">—</div>
-        <div class="kpi-sub" id="kpiBestCoinSub">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">بروتوكولات الشبكات (PoW / CUDA)</div>
+        <div class="kpi-label">البروتوكولات الصالحة للتعدين والـ Mint</div>
         <div class="kpi-value" style="color:var(--amber);" id="kpiOnchainPow">—</div>
         <div class="kpi-sub" id="kpiOnchainSub">—</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">سعر البيتكوين المرجعي</div>
+        <div class="kpi-label">سعر البيتكوين وآخر فحص كل 1 ساعة</div>
         <div class="kpi-value" style="color:var(--cyan);" id="kpiBtcPrice">—</div>
         <div class="kpi-sub" id="kpiUpdatedAt">—</div>
       </div>
     </section>
-
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('onchain', this)">بروتوكولات التعدين الحقيقية (موقع واجهة Mint + توكن على DexScreener)</button>
-      <button class="tab-btn" onclick="switchTab('gpupow', this)">عملات NVIDIA CUDA المباشرة (حساب ربح/خسارة السحابة)</button>
-    </div>
 
     <div id="tab-onchain" class="panel active">
       <div class="toolbar">
@@ -286,27 +274,6 @@
             </tr>
           </thead>
           <tbody id="onchainTbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="tab-gpupow" class="panel">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>النتيجة</th>
-              <th>العملة (Coin)</th>
-              <th>الخوارزمية والسرعة</th>
-              <th>السعر والـ Market Cap</th>
-              <th>الإنتاج اليومي التقديري</th>
-              <th>الدخل الإجمالي ($/يوم)</th>
-              <th>كلفة الماكينة ($/يوم)</th>
-              <th>صافي الأربيتراج ($/يوم | $/ساعة)</th>
-              <th>ROI %</th>
-            </tr>
-          </thead>
-          <tbody id="gpuCoinsTbody"></tbody>
         </table>
       </div>
     </div>
@@ -379,7 +346,6 @@
         STATE.data = await res.json();
         renderKPIs();
         renderOnchainTable();
-        renderGpuCoinsTable();
       } catch (e) {
         console.error(e);
       } finally {
@@ -396,18 +362,11 @@
       document.getElementById("kpiMachineCost").textContent = `$${fmtNum(m.machine_cost_hr_usd, 3)} / hr`;
       document.getElementById("kpiMachineSub").textContent = `$${fmtNum(m.machine_cost_day_usd, 2)} / يوم • ${m.label} (${m.watts}W)`;
 
-      const best = s.best_gpu_l1_coin;
-      if (best) {
-        const col = best.net_day_usd > 0 ? "var(--emerald)" : "var(--rose)";
-        document.getElementById("kpiBestCoin").innerHTML = `<span style="color:${col}">${esc(best.symbol)} (${best.net_day_usd >= 0 ? "+" : ""}$${fmtNum(best.net_day_usd, 2)}/d)</span>`;
-        document.getElementById("kpiBestCoinSub").textContent = `${best.coin_name} (${best.algorithm}) • مربح: ${s.profitable_gpu_l1_coins}/${s.total_gpu_l1_coins}`;
-      }
-
-      document.getElementById("kpiOnchainPow").textContent = `${s.cuda_pow_protocols} PoW / ${s.total_onchain_protocols}`;
+      document.getElementById("kpiOnchainPow").textContent = `${s.total_onchain_protocols} / ${s.total_onchain_protocols}`;
       const excluded = s.excluded_non_mining_count || 0;
-      document.getElementById("kpiOnchainSub").textContent = `فرص قوية: ${s.strong_onchain_opportunities} • مستبعدة (غير تعدينية/بلا موقع): ${excluded}`;
+      document.getElementById("kpiOnchainSub").textContent = `فرص قوية: ${s.strong_onchain_opportunities} • مستبعدة من السكانر: ${excluded}`;
       document.getElementById("kpiBtcPrice").textContent = `$${fmtNum(d.btc_usd, 0)}`;
-      document.getElementById("kpiUpdatedAt").textContent = `آخر حساب: ${d.updated_at}`;
+      document.getElementById("kpiUpdatedAt").textContent = `آخر فحص 1h: ${s.last_scan_at || d.updated_at}`;
     }
 
     function shortAddr(a) {
@@ -502,30 +461,6 @@
             <small class="ltr" style="color:var(--muted);">Gas: $${fmtNum(r.gas_cost_tx_usd, 5)}/tx | Total: $${fmtNum(r.total_cost_hr_usd, 3)}/hr</small>
           </td>
           <td>${beHtml}</td>
-        </tr>`;
-      }).join("");
-    }
-
-    function renderGpuCoinsTable() {
-      const coins = (STATE.data && STATE.data.gpu_l1_coins) || [];
-      const tbody = document.getElementById("gpuCoinsTbody");
-      if (!coins.length) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted);">تعذر جلب بيانات WhatToMine حالياً.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = coins.map(c => {
-        const netCol = c.net_day_usd >= 0 ? "#6ee7b7" : "#fda4af";
-        const vCls = c.net_day_usd > 0.05 ? "b-green" : (c.net_day_usd > -0.25 ? "b-amber" : "b-rose");
-        return `<tr>
-          <td><span class="badge ${vCls}">${esc(c.verdict)}</span></td>
-          <td><strong>${esc(c.coin_name)}</strong> <span class="badge b-cyan">${esc(c.symbol)}</span></td>
-          <td class="ltr">${esc(c.algorithm)}<br><small style="color:var(--muted);">${esc(c.gpu_hashrate)}</small></td>
-          <td class="ltr">$${c.coin_price_usd < 0.01 ? c.coin_price_usd.toPrecision(4) : fmtNum(c.coin_price_usd, 4)}<br><small style="color:var(--muted);">MC: ${esc(c.market_cap)}</small></td>
-          <td class="ltr">${fmtNum(c.est_coins_day, 4)} ${esc(c.symbol)}</td>
-          <td class="ltr">$${fmtNum(c.gross_day_usd, 3)}<br><small style="color:var(--muted);">$${fmtNum(c.gross_hr_usd, 4)}/hr</small></td>
-          <td class="ltr">$${fmtNum(c.machine_cost_day_usd, 3)}<br><small style="color:var(--muted);">$${fmtNum(c.machine_cost_hr_usd, 4)}/hr</small></td>
-          <td class="ltr" style="color:${netCol};font-weight:800;">${c.net_day_usd >= 0 ? "+" : ""}$${fmtNum(c.net_day_usd, 3)}/d<br><small>${c.net_hr_usd >= 0 ? "+" : ""}$${fmtNum(c.net_hr_usd, 4)}/hr</small></td>
-          <td class="ltr" style="color:${netCol};">${c.roi_pct >= 0 ? "+" : ""}${fmtNum(c.roi_pct, 1)}%</td>
         </tr>`;
       }).join("");
     }

@@ -92,12 +92,13 @@ class handler(BaseHTTPRequestHandler):
         path, qs = self._resolve_route()
 
         try:
-            if path in ("/", "/index.html", "/dashboard/index.html"):
-                return self._send_text(DASHBOARD_HTML.read_text(encoding="utf-8"))
-            if path in ("/mining", "/mining.html", "/dashboard/mining.html"):
-                return self._send_text(MINING_HTML.read_text(encoding="utf-8"))
-            if path in ("/arbitrage", "/arbitrage.html", "/dashboard/arbitrage.html"):
+            if path in ("/", "/index.html", "/dashboard/index.html", "/arbitrage", "/arbitrage.html", "/dashboard/arbitrage.html"):
                 return self._send_text(ARBITRAGE_HTML.read_text(encoding="utf-8"))
+            if path in ("/mining", "/mining.html", "/dashboard/mining.html"):
+                self.send_response(302)
+                self.send_header("Location", "/")
+                self.end_headers()
+                return
 
             if path == "/api/arbitrage":
                 gpu = qs.get("gpu", "rtx4090")

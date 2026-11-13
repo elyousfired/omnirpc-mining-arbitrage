@@ -190,18 +190,7 @@ async def _fetch_live_market_inputs(session: aiohttp.ClientSession, omni: OmniRP
             pass
 
     async def load_wtm() -> None:
-        try:
-            async with session.get(
-                "https://whattomine.com/coins.json",
-                headers={"User-Agent": "Mozilla/5.0"},
-                timeout=aiohttp.ClientTimeout(total=10),
-            ) as r:
-                if r.status == 200:
-                    data = await r.json(content_type=None)
-                    if isinstance(data.get("coins"), dict):
-                        wtm_coins.update(data["coins"])
-        except Exception:
-            pass
+        return
 
     async def probe_gas(cid: str) -> None:
         try:
@@ -337,7 +326,8 @@ async def compute_arbitrage_snapshot(
     reg = load_registry()
     all_reg_items = list((reg.get("items") or {}).values())
     raw_items = [x for x in all_reg_items if is_actionable_mining_protocol(x)]
-    excluded_non_mining_count = len(all_reg_items) - len(raw_items)
+    excluded_non_mining_count = max(len(all_reg_items) - len(raw_items), int(reg.get("pruned_last_scan") or 0))
+    last_scan_at = reg.get("updated_at")
     active_cids = [str(x.get("chain_id")) for x in raw_items if x.get("ecosystem") == "EVM"]
 
     omni = OmniRPC()
@@ -350,78 +340,8 @@ async def compute_arbitrage_snapshot(
         )
         prices = mkt_cache["prices"]
         btc_usd = prices.get("BTC", 80000.0)
-        wtm_coins = mkt_cache["wtm"]
-
-        # Query exact WhatToMine live calculator for matching GPU algorithms
-        exact_tasks = []
-        matched_coin_meta: list[tuple[str, dict[str, Any], str, float]] = []
-        for cname, cdata in wtm_coins.items():
-            algo = str(cdata.get("algorithm") or "")
-            if algo in gpu["algos"] and cdata.get("id"):
-                unit, hr = gpu["algos"][algo]
-                matched_coin_meta.append((cname, cdata, unit, hr))
-        # Limit live exact sub-requests to top 14 by btc_revenue so dashboard loads in <1.5s
-        matched_coin_meta.sort(key=lambda t: float(t[1].get("btc_revenue") or 0), reverse=True)
-        top_matched = matched_coin_meta[:14]
-        sem = asyncio.Semaphore(6)
-        exact_res = await asyncio.gather(*(
-            _fetch_wtm_exact_coin(sem, session, int(cdata["id"]), hr)
-            for _, cdata, _, hr in top_matched
-        ))
 
     gpu_coins: list[dict[str, Any]] = []
-    for (cname, cdata, unit, hr), exact in zip(top_matched, exact_res):
-        algo = str(cdata.get("algorithm") or "")
-        tag = str(cdata.get("tag") or cname)
-        est_coins_day = 0.0
-        gross_day_usd = 0.0
-
-        if exact and exact.get("btc_revenue"):
-            est_coins_day = _to_float(exact.get("estimated_rewards"))
-            gross_day_usd = _to_float(exact.get("btc_revenue")) * btc_usd
-        else:
-            ref_hr = WTM_DEFAULT_HR.get(algo)
-            if ref_hr and ref_hr > 0:
-                ratio = hr / ref_hr
-                est_coins_day = _to_float(cdata.get("estimated_rewards")) * ratio
-                gross_day_usd = _to_float(cdata.get("btc_revenue")) * btc_usd * ratio
-
-        gross_hr_usd = gross_day_usd / 24.0
-        net_day_usd = gross_day_usd - machine_cost_day
-        net_hr_usd = gross_hr_usd - machine_cost_hr
-        roi_pct = ((gross_day_usd / machine_cost_day) - 1.0) * 100.0 if machine_cost_day > 0 else 0.0
-
-        ex_btc = float(cdata.get("exchange_rate") or 0)
-        coin_usd = ex_btc * btc_usd if ex_btc > 0 else 0.0
-        mcap_str = str(cdata.get("market_cap") or "—")
-
-        if net_day_usd > 0.05:
-            verdict = "🟢 مربح (أربيتراج إيجابي)"
-        elif net_day_usd > -0.25:
-            verdict = "🟡 قريب من التعادل"
-        else:
-            verdict = "🔴 خاسر (الكلفة > العائد)"
-
-        gpu_coins.append({
-            "coin_name": cname,
-            "symbol": tag,
-            "algorithm": algo,
-            "gpu_hashrate": f"{hr} {unit}",
-            "coin_price_usd": round(coin_usd, 6),
-            "market_cap": mcap_str,
-            "est_coins_day": round(est_coins_day, 4),
-            "gross_day_usd": round(gross_day_usd, 4),
-            "gross_hr_usd": round(gross_hr_usd, 4),
-            "machine_cost_day_usd": round(machine_cost_day, 4),
-            "machine_cost_hr_usd": round(machine_cost_hr, 4),
-            "net_day_usd": round(net_day_usd, 4),
-            "net_hr_usd": round(net_hr_usd, 4),
-            "roi_pct": round(roi_pct, 1),
-            "verdict": verdict,
-            "lagging": bool(cdata.get("lagging")),
-        })
-
-    gpu_coins.sort(key=lambda x: x["net_day_usd"], reverse=True)
 
     # Evaluate On-Chain Mining Protocols (from 1h scanner registry)
     onchain_rows: list[dict[str, Any]] = []
@@ -598,10 +518,7 @@ async def compute_arbitrage_snapshot(
             "excluded_non_mining_count": excluded_non_mining_count,
             "cuda_pow_protocols": sum(1 for r in onchain_rows if r["is_cuda_pow"]),
             "strong_onchain_opportunities": strong_onchain_count,
-            "total_gpu_l1_coins": len(gpu_coins),
-            "profitable_gpu_l1_coins": profitable_l1_count,
-            "best_gpu_l1_coin": gpu_coins[0] if gpu_coins else None,
+            "last_scan_at": last_scan_at,
         },
         "onchain_protocols": onchain_rows,
-        "gpu_l1_coins": gpu_coins,
     }

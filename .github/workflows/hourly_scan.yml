@@ -24,12 +24,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Multi-Chain On-Chain Mining Scan
+      - name: Run Clean v2 Hourly Mint-UI + DexScreener Scan
         env:
           HELIUS_API_KEY: ${{ secrets.HELIUS_API_KEY }}
         run: |
-          python onchain_mining_scanner.py --max-evm 300 --blocks 8
-          python protocol_profiler.py
+          python hourly_mint_scanner.py --max-evm 180
 
       - name: Commit updated registry and scan reports
         run: |

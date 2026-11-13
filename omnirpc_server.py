@@ -29,11 +29,11 @@ NON_EVM_REPORT_PATH = BASE_DIR / "non_evm_onchain_scan.json"
 POW_REPORT_PATH = BASE_DIR / "pow_direct_scan.json"
 
 SCAN_COMMANDS: dict[str, list[str]] = {
-    "evm_fast": [sys.executable, str(BASE_DIR / "onchain_mining_scanner.py"), "--max-evm", "60", "--blocks", "8", "--evm-only"],
-    "evm_full": [sys.executable, str(BASE_DIR / "onchain_mining_scanner.py"), "--max-evm", "650", "--blocks", "10"],
-    "all_chains": [sys.executable, str(BASE_DIR / "onchain_mining_scanner.py"), "--max-evm", "650", "--blocks", "10"],
-    "non_evm": [sys.executable, str(BASE_DIR / "non_evm_onchain_scanner.py")],
-    "pow": [sys.executable, str(BASE_DIR / "pow_direct_scanner.py")],
+    "evm_fast": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--no-blocks"],
+    "evm_full": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--max-evm", "180"],
+    "all_chains": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--max-evm", "180"],
+    "non_evm": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--no-blocks"],
+    "pow": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--no-blocks"],
     "pool": [sys.executable, str(BASE_DIR / "rpc_pool_builder.py")],
 }
 
@@ -233,14 +233,12 @@ def create_app(pool_path: Path = POOL_PATH) -> web.Application:
         return app["omni"]
 
     async def handle_dashboard(_request: web.Request) -> web.Response:
-        if not DASHBOARD_HTML.exists():
-            return web.Response(text="Dashboard UI file missing.", status=404)
-        return web.Response(text=DASHBOARD_HTML.read_text(encoding="utf-8"), content_type="text/html", charset="utf-8")
+        if not ARBITRAGE_HTML.exists():
+            return web.Response(text="Arbitrage UI file missing.", status=404)
+        return web.Response(text=ARBITRAGE_HTML.read_text(encoding="utf-8"), content_type="text/html", charset="utf-8")
 
     async def handle_mining_page(_request: web.Request) -> web.Response:
-        if not MINING_HTML.exists():
-            return web.Response(text="Mining Hunter UI file missing.", status=404)
-        return web.Response(text=MINING_HTML.read_text(encoding="utf-8"), content_type="text/html", charset="utf-8")
+        raise web.HTTPFound("/")
 
     async def handle_arbitrage_page(_request: web.Request) -> web.Response:
         if not ARBITRAGE_HTML.exists():
