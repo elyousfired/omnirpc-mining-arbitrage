@@ -158,14 +158,34 @@ async def _fetch_live_market_inputs(session: aiohttp.ClientSession, omni: OmniRP
     gas_gwei: dict[str, float] = dict(_MARKET_CACHE.get("gas_gwei") or {})
 
     async def load_binance() -> None:
+        for endpoint in (
+            "https://data-api.binance.vision/api/v3/ticker/price",
+            "https://api.binance.com/api/v3/ticker/price",
+        ):
+            try:
+                async with session.get(endpoint, timeout=aiohttp.ClientTimeout(total=8)) as r:
+                    if r.status == 200:
+                        rows = await r.json(content_type=None)
+                        sym_map = {x["symbol"]: float(x["price"]) for x in rows if isinstance(x, dict) and "symbol" in x}
+                        for nat, bsym in NATIVE_SYMBOL_TO_BINANCE.items():
+                            if bsym in sym_map:
+                                prices[nat] = sym_map[bsym]
+                        if prices:
+                            return
+            except Exception:
+                pass
+        # Fallback to CryptoCompare (US-cloud safe) if Binance endpoints fail
         try:
-            async with session.get("https://api.binance.com/api/v3/ticker/price", timeout=aiohttp.ClientTimeout(total=8)) as r:
+            fsyms = ",".join(dict.fromkeys(NATIVE_SYMBOL_TO_BINANCE.keys()))
+            cc_url = f"https://min-api.cryptocompare.com/data/pricemulti?fsyms={fsyms}&tsyms=USD"
+            async with session.get(cc_url, timeout=aiohttp.ClientTimeout(total=8)) as r:
                 if r.status == 200:
-                    rows = await r.json(content_type=None)
-                    sym_map = {x["symbol"]: float(x["price"]) for x in rows if isinstance(x, dict) and "symbol" in x}
-                    for nat, bsym in NATIVE_SYMBOL_TO_BINANCE.items():
-                        if bsym in sym_map:
-                            prices[nat] = sym_map[bsym]
+                    data = await r.json(content_type=None)
+                    if isinstance(data, dict):
+                        for nat in NATIVE_SYMBOL_TO_BINANCE:
+                            usd = (data.get(nat) or {}).get("USD")
+                            if usd:
+                                prices[nat] = float(usd)
         except Exception:
             pass
 
