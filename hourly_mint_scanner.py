@@ -442,156 +442,34 @@ async def _discover_dexscreener_candidates(
     return verified
 
 
-async def run_hourly_mint_scan(max_evm_chains: int = 180, blocks_back: int = 10) -> dict[str, Any]:
-    """Run one complete all-chains PoW + GPU + Fair-Mint scan and update mining_registry.json."""
-    prev_reg = load_registry()
-    scans_done = int(prev_reg.get("total_scans_completed") or 0)
-    evm_offset = (scans_done * 90) % 570
-    bs_offset = (scans_done * 12) % 90
+async def run_hourly_mint_scan(
+    max_evm_chains: int = 180,
+    blocks_back: int = 10,
+    no_blocks: bool = False,
+) -> dict[str, Any]:
+    """Run one full cumulative AI Agent discovery & registration cycle (keeps ALL old + adds new)."""
+    from ai_mining_agent import run_agent_cycle
 
-    omni = OmniRPC()
-    chain_resolver = _build_chain_resolver(omni)
-
-    # 1. Direct rotating multi-chain on-chain RPC scan (small + large EVM, Cosmos, Substrate, Solana, TON, Sui)
-    onchain_report = await onchain_mining_scanner.run_scan(
+    res = await run_agent_cycle(
         max_evm_chains=max_evm_chains,
         blocks_back=blocks_back,
-        all_ecosystems=True,
-        evm_offset=evm_offset,
+        no_blocks=no_blocks,
     )
-
-    connector = aiohttp.TCPConnector(limit=30, ssl=False)
-    async with aiohttp.ClientSession(connector=connector) as session:
-        wtm_wooly, bs_hits = await asyncio.gather(
-            _fetch_wtm_and_woolypooly(session),
-            _discover_blockscout_small_chains(session, max_explorers=24, offset=bs_offset),
-        )
-        discovered_dex = await _discover_dexscreener_candidates(session, chain_resolver, bs_hits)
-
-    # 2. Gather curated small/large PoW + GPU PoW + Mint seeds + onchain hits + newly discovered hits
-    raw_items: list[dict[str, Any]] = []
-    seen_keys: set[tuple[str, str]] = set()
-
-    def add_candidate(it: dict[str, Any]) -> None:
-        cid = str(it.get("chain_id") or "")
-        addr = str(it.get("address") or "").strip().lower()
-        if not addr or _is_testnet_chain(str(it.get("chain_name") or ""), cid):
-            return
-        k = (cid, addr)
-        if k in seen_keys:
-            return
-        seen_keys.add(k)
-        raw_items.append(dict(it))
-
-    for seed in CURATED_MINING_SEEDS:
-        add_candidate(seed)
-    for d in discovered_dex:
-        add_candidate(d)
-
-    for evm_ch in onchain_report.get("evm_results") or []:
-        cid = str(evm_ch.get("chain_id") or "")
-        cname = str(evm_ch.get("chain_name") or "")
-        sym = str(evm_ch.get("native_symbol") or "ETH")
-        if _is_testnet_chain(cname, cid):
-            continue
-        for c in (evm_ch.get("top_active_contracts") or []):
-            add_candidate(
-                {
-                    "ecosystem": "EVM",
-                    "chain_id": evm_ch.get("chain_id"),
-                    "chain_name": cname,
-                    "native_symbol": sym,
-                    "address": c.get("address"),
-                    "tx_count": c.get("tx_count", 0),
-                    "decoded_functions": c.get("decoded_functions") or [],
-                    "is_curated_miner": False,
-                }
-            )
-
-    # 3. Enrich every candidate with live DexScreener + website + explorer data
-    await enrich_registry_items_onchain(raw_items)
-
-    # 4. Strict filter: actionable user-mineable / GPU PoW + official site + live DexScreener price
-    actionable = [it for it in raw_items if is_actionable_mining_protocol(it)]
-    now_iso = utc_now_iso()
-    prev_items = prev_reg.get("items") or {}
-    items_dict: dict[str, dict[str, Any]] = {}
-    new_count = 0
-
-    actionable.sort(
-        key=lambda x: (
-            1 if "gpu" in str(x.get("category") or x.get("protocol_type") or "").lower() else 0,
-            float(((x.get("market_profile") or {}).get("liquidity_usd")) or 0),
-        ),
-        reverse=True,
-    )
-
-    for it in actionable:
-        cid = str(it.get("chain_id") or "")
-        addr = str(it.get("address") or "").strip()
-        uid = it.get("uid") or f"{cid}:{addr.lower()}"
-        prev = prev_items.get(uid) or {}
-        is_new = uid not in prev_items
-        if is_new:
-            new_count += 1
-        it["uid"] = uid
-        it["symbol"] = it.get("symbol") or it.get("native_symbol") or "ETH"
-        it["first_seen_at"] = prev.get("first_seen_at") or now_iso
-        it["last_seen_at"] = now_iso
-        it["discovered_in_scan"] = prev.get("discovered_in_scan") or (scans_done + 1)
-        it["seen_scans"] = int(prev.get("seen_scans") or 0) + 1
-        it["is_new_in_last_scan"] = is_new
-        it["cumulative_txs"] = max(int(prev.get("cumulative_txs") or 0), int(it.get("tx_count") or 1))
-        it["cumulative_mints"] = max(int(prev.get("cumulative_mints") or 0), int(it.get("tx_count") or 1))
-        it["unique_callers"] = max(int(prev.get("unique_callers") or 0), int(it.get("unique_callers") or 1))
-        items_dict[uid] = it
-
-    stats = {
-        "evm_chains_scanned": int(onchain_report.get("evm_chains_scanned") or len(onchain_report.get("evm_results") or [])),
-        "total_chains_scanned": int(onchain_report.get("total_chains_scanned") or 0),
-        "evm_offset": evm_offset,
-        "wtm_gpu_coins": wtm_wooly.get("wtm_count", 0),
-        "wooly_pools": wtm_wooly.get("wooly_count", 0),
-        "blockscout_hits": len(bs_hits),
-        "dex_discovered_verified": len(discovered_dex),
-        "total_candidates_enriched": len(raw_items),
-        "verified_actionable_count": len(items_dict),
-        "newly_registered": new_count,
-    }
-    history_entry = {
-        "scan_id": scans_done + 1,
-        "timestamp": now_iso,
-        "evm_chains_scanned": stats["evm_chains_scanned"],
-        "matched_in_scan": len(items_dict),
-        "newly_registered": new_count,
-        "total_registry_size": len(items_dict),
-    }
-
-    out_reg = {
-        "schema_version": 4,
-        "updated_at": now_iso,
-        "updated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
-        "scan_interval_seconds": 3600,
-        "total_scans_completed": scans_done + 1,
-        "total_protocols": len(items_dict),
-        "pruned_last_scan": max(0, len(raw_items) - len(items_dict)),
-        "last_scan_stats": stats,
-        "items": items_dict,
-        "scan_history": ([history_entry] + list(prev_reg.get("scan_history") or []))[:60],
-    }
-    save_registry(out_reg)
-    return out_reg
+    return res["registry"]
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="OmniRPC Hourly All-Chains PoW & GPU-Mint Scanner (v3)")
+    parser = argparse.ArgumentParser(description="OmniRPC Hourly All-Chains PoW & GPU-Mint Scanner (AI Agent)")
     parser.add_argument("--max-evm", type=int, default=180, help="Max EVM chains per rotating scan window")
     parser.add_argument("--blocks", type=int, default=10, help="Recent blocks back per EVM RPC")
+    parser.add_argument("--no-blocks", action="store_true", help="Skip live block loop and run API/DEX/Blockscout scan")
     args = parser.parse_args()
 
-    reg = asyncio.run(run_hourly_mint_scan(max_evm_chains=args.max_evm, blocks_back=args.blocks))
+    reg = asyncio.run(
+        run_hourly_mint_scan(max_evm_chains=args.max_evm, blocks_back=args.blocks, no_blocks=args.no_blocks)
+    )
     stats = reg.get("last_scan_stats") or {}
-    print(json.dumps({"updated_at_utc": reg.get("updated_at_utc"), "stats": stats}, indent=2, ensure_ascii=False))
+    print(json.dumps({"updated_at": reg.get("updated_at"), "stats": stats}, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

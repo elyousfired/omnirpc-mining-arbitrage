@@ -29,13 +29,14 @@ NON_EVM_REPORT_PATH = BASE_DIR / "non_evm_onchain_scan.json"
 POW_REPORT_PATH = BASE_DIR / "pow_direct_scan.json"
 
 SCAN_COMMANDS: dict[str, list[str]] = {
-    "evm_fast": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--no-blocks"],
-    "evm_full": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--max-evm", "180"],
-    "all_chains": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--max-evm", "180"],
-    "non_evm": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--no-blocks"],
-    "pow": [sys.executable, str(BASE_DIR / "hourly_mint_scanner.py"), "--no-blocks"],
+    "evm_fast": [sys.executable, str(BASE_DIR / "ai_mining_agent.py"), "--no-blocks"],
+    "evm_full": [sys.executable, str(BASE_DIR / "ai_mining_agent.py"), "--max-evm", "180"],
+    "all_chains": [sys.executable, str(BASE_DIR / "ai_mining_agent.py"), "--max-evm", "180"],
+    "non_evm": [sys.executable, str(BASE_DIR / "ai_mining_agent.py"), "--no-blocks"],
+    "pow": [sys.executable, str(BASE_DIR / "ai_mining_agent.py"), "--no-blocks"],
     "pool": [sys.executable, str(BASE_DIR / "rpc_pool_builder.py")],
 }
+AGENT_MEMORY_PATH = BASE_DIR / "agent_memory.json"
 
 
 def _read_json(path: Path, default: Any = None) -> Any:
@@ -160,10 +161,21 @@ def create_app(pool_path: Path = POOL_PATH) -> web.Application:
         "just_finished": False,
         "returncode": None,
     }
+    # Preserve 1h cadence across restarts based on agent_memory.json / mining_registry.json mtime
+    initial_next_run = time.time() + 15
+    if AGENT_MEMORY_PATH.exists():
+        age = max(0.0, time.time() - AGENT_MEMORY_PATH.stat().st_mtime)
+        if age < AUTO_SCAN_INTERVAL - 60:
+            initial_next_run = time.time() + (AUTO_SCAN_INTERVAL - age)
+    elif REGISTRY_JSON.exists():
+        age = max(0.0, time.time() - REGISTRY_JSON.stat().st_mtime)
+        if age < AUTO_SCAN_INTERVAL - 60:
+            initial_next_run = time.time() + (AUTO_SCAN_INTERVAL - age)
+
     app["auto_scan"] = {
         "enabled": True,
         "interval_sec": AUTO_SCAN_INTERVAL,
-        "next_run_at": time.time() + 15,
+        "next_run_at": initial_next_run,
         "last_run_at": None,
         "last_new_count": 0,
     }
@@ -480,6 +492,24 @@ def create_app(pool_path: Path = POOL_PATH) -> web.Application:
         except Exception as exc:
             return web.json_response({"error": str(exc)}, status=502)
 
+    async def handle_api_agent(_request: web.Request) -> web.Response:
+        mem = _read_json(AGENT_MEMORY_PATH)
+        reg = load_registry(REGISTRY_JSON)
+        auto = app["auto_scan"]
+        st = app["scan_state"]
+        return web.json_response({
+            "mode": "local_agent",
+            "agent_memory": mem,
+            "total_accumulated": len(reg.get("items") or {}),
+            "auto_scan": {
+                "enabled": auto["enabled"],
+                "interval_sec": auto["interval_sec"],
+                "running_now": st["running"],
+                "last_line": st["last_line"],
+                "seconds_until_next_scan": max(0, int(auto["next_run_at"] - time.time())) if auto["enabled"] else 0,
+            },
+        })
+
     async def handle_api_providers_health(_request: web.Request) -> web.Response:
         return web.json_response(await check_all_apis_health(get_omni()))
 
@@ -487,6 +517,7 @@ def create_app(pool_path: Path = POOL_PATH) -> web.Application:
     app.router.add_get("/mining", handle_mining_page)
     app.router.add_get("/arbitrage", handle_arbitrage_page)
     app.router.add_get("/api/arbitrage", handle_api_arbitrage)
+    app.router.add_get("/api/agent", handle_api_agent)
     app.router.add_get("/api/registry", handle_api_registry)
     app.router.add_get("/api/providers/health", handle_api_providers_health)
     app.router.add_post("/api/registry/scan-now", handle_api_registry_scan_now)

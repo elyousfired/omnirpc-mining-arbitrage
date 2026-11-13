@@ -182,8 +182,9 @@
       </div>
     </div>
 
-    <div class="nav-links">
-      <span class="badge b-green" style="padding:8px 12px;font-size:12px;">⚡ فحص وتحديث تلقائي كل 1 ساعة</span>
+    <div class="nav-links" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <span class="badge b-green" id="agentHeaderBadge" style="padding:8px 12px;font-size:12px;">🤖 AI Agent مستمر • يحفظ القديم ويزيد الجديد كل 1 ساعة</span>
+      <button class="btn btn-sm" id="btnAgentScan" style="border-color:rgba(16,185,129,0.5);color:#6ee7b7;padding:7px 12px;" onclick="triggerAgentScan()">⚡ فحص الإيجنت الآن</button>
     </div>
   </header>
 
@@ -237,15 +238,23 @@
         <div class="kpi-sub" id="kpiMachineSub">—</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">البروتوكولات الصالحة للتعدين والـ Mint</div>
+        <div class="kpi-label">البروتوكولات المحفوظة والـ AI Agent</div>
         <div class="kpi-value" style="color:var(--amber);" id="kpiOnchainPow">—</div>
         <div class="kpi-sub" id="kpiOnchainSub">—</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">سعر البيتكوين وآخر فحص كل 1 ساعة</div>
+        <div class="kpi-label">سعر البيتكوين وآخر دورة للإيجنت (1h)</div>
         <div class="kpi-value" style="color:var(--cyan);" id="kpiBtcPrice">—</div>
         <div class="kpi-sub" id="kpiUpdatedAt">—</div>
       </div>
+    </section>
+
+    <section class="calc-panel" id="agentBriefBar" style="margin-bottom:14px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="font-size:12px;color:#e2e8f0;">
+        <span class="badge b-cyan" id="agentCyclePill">دورة #0</span>
+        <span id="agentBriefText" style="margin-right:6px;">جاري تحميل ذاكرة الإيجنت...</span>
+      </div>
+      <div class="ltr" style="font-size:11px;color:var(--muted);" id="agentSyncNote">قاعدة تراكمية: القديم محفوظ + الجديد يتزاد كل ساعة</div>
     </section>
 
     <div id="tab-onchain" class="panel active">
@@ -359,14 +368,40 @@
       if (!d) return;
       const m = d.machine || {};
       const s = d.summary || {};
+      const ag = d.agent || {};
       document.getElementById("kpiMachineCost").textContent = `$${fmtNum(m.machine_cost_hr_usd, 3)} / hr`;
       document.getElementById("kpiMachineSub").textContent = `$${fmtNum(m.machine_cost_day_usd, 2)} / يوم • ${m.label} (${m.watts}W)`;
 
-      document.getElementById("kpiOnchainPow").textContent = `${s.total_onchain_protocols} / ${s.total_onchain_protocols}`;
-      const excluded = s.excluded_non_mining_count || 0;
-      document.getElementById("kpiOnchainSub").textContent = `فرص قوية: ${s.strong_onchain_opportunities} • مستبعدة من السكانر: ${excluded}`;
+      document.getElementById("kpiOnchainPow").textContent = `${s.total_onchain_protocols} محفوظ`;
+      const newly = ag.newly_added_last_cycle || 0;
+      document.getElementById("kpiOnchainSub").textContent = `دورة #${ag.total_cycles || 1} • +${newly} جداد فـ آخر ساعة • فرص قوية: ${s.strong_onchain_opportunities}`;
       document.getElementById("kpiBtcPrice").textContent = `$${fmtNum(d.btc_usd, 0)}`;
-      document.getElementById("kpiUpdatedAt").textContent = `آخر فحص 1h: ${s.last_scan_at || d.updated_at}`;
+      document.getElementById("kpiUpdatedAt").textContent = `آخر دورة 1h: ${ag.last_cycle_at || s.last_scan_at || d.updated_at}`;
+
+      document.getElementById("agentCyclePill").textContent = `🤖 دورة #${ag.total_cycles || 1}`;
+      document.getElementById("agentBriefText").textContent = ag.last_brief_ar || `محفوظين ${s.total_onchain_protocols} بروتوكول (القديم + الجديد كل ساعة).`;
+      document.getElementById("agentHeaderBadge").textContent = `🤖 AI Agent • دورة #${ag.total_cycles || 1} (+${newly} جداد)`;
+    }
+
+    async function triggerAgentScan() {
+      const btn = document.getElementById("btnAgentScan");
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "⏳ الإيجنت كيقلب دابا...";
+      try {
+        const res = await fetch("/api/registry/scan-now", { method: "POST" });
+        const data = await res.json();
+        if (data.status === "cloud_scheduled") {
+          document.getElementById("agentBriefText").textContent = "على Vercel السيرفر السحابي كيدير الفحص أوتوماتيكياً كل ساعة عبر GitHub Actions ويحفظ كلشي.";
+        } else if (data.status === "started" || data.status === "already_running") {
+          document.getElementById("agentBriefText").textContent = "الإيجنت خدام دابا كيمسح الشبكات الصغيرة والكبيرة وغادي يزيد أي بروتوكول جديد فوق اللائحة...";
+          setTimeout(loadArbitrage, 15000);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setTimeout(() => { btn.disabled = false; btn.textContent = orig; }, 3500);
+      }
     }
 
     function shortAddr(a) {

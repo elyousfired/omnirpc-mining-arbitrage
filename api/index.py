@@ -17,7 +17,7 @@ if str(ROOT_DIR) not in sys.path:
 
 import aiohttp
 
-from arbitrage_engine import compute_arbitrage_snapshot
+from arbitrage_engine import compute_arbitrage_snapshot, load_latest_registry_and_memory
 from mining_registry import REGISTRY_CSV, REGISTRY_JSON, load_registry
 from omnirpc_client import OmniRPC, POOL_PATH
 from omnirpc_server import (
@@ -117,13 +117,29 @@ class handler(BaseHTTPRequestHandler):
                 )
                 return self._send_json(data)
 
+            if path == "/api/agent":
+                reg, mem = asyncio.run(_with_session(load_latest_registry_and_memory))
+                return self._send_json({
+                    "mode": "cloud_github_agent",
+                    "agent_memory": mem,
+                    "total_accumulated": len(reg.get("items") or {}),
+                    "auto_scan": {
+                        "enabled": True,
+                        "interval_sec": AUTO_SCAN_INTERVAL,
+                        "running_now": False,
+                        "last_line": mem.get("last_agent_brief_ar") or "الإيجنت التلقائي خدام كل ساعة عبر GitHub Actions.",
+                        "seconds_until_next_scan": AUTO_SCAN_INTERVAL,
+                    },
+                })
+
             if path == "/api/registry":
-                reg = load_registry(REGISTRY_JSON)
+                reg, mem = asyncio.run(_with_session(load_latest_registry_and_memory))
                 hist = reg.get("scan_history") or []
                 last_run = hist[0].get("timestamp") if hist else None
                 last_new = hist[0].get("newly_registered", 0) if hist else 0
                 return self._send_json({
                     "registry": reg,
+                    "agent_memory": mem,
                     "auto_scan": {
                         "enabled": True,
                         "interval_sec": AUTO_SCAN_INTERVAL,

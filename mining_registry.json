@@ -1,22 +1,26 @@
 {
-  "schema_version": 4,
-  "updated_at": "2026-11-13T21:08:38Z",
-  "updated_at_utc": "2026-11-13 21:08:38 UTC",
+  "schema_version": 5,
+  "agent_managed": true,
+  "updated_at": "2026-11-13T21:27:44Z",
+  "updated_at_utc": "2026-11-13 21:27:44 UTC",
   "scan_interval_seconds": 3600,
-  "total_scans_completed": 17,
+  "total_scans_completed": 19,
   "total_protocols": 32,
-  "pruned_last_scan": 0,
+  "pruned_last_scan": 1,
   "last_scan_stats": {
-    "evm_chains_scanned": 180,
-    "total_chains_scanned": 392,
-    "evm_offset": 300,
+    "evm_chains_scanned": 120,
+    "total_chains_scanned": 332,
+    "evm_offset": 0,
+    "bs_offset": 0,
     "wtm_gpu_coins": 41,
     "wooly_pools": 23,
-    "blockscout_hits": 16,
+    "blockscout_hits": 19,
     "dex_discovered_verified": 7,
-    "total_candidates_enriched": 33,
-    "verified_actionable_count": 33,
-    "newly_registered": 0
+    "refreshed_existing_prices": 32,
+    "verified_this_cycle": 32,
+    "newly_registered": 0,
+    "total_accumulated_protocols": 32,
+    "duration_s": 76.7
   },
   "items": {
     "evm:1030:0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b": {
@@ -37,6 +41,7 @@
       "is_curated_miner": true,
       "wtm_name": "Conflux",
       "gpu_algo": "Octopus",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "resolved_token_address": "0x14b2D3bC65e74DAE1030EAFd8ac30c533c976A9b",
@@ -44,7 +49,7 @@
         "dex_id": "swappi",
         "price_usd": "0.05848",
         "liquidity_usd": 197623.47,
-        "volume_24h_usd": 2.46,
+        "volume_24h_usd": 1.84,
         "dex_url": "https://dexscreener.com/conflux/0x949b78ef2c8d6979098e195b08f27ff99cb20448",
         "dex_base_token": "0x889138644274a7Dc602f25A7e7D53fF40E6d0091",
         "websites": [
@@ -59,7 +64,7 @@
         "name": "Wrapped Conflux",
         "symbol": "WCFX",
         "decimals": 18,
-        "total_supply_raw": "20239774841084000942228574",
+        "total_supply_raw": "20239777572166685256886234",
         "is_erc721": false,
         "is_erc1155": false,
         "standard": "ERC-20 (18d)",
@@ -79,11 +84,12 @@
       "explorer_name": "ConfluxScan",
       "explorer_url": "https://evm.confluxscan.io/address/0x14b2D3bC65e74DAE1030EAFd8ac30c533c976A9b",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Conflux eSpace"
     },
     "evm:56:0x3d6545b08693dae087e957cb1180ee38b9e3c25e": {
       "uid": "evm:56:0x3d6545b08693dae087e957cb1180ee38b9e3c25e",
@@ -103,6 +109,7 @@
       "is_curated_miner": true,
       "wtm_name": "EthereumClassic",
       "gpu_algo": "Etchash",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -147,11 +154,12 @@
       "explorer_name": "BscScan",
       "explorer_url": "https://bscscan.com/address/0x3d6545b08693dae087e957cb1180ee38b9e3c25e",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Ethereum Classic (BSC)"
     },
     "evm:1:0xdb85f6685950e285b1e611037bebe5b34e2b7d78": {
       "uid": "evm:1:0xdb85f6685950e285b1e611037bebe5b34e2b7d78",
@@ -171,6 +179,7 @@
       "is_curated_miner": true,
       "wtm_name": "Zano",
       "gpu_algo": "ProgPowZ",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -220,11 +229,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0xdb85f6685950E285b1E611037BEBe5B34e2B7d78",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Zano (ETH Bridge)"
     },
     "cardano:mainnet:04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247": {
       "uid": "cardano:mainnet:04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247",
@@ -244,6 +254,7 @@
       "is_curated_miner": true,
       "wtm_name": "Ergo",
       "gpu_algo": "Autolykos",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "resolved_token_address": "04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247",
@@ -268,11 +279,12 @@
       "explorer_name": "Cardanoscan",
       "explorer_url": "https://cardanoscan.io/token/04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Ergo / Cardano (rsERG)"
     },
     "ton:mainnet:EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O": {
       "uid": "ton:mainnet:EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O",
@@ -290,6 +302,7 @@
       "unique_callers": 900,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "resolved_token_address": "EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O",
@@ -300,7 +313,7 @@
         "is_verified": true,
         "price_usd": "0.0004915",
         "liquidity_usd": 35863.2,
-        "volume_24h_usd": 1012.53,
+        "volume_24h_usd": 989.48,
         "dex_url": "https://dexscreener.com/ton/eqasbzlwa2vfdsgodf2w96pdccbjjrxdnxxpul7nmm0wdnmx"
       },
       "onchain_profile": {
@@ -314,11 +327,12 @@
       "explorer_name": "Tonviewer",
       "explorer_url": "https://tonviewer.com/EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على TON Mainnet"
     },
     "evm:1:0xe60201989b8628f43dc0605f585a72bcf1f1e977": {
       "uid": "evm:1:0xe60201989b8628f43dc0605f585a72bcf1f1e977",
@@ -337,6 +351,7 @@
       "cumulative_mints": 1,
       "is_curated_miner": true,
       "gpu_algo": "KawPow",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -350,9 +365,9 @@
         "resolved_token_address": "0xE60201989b8628F43dC0605f585a72Bcf1F1e977",
         "dex_pairs_count": 3,
         "dex_id": "uniswap",
-        "price_usd": "0.001569",
-        "liquidity_usd": 17063.73,
-        "volume_24h_usd": 1862.86,
+        "price_usd": "0.001564",
+        "liquidity_usd": 17035.4,
+        "volume_24h_usd": 1876.26,
         "dex_url": "https://dexscreener.com/ethereum/0x20b71392201dd46be64fd08eab9d1643e2fab747",
         "dex_base_token": "0xE60201989b8628F43dC0605f585a72Bcf1F1e977",
         "websites": [
@@ -386,11 +401,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0xE60201989b8628F43dC0605f585a72Bcf1F1e977",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Clore.ai (ETH)"
     },
     "ton:mainnet:EQCymLRXp1QYxZKek4CTInckB1ey5TkyAJQpPAlNetiO54Vt": {
       "uid": "ton:mainnet:EQCymLRXp1QYxZKek4CTInckB1ey5TkyAJQpPAlNetiO54Vt",
@@ -408,6 +424,7 @@
       "unique_callers": 620,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "resolved_token_address": "EQCymLRXp1QYxZKek4CTInckB1ey5TkyAJQpPAlNetiO54Vt",
@@ -418,7 +435,7 @@
         "is_verified": true,
         "price_usd": "0.0004508",
         "liquidity_usd": 14223.02,
-        "volume_24h_usd": 41.11,
+        "volume_24h_usd": 29.53,
         "dex_url": "https://dexscreener.com/ton/eqcq2oav56bxg0z9vittfvw7wjpmgdna6mflf0-_jcqyybkk"
       },
       "onchain_profile": {
@@ -432,11 +449,12 @@
       "explorer_name": "Tonviewer",
       "explorer_url": "https://tonviewer.com/EQCymLRXp1QYxZKek4CTInckB1ey5TkyAJQpPAlNetiO54Vt",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على TON Mainnet"
     },
     "evm:1:0x9928a8600d14ac22c0be1e8d58909834d7ceaf13": {
       "uid": "evm:1:0x9928a8600d14ac22c0be1e8d58909834d7ceaf13",
@@ -456,6 +474,7 @@
       "is_curated_miner": true,
       "wtm_name": "Dynexcoin",
       "gpu_algo": "DynexSolve",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -505,11 +524,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0x9928a8600d14ac22c0be1e8d58909834d7ceaf13",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Dynex (ETH Bridge)"
     },
     "evm:56:0xd5d0322b6bab6a762c79f8c81a0b674778e13aed": {
       "uid": "evm:56:0xd5d0322b6bab6a762c79f8c81a0b674778e13aed",
@@ -529,6 +549,7 @@
       "is_curated_miner": true,
       "wtm_name": "Firo",
       "gpu_algo": "FiroPow",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -573,11 +594,12 @@
       "explorer_name": "BscScan",
       "explorer_url": "https://bscscan.com/address/0xd5d0322b6bab6a762c79f8c81a0b674778e13aed",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Firo (BSC Bridge)"
     },
     "evm:1:0xfa704148d516b209d52c2d75f239274c8f8eaf1a": {
       "uid": "evm:1:0xfa704148d516b209d52c2d75f239274c8f8eaf1a",
@@ -597,6 +619,7 @@
       "is_curated_miner": true,
       "wtm_name": "OctaSpace",
       "gpu_algo": "Ethash",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -646,11 +669,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0xfa704148d516b209d52c2d75f239274c8f8eaf1a",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على OctaSpace (Ethash)"
     },
     "evm:56:0xaff9084f2374585879e8b434c399e29e80cce635": {
       "uid": "evm:56:0xaff9084f2374585879e8b434c399e29e80cce635",
@@ -669,6 +693,7 @@
       "cumulative_mints": 1,
       "is_curated_miner": true,
       "gpu_algo": "ZelHash",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -677,9 +702,9 @@
         "resolved_token_address": "0xaff9084f2374585879e8b434c399e29e80cce635",
         "dex_pairs_count": 3,
         "dex_id": "pancakeswap",
-        "price_usd": "0.05122",
-        "liquidity_usd": 4376.25,
-        "volume_24h_usd": 1410.21,
+        "price_usd": "0.05100",
+        "liquidity_usd": 4354.86,
+        "volume_24h_usd": 1411.49,
         "dex_url": "https://dexscreener.com/bsc/0xf1ca293f00b75f35fc64466437cfe3fec4cf4cd9",
         "dex_base_token": "0xaFF9084f2374585879e8B434C399E29E80ccE635",
         "websites": [
@@ -713,11 +738,12 @@
       "explorer_name": "BscScan",
       "explorer_url": "https://bscscan.com/address/0xaff9084f2374585879e8b434c399e29e80cce635",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Flux (BSC Bridge)"
     },
     "evm:8453:0xa1c0decafe3e9bf06a5f29b7015cd373a9854608": {
       "uid": "evm:8453:0xa1c0decafe3e9bf06a5f29b7015cd373a9854608",
@@ -736,6 +762,7 @@
       "cumulative_mints": 1,
       "is_curated_miner": true,
       "gpu_algo": "KawPow",
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -782,11 +809,12 @@
       "explorer_name": "Basescan",
       "explorer_url": "https://basescan.org/address/0xa1c0decafe3e9bf06a5f29b7015cd373a9854608",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على AI Power Grid (Base)"
     },
     "solana:mainnet:oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv": {
       "uid": "solana:mainnet:oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv",
@@ -805,13 +833,14 @@
       "unique_callers": 500,
       "cumulative_mints": 50000,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
-        "price_usd": "96.18",
+        "price_usd": "96.66",
         "blockscout_token_name": "ORE",
         "blockscout_symbol": "ORE",
-        "liquidity_usd": 598466.92,
-        "volume_24h_usd": 151860.31,
+        "liquidity_usd": 599426.08,
+        "volume_24h_usd": 153289.34,
         "dex_url": "https://dexscreener.com/solana/c7hf6mvqwerhsf1krfvnkzdarb9psoffiwzdipo9c7cz",
         "websites": [
           "https://ore.supply",
@@ -847,11 +876,12 @@
       "explorer_name": "Solscan",
       "explorer_url": "https://solscan.io/account/oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv",
       "first_seen_at": "2026-11-13T20:13:17Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 10,
-      "seen_scans": 5,
+      "seen_scans": 7,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 50000
+      "cumulative_txs": 50000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Solana Mainnet"
     },
     "evm:1:0xf19308f923582a6f7c465e5ce7a9dc1bec6665b1": {
       "uid": "evm:1:0xf19308f923582a6f7c465e5ce7a9dc1bec6665b1",
@@ -869,6 +899,7 @@
       "unique_callers": 450,
       "cumulative_mints": 60000,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -884,7 +915,7 @@
         "dex_id": "uniswap",
         "price_usd": "0.00000004121",
         "liquidity_usd": 183316.17,
-        "volume_24h_usd": 25346.69,
+        "volume_24h_usd": 22731.46,
         "dex_url": "https://dexscreener.com/ethereum/0xc45a81bc23a64ea556ab4cdf08a86b61cdceea8b",
         "dex_base_token": "0xF19308F923582A6f7c465e5CE7a9Dc1BEC6665B1",
         "websites": [
@@ -932,11 +963,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0xF19308F923582A6f7c465e5CE7a9Dc1BEC6665B1",
       "first_seen_at": "2026-11-13T20:19:35Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 10,
-      "seen_scans": 5,
+      "seen_scans": 7,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 60000
+      "cumulative_txs": 60000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Ethereum Mainnet"
     },
     "evm:8453:0xae4a37d554c6d6f3e398546d8566b25052e0169c": {
       "uid": "evm:8453:0xae4a37d554c6d6f3e398546d8566b25052e0169c",
@@ -954,6 +986,7 @@
       "unique_callers": 420,
       "cumulative_mints": 35000,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1012,11 +1045,12 @@
       "explorer_name": "Basescan",
       "explorer_url": "https://basescan.org/address/0xae4a37d554c6d6f3e398546d8566b25052e0169c",
       "first_seen_at": "2026-11-13T20:19:35Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 10,
-      "seen_scans": 5,
+      "seen_scans": 7,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 35000
+      "cumulative_txs": 35000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Base"
     },
     "evm:369:0xff640cbd35a618df1348d861b5e47f7eab05b422": {
       "uid": "evm:369:0xff640cbd35a618df1348d861b5e47f7eab05b422",
@@ -1034,6 +1068,7 @@
       "unique_callers": 410,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1042,9 +1077,9 @@
         "resolved_token_address": "0xFf640cBd35A618Df1348D861B5e47f7eaB05b422",
         "dex_pairs_count": 30,
         "dex_id": "pulsex",
-        "price_usd": "0.09856",
-        "liquidity_usd": 81945.47,
-        "volume_24h_usd": 3788.11,
+        "price_usd": "0.09876",
+        "liquidity_usd": 82030.95,
+        "volume_24h_usd": 3820,
         "dex_url": "https://dexscreener.com/pulsechain/0xb1786f834f38494b4ccc82c012a7bac2e46fe358",
         "dex_base_token": "0xFf640cBd35A618Df1348D861B5e47f7eaB05b422",
         "websites": [
@@ -1080,11 +1115,12 @@
       "explorer_name": "PulseScan",
       "explorer_url": "https://otter.pulsechain.com/address/0xFf640cBd35A618Df1348D861B5e47f7eaB05b422",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على PulseChain"
     },
     "evm:1:0xd536e7a9543cf9867a580b45cec7f748a1fe11ec": {
       "uid": "evm:1:0xd536e7a9543cf9867a580b45cec7f748a1fe11ec",
@@ -1102,6 +1138,7 @@
       "unique_callers": 190,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1113,11 +1150,11 @@
         "blockscout_symbol": "ORX",
         "token_holders": "1226",
         "resolved_token_address": "0xd536E7A9543Cf9867a580B45CEC7F748a1FE11eC",
-        "dex_pairs_count": 5,
+        "dex_pairs_count": 6,
         "dex_id": "uniswap",
         "price_usd": "0.01647",
         "liquidity_usd": 67977.55,
-        "volume_24h_usd": 10569.67,
+        "volume_24h_usd": 9453.67,
         "dex_url": "https://dexscreener.com/ethereum/0x10ef9f7f4f33799473c64fa906afdbdbab179dd0",
         "dex_base_token": "0x58d7Fa7356D68C494c2De09f95d55C2Ff2D38BD3",
         "websites": [
@@ -1156,11 +1193,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0xd536E7A9543Cf9867a580B45CEC7F748a1FE11eC",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Ethereum Mainnet"
     },
     "evm:1:0x06450dee7fd2fb8e39061434babcfc05599a6fb8": {
       "uid": "evm:1:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
@@ -1178,6 +1216,7 @@
       "unique_callers": 400,
       "cumulative_mints": 40000,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1191,9 +1230,9 @@
         "resolved_token_address": "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
         "dex_pairs_count": 7,
         "dex_id": "uniswap",
-        "price_usd": "0.000000003192",
-        "liquidity_usd": 51734.14,
-        "volume_24h_usd": 23903.88,
+        "price_usd": "0.000000003168",
+        "liquidity_usd": 51384.62,
+        "volume_24h_usd": 22801.24,
         "dex_url": "https://dexscreener.com/ethereum/0x2a9d2ba41aba912316d16742f259412b681898db",
         "dex_base_token": "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
         "websites": [
@@ -1211,7 +1250,7 @@
         "name": "XEN Crypto",
         "symbol": "XEN",
         "decimals": 18,
-        "total_supply_raw": "468467557850645334085505986958625",
+        "total_supply_raw": "468467558570423334085505986958625",
         "is_erc721": false,
         "is_erc1155": false,
         "standard": "ERC-20 (18d)",
@@ -1247,11 +1286,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
       "first_seen_at": "2026-11-13T20:13:17Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 10,
-      "seen_scans": 5,
+      "seen_scans": 7,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 40000
+      "cumulative_txs": 40000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Ethereum Mainnet"
     },
     "1:0xfd4cb1294df23920e683e046963117cae6c807d9": {
       "ecosystem": "EVM",
@@ -1283,7 +1323,7 @@
         "blockscout_symbol": "SHOGUN",
         "token_holders": "1132",
         "resolved_token_address": "0xfd4cb1294df23920e683e046963117cae6c807d9",
-        "dex_pairs_count": 5,
+        "dex_pairs_count": 6,
         "dex_id": "uniswap",
         "price_usd": "0.00005601",
         "liquidity_usd": 25540.25,
@@ -1299,12 +1339,13 @@
         ],
         "reward_token_symbol": "SHOGUN"
       },
+      "discovery_source": "autonomous_dex_blockscout",
       "onchain_profile": {
         "probed": true,
         "name": "SHOGUN",
         "symbol": "SHOGUN",
         "decimals": 18,
-        "total_supply_raw": "2206546826938330346086719027",
+        "total_supply_raw": "2206545069407260713659462842",
         "is_erc721": false,
         "is_erc1155": false,
         "standard": "ERC-20 (18d)",
@@ -1321,13 +1362,14 @@
       "uid": "1:0xfd4cb1294df23920e683e046963117cae6c807d9",
       "symbol": "ETH",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
       "cumulative_txs": 4,
       "cumulative_mints": 4,
-      "unique_callers": 1
+      "unique_callers": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Ethereum"
     },
     "evm:1:0x5c47902c8c80779cb99235e42c354e53f38c3b0d": {
       "uid": "evm:1:0x5c47902c8c80779cb99235e42c354e53f38c3b0d",
@@ -1344,6 +1386,7 @@
       "unique_callers": 210,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1396,11 +1439,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0x5c47902c8C80779CB99235E42C354E53F38C3B0d",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Ethereum Mainnet"
     },
     "1:0x6532b3f1e4dbff542fbd6befe5ed7041c10b385a": {
       "ecosystem": "EVM",
@@ -1449,6 +1493,7 @@
         ],
         "reward_token_symbol": "TINC"
       },
+      "discovery_source": "autonomous_dex_blockscout",
       "onchain_profile": {
         "probed": true,
         "name": "Titan Farms Incentive Token",
@@ -1473,13 +1518,14 @@
       "uid": "1:0x6532b3f1e4dbff542fbd6befe5ed7041c10b385a",
       "symbol": "ETH",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
       "cumulative_txs": 1,
       "cumulative_mints": 1,
-      "unique_callers": 1
+      "unique_callers": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Ethereum"
     },
     "solana:mainnet:E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu": {
       "uid": "solana:mainnet:E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
@@ -1497,6 +1543,7 @@
       "unique_callers": 120,
       "cumulative_mints": 12000,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "price_usd": "0.009328",
@@ -1539,11 +1586,12 @@
       "explorer_name": "Solscan",
       "explorer_url": "https://solscan.io/account/E3yUqBNTZxV8ELvW99oRLC7z4ddbJqqR4NphwrMug9zu",
       "first_seen_at": "2026-11-13T20:13:17Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 10,
-      "seen_scans": 5,
+      "seen_scans": 7,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 12000
+      "cumulative_txs": 12000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Solana Mainnet"
     },
     "evm:369:0x037645963aece8c5beb947da5621362c9f7db5a6": {
       "uid": "evm:369:0x037645963aece8c5beb947da5621362c9f7db5a6",
@@ -1560,6 +1608,7 @@
       "unique_callers": 140,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1604,11 +1653,12 @@
       "explorer_name": "PulseScan",
       "explorer_url": "https://otter.pulsechain.com/address/0x037645963Aece8C5Beb947dA5621362c9f7dB5a6",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على PulseChain"
     },
     "evm:1:0xfcd7ccee4071aa4ecfac1683b7cc0afecaf42a36": {
       "uid": "evm:1:0xfcd7ccee4071aa4ecfac1683b7cc0afecaf42a36",
@@ -1625,6 +1675,7 @@
       "unique_callers": 170,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1634,13 +1685,13 @@
         "is_verified": true,
         "blockscout_token_name": "Titan Blaze",
         "blockscout_symbol": "BLAZE",
-        "token_holders": "569",
+        "token_holders": "568",
         "resolved_token_address": "0xfcd7cceE4071aA4ecFAC1683b7CC0aFeCAF42A36",
         "dex_pairs_count": 7,
         "dex_id": "uniswap",
-        "price_usd": "0.01809",
-        "liquidity_usd": 7321.25,
-        "volume_24h_usd": 1582.93,
+        "price_usd": "0.01810",
+        "liquidity_usd": 7323.57,
+        "volume_24h_usd": 1584.09,
         "dex_url": "https://dexscreener.com/ethereum/0x4d3a10d4792dd12ececc5f3034c8e264b28485d1",
         "dex_base_token": "0xfcd7cceE4071aA4ecFAC1683b7CC0aFeCAF42A36",
         "websites": [
@@ -1677,11 +1728,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0xfcd7cceE4071aA4ecFAC1683b7CC0aFeCAF42A36",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Ethereum Mainnet"
     },
     "evm:137:0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e": {
       "uid": "evm:137:0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
@@ -1699,6 +1751,7 @@
       "unique_callers": 290,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1752,11 +1805,12 @@
       "explorer_name": "Polygonscan",
       "explorer_url": "https://polygonscan.com/address/0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Polygon Mainnet"
     },
     "evm:1:0xb6ed7644c69416d67b522e20bc294a9a9b405b31": {
       "uid": "evm:1:0xb6ed7644c69416d67b522e20bc294a9a9b405b31",
@@ -1775,6 +1829,7 @@
       "unique_callers": 250,
       "cumulative_mints": 25000,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1835,11 +1890,12 @@
       "explorer_name": "Etherscan",
       "explorer_url": "https://etherscan.io/address/0xb6ed7644c69416d67b522e20bc294a9a9b405b31",
       "first_seen_at": "2026-11-13T20:13:17Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 10,
-      "seen_scans": 5,
+      "seen_scans": 7,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 25000
+      "cumulative_txs": 25000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Ethereum Mainnet"
     },
     "evm:56:0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e": {
       "uid": "evm:56:0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
@@ -1857,6 +1913,7 @@
       "unique_callers": 280,
       "cumulative_mints": 28000,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -1920,71 +1977,12 @@
       "explorer_name": "BscScan",
       "explorer_url": "https://bscscan.com/address/0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
       "first_seen_at": "2026-11-13T20:19:35Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 10,
-      "seen_scans": 5,
+      "seen_scans": 7,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 28000
-    },
-    "solana:mainnet:V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine": {
-      "uid": "solana:mainnet:V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
-      "ecosystem": "Solana",
-      "chain_id": "solana",
-      "chain_name": "Solana Mainnet",
-      "symbol": "SOL",
-      "address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
-      "category": "PoW / Hash & Epoch Mining",
-      "detection_reason": "User-Verified Solana Web PoW Miner (Fodina)",
-      "decoded_functions": [
-        "mine(pow)",
-        "start_mining()"
-      ],
-      "unique_callers": 320,
-      "cumulative_mints": 18000,
-      "is_curated_miner": true,
-      "market_profile": {
-        "probed": true,
-        "price_usd": "0.00005972",
-        "blockscout_token_name": "Fodina",
-        "blockscout_symbol": "FDNA",
-        "liquidity_usd": 1488.33,
-        "volume_24h_usd": 730087.57,
-        "dex_url": "https://dexscreener.com/solana/b9k3atnmvujfcdjd9jypkfblakt8ampf6d37k8sdhkbe",
-        "websites": [
-          "https://fodinamine.com/#start",
-          "https://fodinamine.com/"
-        ],
-        "resolved_token_address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
-        "reward_token_symbol": "FDNA",
-        "is_verified": true
-      },
-      "onchain_profile": {
-        "probed": true,
-        "symbol": "FDNA"
-      },
-      "protocol_name": "Fodina (FDNA) — Solana Web PoW",
-      "protocol_type": "تعدين توكن PoW / Fair-Mint",
-      "is_standard_token_noise": false,
-      "token_address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
-      "security_profile": {
-        "probed": true,
-        "verdict": "خطر RugCheck",
-        "rugcheck_score": 52285,
-        "risks": [
-          "Mint Authority still enabled",
-          "Low Liquidity",
-          "Mutable metadata"
-        ],
-        "risk_level": "high"
-      },
-      "explorer_name": "Solscan",
-      "explorer_url": "https://solscan.io/account/V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
-      "first_seen_at": "2026-11-13T20:19:35Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
-      "discovered_in_scan": 10,
-      "seen_scans": 5,
-      "is_new_in_last_scan": false,
-      "cumulative_txs": 18000
+      "cumulative_txs": 28000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على BNB Smart Chain Mainnet"
     },
     "evm:369:0x06450dee7fd2fb8e39061434babcfc05599a6fb8": {
       "uid": "evm:369:0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
@@ -2002,6 +2000,7 @@
       "unique_callers": 310,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -2055,11 +2054,74 @@
       "explorer_name": "PulseScan",
       "explorer_url": "https://otter.pulsechain.com/address/0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على PulseChain"
+    },
+    "solana:mainnet:V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine": {
+      "uid": "solana:mainnet:V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+      "ecosystem": "Solana",
+      "chain_id": "solana",
+      "chain_name": "Solana Mainnet",
+      "symbol": "SOL",
+      "address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+      "category": "PoW / Hash & Epoch Mining",
+      "detection_reason": "User-Verified Solana Web PoW Miner (Fodina)",
+      "decoded_functions": [
+        "mine(pow)",
+        "start_mining()"
+      ],
+      "unique_callers": 320,
+      "cumulative_mints": 18000,
+      "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
+      "market_profile": {
+        "probed": true,
+        "price_usd": "0.00005893",
+        "blockscout_token_name": "Fodina",
+        "blockscout_symbol": "FDNA",
+        "liquidity_usd": 1475.76,
+        "volume_24h_usd": 730091.14,
+        "dex_url": "https://dexscreener.com/solana/b9k3atnmvujfcdjd9jypkfblakt8ampf6d37k8sdhkbe",
+        "websites": [
+          "https://fodinamine.com/#start",
+          "https://fodinamine.com/"
+        ],
+        "resolved_token_address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+        "reward_token_symbol": "FDNA",
+        "is_verified": true
+      },
+      "onchain_profile": {
+        "probed": true,
+        "symbol": "FDNA"
+      },
+      "protocol_name": "Fodina (FDNA) — Solana Web PoW",
+      "protocol_type": "تعدين توكن PoW / Fair-Mint",
+      "is_standard_token_noise": false,
+      "token_address": "V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+      "security_profile": {
+        "probed": true,
+        "verdict": "خطر RugCheck",
+        "rugcheck_score": 52293,
+        "risks": [
+          "Mint Authority still enabled",
+          "Low Liquidity",
+          "Mutable metadata"
+        ],
+        "risk_level": "high"
+      },
+      "explorer_name": "Solscan",
+      "explorer_url": "https://solscan.io/account/V9TkMoDUrAiBBJPuVidc4xsYc5y3kUVM8XxQnMwmine",
+      "first_seen_at": "2026-11-13T20:19:35Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
+      "discovered_in_scan": 10,
+      "seen_scans": 7,
+      "is_new_in_last_scan": false,
+      "cumulative_txs": 18000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Solana Mainnet"
     },
     "evm:8453:0xffcbf84650ce02dafe96926b37a0ac5e34932fa5": {
       "uid": "evm:8453:0xffcbf84650ce02dafe96926b37a0ac5e34932fa5",
@@ -2077,6 +2139,7 @@
       "unique_callers": 240,
       "cumulative_mints": 24000,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -2140,11 +2203,12 @@
       "explorer_name": "Basescan",
       "explorer_url": "https://basescan.org/address/0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5",
       "first_seen_at": "2026-11-13T20:19:35Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 10,
-      "seen_scans": 5,
+      "seen_scans": 7,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 24000
+      "cumulative_txs": 24000,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Base"
     },
     "evm:137:0x71b821aa52a49f32eed535fca6eb5aa130085978": {
       "uid": "evm:137:0x71b821aa52a49f32eed535fca6eb5aa130085978",
@@ -2162,6 +2226,7 @@
       "unique_callers": 180,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -2209,11 +2274,12 @@
       "explorer_name": "Polygonscan",
       "explorer_url": "https://polygonscan.com/address/0x71b821aa52a49f32eed535fca6eb5aa130085978",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين GPU PoW • موثّق على Polygon Mainnet"
     },
     "evm:43114:0xc0c5aa69dbe4d6dddfbc89c0957686ec60f24389": {
       "uid": "evm:43114:0xc0c5aa69dbe4d6dddfbc89c0957686ec60f24389",
@@ -2231,6 +2297,7 @@
       "unique_callers": 160,
       "cumulative_mints": 1,
       "is_curated_miner": true,
+      "discovery_source": "curated_verified_seed",
       "market_profile": {
         "probed": true,
         "sourcify_verified": true,
@@ -2294,14 +2361,34 @@
       "explorer_name": "SnowScan",
       "explorer_url": "https://snowscan.xyz/address/0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389",
       "first_seen_at": "2026-11-13T21:03:09Z",
-      "last_seen_at": "2026-11-13T21:08:38Z",
+      "last_seen_at": "2026-11-13T21:27:44Z",
       "discovered_in_scan": 16,
-      "seen_scans": 2,
+      "seen_scans": 4,
       "is_new_in_last_scan": false,
-      "cumulative_txs": 1
+      "cumulative_txs": 1,
+      "agent_reasoning": "تعدين / Mint عبر الموقع الرسمي • موثّق على Avalanche C-Chain"
     }
   },
   "scan_history": [
+    {
+      "scan_id": 19,
+      "timestamp": "2026-11-13T21:27:44Z",
+      "duration_s": 76.7,
+      "evm_chains_scanned": 120,
+      "total_chains_scanned": 332,
+      "matched_in_scan": 32,
+      "newly_registered": 0,
+      "new_names": [],
+      "total_registry_size": 32
+    },
+    {
+      "scan_id": 18,
+      "timestamp": "2026-11-13T21:11:44Z",
+      "evm_chains_scanned": 180,
+      "matched_in_scan": 32,
+      "newly_registered": 0,
+      "total_registry_size": 32
+    },
     {
       "scan_id": 17,
       "timestamp": "2026-11-13T21:08:38Z",

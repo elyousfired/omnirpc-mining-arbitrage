@@ -389,6 +389,85 @@ def _compute_verification(item: dict[str, Any]) -> tuple[str, str, bool]:
     return ("unverified", "⚠️ غير موثّق مصدرياً", False)
 
 
+_GITHUB_REG_CACHE: dict[str, Any] = {"ts": 0.0, "reg": None, "mem": None}
+_RAW_BASE = "https://raw.githubusercontent.com/elyousfired/omnirpc-mining-arbitrage/main"
+_AGENT_MEM_PATH = Path(__file__).resolve().parent / "agent_memory.json"
+
+
+def _load_local_agent_memory() -> dict[str, Any]:
+    if _AGENT_MEM_PATH.exists():
+        try:
+            d = json.loads(_AGENT_MEM_PATH.read_text(encoding="utf-8"))
+            if isinstance(d, dict):
+                return d
+        except Exception:
+            pass
+    return {}
+
+
+async def load_latest_registry_and_memory(session: aiohttp.ClientSession) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Load accumulated mining_registry + agent_memory, merging local & latest GitHub hourly state."""
+    local_reg = load_registry()
+    local_mem = _load_local_agent_memory()
+
+    now = time.time()
+    remote_reg = _GITHUB_REG_CACHE.get("reg")
+    remote_mem = _GITHUB_REG_CACHE.get("mem")
+    if now - float(_GITHUB_REG_CACHE.get("ts") or 0) > 45:
+        async def _get_json(url: str) -> dict[str, Any] | None:
+            try:
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=4)) as r:
+                    if r.status == 200:
+                        d = await r.json(content_type=None)
+                        return d if isinstance(d, dict) else None
+            except Exception:
+                return None
+            return None
+
+        r_reg, r_mem = await asyncio.gather(
+            _get_json(f"{_RAW_BASE}/mining_registry.json"),
+            _get_json(f"{_RAW_BASE}/agent_memory.json"),
+        )
+        if r_reg is not None:
+            remote_reg = r_reg
+            _GITHUB_REG_CACHE["reg"] = r_reg
+        if r_mem is not None:
+            remote_mem = r_mem
+            _GITHUB_REG_CACHE["mem"] = r_mem
+        _GITHUB_REG_CACHE["ts"] = now
+
+    # Non-destructive merge: NEVER drop previously saved protocols from either local or remote
+    merged_items: dict[str, dict[str, Any]] = {}
+    for src in (local_reg, remote_reg):
+        if not isinstance(src, dict):
+            continue
+        for uid, it in (src.get("items") or {}).items():
+            if not isinstance(it, dict):
+                continue
+            prev = merged_items.get(uid)
+            if prev is None or str(it.get("last_seen_at") or "") > str(prev.get("last_seen_at") or ""):
+                merged_items[uid] = it
+
+    use_remote = (
+        isinstance(remote_reg, dict)
+        and (
+            int(remote_reg.get("total_scans_completed") or 0) > int(local_reg.get("total_scans_completed") or 0)
+            or str(remote_reg.get("updated_at") or "") > str(local_reg.get("updated_at") or "")
+        )
+    )
+    primary_reg = dict(remote_reg if use_remote else local_reg)
+    primary_reg["items"] = merged_items
+    primary_reg["total_protocols"] = len(merged_items)
+
+    use_remote_mem = (
+        isinstance(remote_mem, dict)
+        and int(remote_mem.get("total_cycles") or 0) >= int(local_mem.get("total_cycles") or 0)
+        and str(remote_mem.get("last_cycle_at") or "") >= str(local_mem.get("last_cycle_at") or "")
+    )
+    primary_mem = dict(remote_mem if use_remote_mem else local_mem)
+    return primary_reg, primary_mem
+
+
 async def compute_arbitrage_snapshot(
     gpu_id: str = "rtx4090",
     mode: str = "cloud",
@@ -403,16 +482,16 @@ async def compute_arbitrage_snapshot(
     machine_cost_hr = effective_cloud_hr if mode == "cloud" else round((watts / 1000.0) * kwh_cost, 4)
     machine_cost_day = round(machine_cost_hr * 24.0, 4)
 
-    reg = load_registry()
-    all_reg_items = list((reg.get("items") or {}).values())
-    raw_items = [x for x in all_reg_items if is_actionable_mining_protocol(x)]
-    excluded_non_mining_count = max(len(all_reg_items) - len(raw_items), int(reg.get("pruned_last_scan") or 0))
-    last_scan_at = reg.get("updated_at")
-    active_cids = [str(x.get("chain_id")) for x in raw_items if x.get("ecosystem") == "EVM"]
-
     omni = OmniRPC()
     connector = aiohttp.TCPConnector(limit=30, ssl=False)
     async with aiohttp.ClientSession(connector=connector) as session:
+        reg, agent_mem = await load_latest_registry_and_memory(session)
+        all_reg_items = list((reg.get("items") or {}).values())
+        raw_items = [x for x in all_reg_items if is_actionable_mining_protocol(x)]
+        excluded_non_mining_count = max(len(all_reg_items) - len(raw_items), int(reg.get("pruned_last_scan") or 0))
+        last_scan_at = reg.get("updated_at")
+        active_cids = [str(x.get("chain_id")) for x in raw_items if x.get("ecosystem") == "EVM"]
+
         mkt_cache = await _fetch_live_market_inputs(session, omni, active_cids)
         chainid_map, bs_map = await asyncio.gather(
             _load_chainid_explorers(session),
@@ -641,6 +720,10 @@ async def compute_arbitrage_snapshot(
             "explorer_url": exp_url,
             "dex_url": mkt.get("dex_url") or "",
             "is_new": bool(item.get("is_new_in_last_scan")),
+            "first_seen_at": item.get("first_seen_at"),
+            "seen_scans": int(item.get("seen_scans") or 1),
+            "discovery_source": item.get("discovery_source") or "verified_registry",
+            "agent_reasoning": item.get("agent_reasoning") or "",
             "decoded_functions": (item.get("decoded_functions") or [])[:4],
         })
 
@@ -676,6 +759,16 @@ async def compute_arbitrage_snapshot(
             {"id": k, "label": v["label"], "watts": v["watts"], "default_cloud_hr": v["default_cloud_hr"]}
             for k, v in GPU_PROFILES.items()
         ],
+        "agent": {
+            "name": agent_mem.get("agent_name") or "OmniRPC Autonomous Mining Agent",
+            "total_cycles": int(agent_mem.get("total_cycles") or reg.get("total_scans_completed") or 0),
+            "last_cycle_at": agent_mem.get("last_cycle_at") or last_scan_at,
+            "newly_added_last_cycle": int(agent_mem.get("newly_added_last_cycle") or (reg.get("last_scan_stats") or {}).get("newly_registered") or 0),
+            "known_protocols_count": len(onchain_rows),
+            "last_brief_ar": agent_mem.get("last_agent_brief_ar") or "",
+            "ai_llm_enabled": bool(agent_mem.get("ai_llm_enabled")),
+            "cycle_logs": (agent_mem.get("cycle_logs") or reg.get("scan_history") or [])[:5],
+        },
         "summary": {
             "total_onchain_protocols": len(onchain_rows),
             "excluded_non_mining_count": excluded_non_mining_count,
