@@ -1,16 +1,27 @@
 {
   "agent_name": "OmniRPC Autonomous Mining Agent",
   "version": "1.0",
-  "total_cycles": 19,
-  "cursor_evm_offset": 90,
-  "cursor_bs_offset": 14,
-  "cursor_query_batch": 1,
-  "last_cycle_at": "2026-11-13T21:27:44Z",
+  "total_cycles": 20,
+  "cursor_evm_offset": 180,
+  "cursor_bs_offset": 28,
+  "cursor_query_batch": 2,
+  "last_cycle_at": "2026-11-13T21:29:05Z",
   "known_protocols_count": 32,
   "newly_added_last_cycle": 0,
   "ai_llm_enabled": false,
-  "last_agent_brief_ar": "الدورة #19: فحص الإيجنت 332 شبكة وحدّث الأسعار، وبقى محافظ على كل البروتوكولات القديمة (32 بروتوكول جاهز للتعدين).",
+  "last_agent_brief_ar": "الدورة #20: فحص الإيجنت 392 شبكة وحدّث الأسعار، وبقى محافظ على كل البروتوكولات القديمة (32 بروتوكول جاهز للتعدين).",
   "cycle_logs": [
+    {
+      "scan_id": 20,
+      "timestamp": "2026-11-13T21:29:05Z",
+      "duration_s": 38.3,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 32,
+      "newly_registered": 0,
+      "new_names": [],
+      "total_registry_size": 32
+    },
     {
       "scan_id": 19,
       "timestamp": "2026-11-13T21:27:44Z",
