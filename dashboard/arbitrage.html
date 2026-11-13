@@ -154,9 +154,9 @@
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 12px; overflow-x: auto; margin-bottom: 20px;
     }
-    table { width: 100%; border-collapse: collapse; font-size: 12.2px; }
-    th, td { padding: 9px 8px; text-align: right; border-bottom: 1px solid rgba(36, 49, 79, 0.65); vertical-align: middle; }
-    th { background: var(--bg-elev); color: var(--muted); font-size: 11.4px; font-weight: 700; white-space: nowrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 11.8px; }
+    th, td { padding: 8px 6px; text-align: right; border-bottom: 1px solid rgba(36, 49, 79, 0.65); vertical-align: middle; }
+    th { background: var(--bg-elev); color: var(--muted); font-size: 11px; font-weight: 700; white-space: normal; line-height: 1.25; }
     tr:hover td { background: rgba(26, 37, 64, 0.55); }
 
     .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; }
@@ -455,7 +455,9 @@
 
         let beHtml = "";
         if (r.breakeven_tokens_tx !== null && r.breakeven_tokens_tx !== undefined) {
-          beHtml = `<strong class="ltr" style="color:#6ee7b7;">${fmtNum(r.breakeven_tokens_tx, 3)} ${esc(r.token_symbol)} / tx</strong><br><small class="ltr" style="color:var(--muted);">${fmtNum(r.breakeven_tokens_hr, 2)} / hr ($${fmtNum(r.breakeven_usd_tx, 5)}/tx)</small>`;
+          const beTxStr = r.breakeven_tokens_tx > 0 && r.breakeven_tokens_tx < 0.01 ? r.breakeven_tokens_tx.toFixed(4) : fmtNum(r.breakeven_tokens_tx, 3);
+          const beHrStr = r.breakeven_tokens_hr > 0 && r.breakeven_tokens_hr < 0.1 ? r.breakeven_tokens_hr.toFixed(4) : fmtNum(r.breakeven_tokens_hr, 2);
+          beHtml = `<strong class="ltr" style="color:#6ee7b7;">${beTxStr} ${esc(r.token_symbol)} / tx</strong><br><small class="ltr" style="color:var(--muted);">${beHrStr} / hr ($${fmtNum(r.breakeven_usd_tx, 5)}/tx)</small>`;
         } else {
           beHtml = `<strong class="ltr" style="color:#fbbf24;">&gt;= $${fmtNum(r.breakeven_usd_tx, 5)} / tx</strong><br><small class="ltr" style="color:var(--muted);">&gt;= $${fmtNum(r.breakeven_usd_hr, 3)} / hr (قبل الإدراج)</small>`;
         }
