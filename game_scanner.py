@@ -22,19 +22,30 @@ BASE_DIR = Path(__file__).resolve().parent
 GAMES_REGISTRY_JSON = BASE_DIR / "games_registry.json"
 
 GAMIFIED_SEARCH_QUERIES = [
+    "ore",
+    "motherlode",
+    "minebean",
+    "minecat",
+    "idlemine",
+    "antminer",
+    "aidiglet",
+    "blitzmine",
     "grid mining",
-    "motherlode ore",
     "5x5 mine",
-    "glaze king",
-    "minechain",
-    "virtual mining game",
     "tile mine",
+    "glaze",
+    "minechain",
+    "virtual mining",
+    "dig mine",
+    "bitz mine",
 ]
+
+TESTNET_GAME_SLUGS = {"robinhood", "arc", "sepolia", "goerli", "holesky", "amoy", "devnet", "mumbai", "fuji"}
 
 CURATED_GAMIFIED_MINING_GAMES: list[dict[str, Any]] = [
     {
         "uid": "game:solana:orev3",
-        "name": "ORE Protocol V3/V4 (Grid Betting)",
+        "name": "ORE Protocol V3/V4 (5x5 Grid Betting)",
         "symbol": "ORE",
         "chain_name": "Solana Mainnet",
         "chain_id": "solana",
@@ -47,8 +58,98 @@ CURATED_GAMIFIED_MINING_GAMES: list[dict[str, Any]] = [
         "round_duration_sec": 60,
         "entry_currency": "SOL",
         "house_cut_pct": 10.5,
-        "mechanic_ar": "كتحط SOL فـ مربع أو كثر من شبكة 5x5 كل دقيقة؛ كيتختار مربع واحد عشوائياً، والرابحين كياخدو الجائزة + توكن ORE + جاكبوت Motherlode (~10% اقتطاع من المربعات الخاسرة لـ buyback/burn).",
-        "risk_note_ar": "لعبة احتمالات/رهان (ماشي تعدين GPU). القيمة المتوقعة كتعلق بعدد اللاعبين واقتطاع البروتوكول (~10%).",
+        "mechanic_ar": "كتحط SOL فـ مربع أو كثر من شبكة 5x5 كل دقيقة؛ كيتختار مربع واحد عشوائياً، والرابحين كياخدو الجائزة + توكن ORE + جاكبوت Motherlode.",
+        "risk_note_ar": "لعبة احتمالات/رهان (ماشي تعدين GPU).",
+    },
+    {
+        "uid": "game:base:minebean",
+        "name": "MineBean (Base 5x5 Grid Mining)",
+        "symbol": "BEAN",
+        "chain_name": "Base",
+        "chain_id": "base",
+        "contract": "0x5c72992b83E74c4D5200A8E8920fB946214a5A5D",
+        "token_address": "0x5c72992b83E74c4D5200A8E8920fB946214a5A5D",
+        "site_url": "https://www.minebean.com/",
+        "game_type": "GRID_5X5_BETTING",
+        "game_type_ar": "نظام المربعات 5x5 على Base (شبيه ORE)",
+        "grid_layout": "5x5 (25 مربع)",
+        "round_duration_sec": 60,
+        "entry_currency": "ETH (Base)",
+        "house_cut_pct": 10.0,
+        "mechanic_ar": "نسخة نظام المربعات على شبكة Base: كتدخل بـ ETH فـ مربعات الشبكة وكل جولة كيربح مربع وكيوزع BEAN + جاكبوت.",
+        "risk_note_ar": "لعبة مربعات على Base L2 — راقب السيولة ورسوم الغاز.",
+    },
+    {
+        "uid": "game:solana:minecat",
+        "name": "MINECAT Mining Control (Grid Game)",
+        "symbol": "MINECAT",
+        "chain_name": "Solana Mainnet",
+        "chain_id": "solana",
+        "contract": "4ZnJ72JoEVazMe7nvbek7CfSKh7eTtR3nikyAua6EkiE",
+        "token_address": "4ZnJ72JoEVazMe7nvbek7CfSKh7eTtR3nikyAua6EkiE",
+        "site_url": "https://minecatore.com/",
+        "game_type": "GRID_5X5_BETTING",
+        "game_type_ar": "نظام المربعات على Solana (ORE Fork)",
+        "grid_layout": "Grid Squares",
+        "round_duration_sec": 60,
+        "entry_currency": "SOL",
+        "house_cut_pct": 10.0,
+        "mechanic_ar": "لعبة تعدين بالمربعات مستوحاة من ORE على Solana (MineCat ORE) فيها جولات ومربعات ومكافآت.",
+        "risk_note_ar": "لعبة مربعات على Solana — تأكد من السيولة قبل الدخول.",
+    },
+    {
+        "uid": "game:solana:idlemine",
+        "name": "IdleMine ($IDLE — Grid & Tiles Miner)",
+        "symbol": "IDLE",
+        "chain_name": "Solana Mainnet",
+        "chain_id": "solana",
+        "contract": "BjcRmwm8e25RgjkyaFE56fc7bxRgGPw96JUkXRJFEroT",
+        "token_address": "BjcRmwm8e25RgjkyaFE56fc7bxRgGPw96JUkXRJFEroT",
+        "site_url": "https://idlemine.io",
+        "game_type": "GRID_5X5_BETTING",
+        "game_type_ar": "نظام المربعات والبلاطات (Grid & Tiles)",
+        "grid_layout": "Tile Grid",
+        "round_duration_sec": 60,
+        "entry_currency": "SOL / IDLE",
+        "house_cut_pct": 5.0,
+        "mechanic_ar": "لعبة تعدين تفاعلية بالـ Grid و Tiles على Solana مع اقتصاد توكن IDLE وسيولة عالية.",
+        "risk_note_ar": "لعبة Web3 تفاعلية (ماشي تعدين GPU).",
+    },
+    {
+        "uid": "game:solana:antminer",
+        "name": "ANT MINER ($ANT — Colony Grid)",
+        "symbol": "ANT",
+        "chain_name": "Solana Mainnet",
+        "chain_id": "solana",
+        "contract": "7ypCq2CJ4fnbtS3z2B1W1UT2he5E3u7Md6Gy1ri7uGrQ",
+        "token_address": "7ypCq2CJ4fnbtS3z2B1W1UT2he5E3u7Md6Gy1ri7uGrQ",
+        "site_url": "https://theantminer.xyz/",
+        "game_type": "GRID_5X5_BETTING",
+        "game_type_ar": "لعبة تعدين بالمربعات والجولات (Solana)",
+        "grid_layout": "Colony Grid",
+        "round_duration_sec": 60,
+        "entry_currency": "SOL",
+        "house_cut_pct": 10.0,
+        "mechanic_ar": "لعبة تعدين جولات ومربعات على Solana (The ants mine. The colony eats).",
+        "risk_note_ar": "لعبة احتمالات وجولات على Solana.",
+    },
+    {
+        "uid": "game:solana:aidiglet",
+        "name": "AiDiglet ($DIGS — Tap & Grid Miner)",
+        "symbol": "DIGS",
+        "chain_name": "Solana Mainnet",
+        "chain_id": "solana",
+        "contract": "9QT8K685Hrae4k11dhGXirdtpfAaimExtyfwt8cPpump",
+        "token_address": "9QT8K685Hrae4k11dhGXirdtpfAaimExtyfwt8cPpump",
+        "site_url": "https://aidiglet.me",
+        "game_type": "IDLE_CRAFTING_MINER",
+        "game_type_ar": "لعبة Tap-to-Mine & Grid",
+        "grid_layout": "Tap / Grid",
+        "round_duration_sec": 60,
+        "entry_currency": "SOL / TG",
+        "house_cut_pct": 5.0,
+        "mechanic_ar": "لعبة تعدين تفاعلية (Telegram + Solana) بنظام الجولات والمكافآت.",
+        "risk_note_ar": "لعبة تعدين اجتماعية — راقب التقلبات.",
     },
     {
         "uid": "game:base:donut_glaze",
@@ -65,8 +166,8 @@ CURATED_GAMIFIED_MINING_GAMES: list[dict[str, Any]] = [
         "round_duration_sec": 3600,
         "entry_currency": "ETH (Base)",
         "house_cut_pct": 20.0,
-        "mechanic_ar": "مزاد تنازلي (King of the Hill): كتخلص ETH باش تاخد التاج وتبدا تربح DONUT كل ثانية حتى يجي واحد آخر يشري التاج عليك؛ كيرجع لك 80% من سومة اللي جا وراك و 20% كتقسم على الخزينة والمطور.",
-        "risk_note_ar": "لعبة تنافسية (ماشي تعدين GPU). إلا ما شرا حتى واحد التاج موراك بسعر أعلى كاتخسر فرق الـ ETH.",
+        "mechanic_ar": "مزاد تنازلي (King of the Hill): كتخلص ETH باش تاخد التاج وتبدا تربح DONUT كل ثانية حتى يجي واحد آخر يشري التاج عليك.",
+        "risk_note_ar": "لعبة تنافسية (ماشي تعدين GPU).",
     },
     {
         "uid": "game:solana:coal_minechain",
@@ -83,8 +184,8 @@ CURATED_GAMIFIED_MINING_GAMES: list[dict[str, Any]] = [
         "round_duration_sec": 60,
         "entry_currency": "SOL / COAL",
         "house_cut_pct": 5.0,
-        "mechanic_ar": "كيجمع بين تعدين DrillX وميكانيك لعبة جمع الموارد (ORE, WOOD, INGOT) وصناعة أدوات كتزيد سرعة التعدين فـ الشبكة.",
-        "risk_note_ar": "نظام هجين (فيه PoW بـ coal-cli ولكن الواجهة ديالو لعبة crafting وupgrades).",
+        "mechanic_ar": "كيجمع بين تعدين DrillX وميكانيك لعبة جمع الموارد (ORE, WOOD, INGOT) وصناعة أدوات.",
+        "risk_note_ar": "نظام هجين (فيه PoW بـ coal-cli ولكن الواجهة ديالو لعبة crafting).",
     },
 ]
 
@@ -140,16 +241,19 @@ async def _discover_new_grid_games(session: aiohttp.ClientSession, known_tokens:
             pass
         return []
 
-    batches = await asyncio.gather(*[_search_q(q) for q in GAMIFIED_SEARCH_QUERIES[:4]], return_exceptions=True)
+    batches = await asyncio.gather(*[_search_q(q) for q in GAMIFIED_SEARCH_QUERIES], return_exceptions=True)
     to_verify: list[tuple[dict[str, Any], str]] = []
     for res in batches:
         if not isinstance(res, list):
             continue
-        for p in res[:10]:
+        for p in res[:15]:
             if not isinstance(p, dict):
                 continue
+            cid = str(p.get("chainId") or "").lower()
+            if not cid or cid in TESTNET_GAME_SLUGS:
+                continue
             liq = float(((p.get("liquidity") or {}).get("usd")) or 0.0)
-            if liq < 2000:
+            if liq < 300:
                 continue
             base = p.get("baseToken") or {}
             taddr = str(base.get("address") or "").strip()
@@ -197,7 +301,7 @@ async def _discover_new_grid_games(session: aiohttp.ClientSession, known_tokens:
             "matched_game_signals": ui.get("matched_game_signals") or [],
         }
 
-    verified = await asyncio.gather(*[_verify_one(p, site) for p, site in to_verify[:12]], return_exceptions=True)
+    verified = await asyncio.gather(*[_verify_one(p, site) for p, site in to_verify[:40]], return_exceptions=True)
     for item in verified:
         if isinstance(item, dict):
             candidates.append(item)

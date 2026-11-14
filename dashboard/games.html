@@ -203,18 +203,23 @@
         const cls = g.game_type === "GRID_5X5_BETTING" ? "b-purple" : (g.game_type === "KOTH_AUCTION" ? "b-amber" : "b-cyan");
         const px = Number(g.price_usd || 0);
         const pxStr = px > 0 ? `$${px < 0.01 ? px.toPrecision(4) : fmtNum(px, 4)}` : "—";
+        const chainLabel = g.chain_name || g.chain || "—";
+        const currencyLabel = g.entry_currency || g.bet_asset || "—";
+        const typeLabel = g.game_type_ar || g.game_label_ar || g.game_type;
+        const roundLabel = g.round_duration_sec ? `${g.round_duration_sec}s` : (g.round_duration || "—");
+        const siteUrl = g.site_url || g.official_url || "";
         return `<tr>
           <td>
             <strong>${esc(g.name)}</strong> <span class="badge b-cyan">${esc(g.symbol)}</span><br>
-            <small style="color:var(--muted);">${esc(g.chain)} • ${esc(g.bet_asset)}</small>
+            <small style="color:var(--muted);">${esc(chainLabel)} • ${esc(currencyLabel)}</small>
           </td>
           <td>
-            <span class="badge ${cls}">${esc(g.game_label_ar || g.game_type)}</span><br>
+            <span class="badge ${cls}">${esc(typeLabel)}</span><br>
             <small style="color:var(--muted);">${esc(g.mechanic_ar || "")}</small>
           </td>
           <td>
-            <span class="ltr">${esc(g.grid_layout || "—")}</span> • <span class="ltr">${esc(g.round_duration || "—")}</span><br>
-            <small style="color:#fcd34d;">House Cut: ${esc(g.house_cut_pct ?? 0)}% | Motherlode: ${esc(g.motherlode_chance || "—")}</small>
+            <span class="ltr">${esc(g.grid_layout || "—")}</span> • <span class="ltr">${esc(roundLabel)}</span><br>
+            <small style="color:#fcd34d;">House Cut: ${esc(g.house_cut_pct ?? 0)}%</small>
           </td>
           <td>
             <strong class="ltr" style="color:#6ee7b7;">${pxStr}</strong><br>
@@ -222,7 +227,7 @@
           </td>
           <td>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              ${g.official_url ? `<a class="btn" style="border-color:rgba(167,139,250,0.45);color:#ddd6fe;" target="_blank" href="${esc(g.official_url)}">🎮 فتح اللعبة</a>` : ""}
+              ${siteUrl ? `<a class="btn" style="border-color:rgba(167,139,250,0.45);color:#ddd6fe;" target="_blank" href="${esc(siteUrl)}">🎮 فتح اللعبة</a>` : ""}
               ${g.dex_url ? `<a class="btn" target="_blank" href="${esc(g.dex_url)}">DEX</a>` : ""}
             </div>
           </td>
