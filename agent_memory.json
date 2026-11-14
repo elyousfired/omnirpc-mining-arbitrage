@@ -1,16 +1,30 @@
 {
   "agent_name": "OmniRPC Autonomous Mining Agent",
   "version": "1.1",
-  "total_cycles": 22,
-  "cursor_evm_offset": 360,
-  "cursor_bs_offset": 56,
-  "cursor_query_batch": 4,
-  "last_cycle_at": "2026-11-14T07:18:14Z",
-  "known_protocols_count": 35,
-  "newly_added_last_cycle": 0,
+  "total_cycles": 23,
+  "cursor_evm_offset": 450,
+  "cursor_bs_offset": 70,
+  "cursor_query_batch": 0,
+  "last_cycle_at": "2026-11-14T14:43:59Z",
+  "known_protocols_count": 37,
+  "newly_added_last_cycle": 2,
   "ai_llm_enabled": false,
-  "last_agent_brief_ar": "الدورة #22: فحص الإيجنت 392 شبكة وحدّث الأسعار، وبقى محافظ على كل البروتوكولات القديمة (35 بروتوكول جاهز للتعدين).",
+  "last_agent_brief_ar": "الدورة #23: فحص الإيجنت 392 شبكة، زاد +2 بروتوكولات جديدة (Solana Program H1kXUqEP..., Solana Program GpuxEQPL...) فوق القديم، المجموع المخزن دابا 37 بروتوكول.",
   "cycle_logs": [
+    {
+      "scan_id": 23,
+      "timestamp": "2026-11-14T14:43:59Z",
+      "duration_s": 49.8,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 35,
+      "newly_registered": 2,
+      "new_names": [
+        "Solana Program H1kXUqEP...",
+        "Solana Program GpuxEQPL..."
+      ],
+      "total_registry_size": 37
+    },
     {
       "scan_id": 22,
       "timestamp": "2026-11-14T07:18:14Z",
@@ -154,6 +168,38 @@
       "website": "https://a-network.net",
       "dex_url": "https://dexscreener.com/bsc/0xb90071e377a31a6ea2cfdebe19a4d5226c420b6b",
       "explorer_url": "https://bscscan.com/address/0x791055A7d52AA392eaE8De04250497f33807E46A",
+      "reported_to_chat": false
+    },
+    {
+      "id": "alert-23-solana:h1kxuqepkqnnenjgnn5tuhf3nsqk2vb1jua9c4rggpuf",
+      "discovered_at": "2026-11-14T14:43:59Z",
+      "cycle_id": 23,
+      "uid": "solana:h1kxuqepkqnnenjgnn5tuhf3nsqk2vb1jua9c4rggpuf",
+      "protocol_name": "Solana Program H1kXUqEP...",
+      "token_symbol": "SOL",
+      "chain_name": "Solana",
+      "kind": "mint_tx",
+      "price_usd": "0.001895",
+      "liquidity_usd": 43205.65,
+      "website": "https://www.attentionmine.com/",
+      "dex_url": "https://dexscreener.com/solana/d3haatzfgauvvsowegzaxrkquqg5ngcq7xwf5x4zsdny",
+      "explorer_url": "https://solscan.io/account/H1kXUqEPkQNNeNjGNN5tuHf3nsQK2vB1jUA9c4RggpUf",
+      "reported_to_chat": false
+    },
+    {
+      "id": "alert-23-solana:gpuxeqplfftudzeo5nxm2ujwh7uawddag94aa54srqjc",
+      "discovered_at": "2026-11-14T14:43:59Z",
+      "cycle_id": 23,
+      "uid": "solana:gpuxeqplfftudzeo5nxm2ujwh7uawddag94aa54srqjc",
+      "protocol_name": "Solana Program GpuxEQPL...",
+      "token_symbol": "SOL",
+      "chain_name": "Solana",
+      "kind": "mint_tx",
+      "price_usd": "0.000005174",
+      "liquidity_usd": 2754.85,
+      "website": "https://robotmines.bot",
+      "dex_url": "https://dexscreener.com/solana/7xmfwcc6jcjgdsylxbehc9karw4j8aeyybuqms8y3bnz",
+      "explorer_url": "https://solscan.io/account/GpuxEQPLFftuDZeo5nXm2UJWH7uAWDDaG94aa54SRQjc",
       "reported_to_chat": false
     }
   ]
