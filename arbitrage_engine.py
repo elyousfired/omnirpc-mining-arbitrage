@@ -271,12 +271,11 @@ async def _fetch_live_market_inputs(session: aiohttp.ClientSession, omni: OmniRP
             pass
 
     top_cids = list(dict.fromkeys(active_chain_ids))[:22]
-    await asyncio.gather(load_binance(), load_wtm(), *(probe_gas(c) for c in top_cids))
+    await asyncio.gather(load_binance(), *(probe_gas(c) for c in top_cids))
 
     if prices:
         _MARKET_CACHE["prices"] = prices
-    if wtm_coins:
-        _MARKET_CACHE["wtm"] = wtm_coins
+    _MARKET_CACHE["wtm"] = wtm_coins
     _MARKET_CACHE["gas_gwei"] = gas_gwei
     _MARKET_CACHE["ts"] = now
     return _MARKET_CACHE
@@ -351,8 +350,10 @@ def _estimate_tx_gas_usd(item: dict[str, Any], prices: dict[str, float], gas_gwe
     gwei = gas_gwei.get(cid)
     if gwei is None:
         gwei = 15.0 if cid == "1" else 0.05
-    # Typical on-chain mine/mint tx uses ~120,000 gas
-    eth_used = (120_000 * gwei) / 1e9
+    # Use Sandbox-measured gas units from eth_estimateGas when available, else typical 120,000 gas
+    sb = item.get("sandbox_test") or {}
+    gas_units = int(sb.get("est_gas_units") or 0) or 120_000
+    eth_used = (gas_units * gwei) / 1e9
     return round(eth_used * nat_px, 6)
 
 
@@ -436,9 +437,18 @@ async def load_latest_registry_and_memory(session: aiohttp.ClientSession) -> tup
             _GITHUB_REG_CACHE["mem"] = r_mem
         _GITHUB_REG_CACHE["ts"] = now
 
-    # Non-destructive merge: NEVER drop previously saved protocols from either local or remote
+    # If local registry is already at or ahead of GitHub remote, avoid resurrecting pruned entries;
+    # only union-merge when remote GitHub Actions actually finished a newer hourly cycle.
+    use_remote = (
+        isinstance(remote_reg, dict)
+        and (
+            int(remote_reg.get("total_scans_completed") or 0) > int(local_reg.get("total_scans_completed") or 0)
+            or str(remote_reg.get("updated_at") or "") > str(local_reg.get("updated_at") or "")
+        )
+    )
     merged_items: dict[str, dict[str, Any]] = {}
-    for src in (local_reg, remote_reg):
+    sources = (local_reg, remote_reg) if use_remote else (local_reg,)
+    for src in sources:
         if not isinstance(src, dict):
             continue
         for uid, it in (src.get("items") or {}).items():
@@ -447,14 +457,6 @@ async def load_latest_registry_and_memory(session: aiohttp.ClientSession) -> tup
             prev = merged_items.get(uid)
             if prev is None or str(it.get("last_seen_at") or "") > str(prev.get("last_seen_at") or ""):
                 merged_items[uid] = it
-
-    use_remote = (
-        isinstance(remote_reg, dict)
-        and (
-            int(remote_reg.get("total_scans_completed") or 0) > int(local_reg.get("total_scans_completed") or 0)
-            or str(remote_reg.get("updated_at") or "") > str(local_reg.get("updated_at") or "")
-        )
-    )
     primary_reg = dict(remote_reg if use_remote else local_reg)
     primary_reg["items"] = merged_items
     primary_reg["total_protocols"] = len(merged_items)
@@ -565,55 +567,37 @@ async def compute_arbitrage_snapshot(
         px = _to_float(mkt.get("price_usd"))
         liq = _to_float(mkt.get("liquidity_usd"))
         vol24 = _to_float(mkt.get("volume_24h_usd"))
+        sb = item.get("sandbox_test") or {}
         gas_tx = _estimate_tx_gas_usd(item, prices, gas_gwei)
-        gas_hr = gas_tx * tx_per_hr
+        mint_fee_usd = _to_float(sb.get("mint_fee_usd"))
+        tx_fee_total = round(gas_tx + mint_fee_usd, 6)
+        gas_hr = tx_fee_total * tx_per_hr
 
         est_coins_day = None
         gross_day_usd = None
         net_day_usd = None
         breakeven_coin_px = None
         gpu_hashrate_label = ""
+        is_gpu_pow = False
 
-        if is_gpu_pow and algo_spec and wtm_entry:
-            unit, hr_val = algo_spec
-            gpu_hashrate_label = f"{hr_val} {unit}"
-            nethash = _to_float(wtm_entry.get("nethash"))
-            blk_time = _to_float(wtm_entry.get("block_time"))
-            blk_rew = _to_float(wtm_entry.get("block_reward"))
-            if nethash > 0 and blk_time > 0 and blk_rew > 0:
-                our_hps = hr_val * _unit_mult(unit)
-                est_coins_day = (our_hps / nethash) * (86400.0 / blk_time) * blk_rew * 0.99
-                if px > 0 and est_coins_day > 0:
-                    gross_day_usd = est_coins_day * px
-                    net_day_usd = gross_day_usd - machine_cost_day
-                    breakeven_coin_px = machine_cost_day / est_coins_day
-                    gpu_coins.append({"symbol": token_sym, "net_day_usd": net_day_usd})
-
-        if is_gpu_pow and gpu_hashrate_label:
-            mining_mode = f"GPU {matched_algo} ({gpu_hashrate_label})"
-        elif is_gpu_pow:
-            mining_mode = f"GPU {matched_algo or 'PoW'} Miner"
-        elif eco == "Solana" or "eclipse" in cname.lower():
-            mining_mode = "CLI / GPU Miner (PoW)" if is_cuda_pow else "SVM Mint / Miner"
-        elif any(k in ptype.lower() for k in ("node", "storage", "depin")) or any(k in fns_blob for k in ("provepossession", "submitepoch", "sealepoch")):
-            mining_mode = "Node / Epoch Miner"
-        elif is_cuda_pow:
-            mining_mode = "NVIDIA CUDA / EVM PoW"
+        if sb.get("onchain_pow_state") or sb.get("pow_functions"):
+            mining_mode = "On-Chain PoW + Web3 Mint"
+        elif sb.get("trial_status") == "SIMULATED_OPEN":
+            mining_mode = "Web3 Mint (Simulated Open)"
+        elif eco == "Solana" or eco == "TON":
+            mining_mode = f"{eco} Web3 Mint/Mine UI"
         else:
-            mining_mode = "RPC Bot / Fair Mint"
+            mining_mode = "Connect Wallet -> Mint UI"
 
-        # For GPU PoW, use full selected GPU hourly cost; for RPC Bot/Mint, mostly gas + tiny VPS/PC cost
-        effective_machine_hr = machine_cost_hr if is_cuda_pow else (0.02 if mode == "cloud" else 0.01)
-        total_cost_hr = effective_machine_hr + (0.0 if is_gpu_pow else gas_hr)
+        # Pure Web3 Mint / Mine cost: on-chain gas + contract mint fee (+ minimal node overhead)
+        effective_machine_hr = 0.02 if mode == "cloud" else 0.01
+        total_cost_hr = effective_machine_hr + gas_hr
+        total_cost_tx = (effective_machine_hr / tx_per_hr if tx_per_hr > 0 else effective_machine_hr) + tx_fee_total
 
         breakeven_usd_hr = round(total_cost_hr, 4)
-        breakeven_usd_tx = round(total_cost_hr / tx_per_hr, 5) if tx_per_hr > 0 else round(total_cost_hr, 5)
+        breakeven_usd_tx = round(total_cost_tx, 5)
         breakeven_tokens_hr = round(total_cost_hr / px, 4) if px > 0 else None
-        breakeven_tokens_tx = (
-            round(machine_cost_day / px, 4)
-            if (is_gpu_pow and px > 0)
-            else (round((total_cost_hr / tx_per_hr) / px, 4) if (px > 0 and tx_per_hr > 0) else None)
-        )
+        breakeven_tokens_tx = round(total_cost_tx / px, 4) if px > 0 else None
 
         ver_level, ver_label, is_code_ok = _compute_verification(item)
         websites = [w for w in (mkt.get("websites") or []) if isinstance(w, str) and w.startswith(("http://", "https://"))]
@@ -627,18 +611,22 @@ async def compute_arbitrage_snapshot(
             risk = "medium"
             sec_verdict = "PoW Mintable (عادي للتعدين)"
         score = 0
-        if is_cuda_pow:
-            score += 25
+        if sb.get("is_actionable_web3_mint"):
+            score += 20
+        if sb.get("trial_status") in ("SIMULATED_OPEN", "POW_OR_MINT_ACTIVE"):
+            score += 10
+        if sb.get("onchain_pow_state") or sb.get("pow_functions"):
+            score += 8
         if ver_level == "verified":
-            score += 15
+            score += 14
         elif ver_level == "onchain_confirmed":
             score += 6
         if liq >= 50000:
-            score += 28
+            score += 24
         elif liq >= 5000:
-            score += 18
+            score += 16
         elif px > 0:
-            score += 10
+            score += 8
         if websites:
             score += 5
         if gas_tx < 0.02:
@@ -647,9 +635,9 @@ async def compute_arbitrage_snapshot(
             score += 6
         callers = int(item.get("unique_callers") or 0)
         if callers >= 5:
-            score += 10
+            score += 8
         elif callers >= 2:
-            score += 5
+            score += 4
         if risk == "low":
             score += 10
         elif risk == "high":
@@ -659,24 +647,18 @@ async def compute_arbitrage_snapshot(
 
         if risk == "high":
             verdict = "🔴 خطر / Honeypot"
-        elif is_gpu_pow and net_day_usd is not None and net_day_usd > 0:
-            verdict = "🟢 تعدين GPU مربح لايف"
-        elif is_gpu_pow and gross_day_usd is not None and gross_day_usd > 0:
-            verdict = "🟡 تعدين GPU (دخل < كلفة)"
         elif score >= 60 and liq >= 5000:
-            verdict = "🟢 فرصة أربيتراج قوية"
+            verdict = "🟢 Connect Wallet -> Mint قوية"
         elif px > 0 and liq >= 1000:
-            verdict = "🟡 قابل للمراقبة (مسعّر)"
-        elif is_cuda_pow and px == 0:
-            verdict = "🟡 PoW مبكر (قبل الإدراج)"
+            verdict = "🟡 Connect Wallet -> Mint شغالة"
         else:
-            verdict = "⚪ غير مسعّر / بلا سيولة"
+            verdict = "⚪ سيولة ضعيفة"
 
         exp_name, exp_url = resolve_explorer_link(eco, cid, cname, addr, chainid_map, bs_map)
 
         onchain_rows.append({
             "uid": item.get("uid"),
-            "kind": "gpu_pow" if is_gpu_pow else "mint_tx",
+            "kind": "mint_tx",
             "protocol_name": item.get("protocol_name") or addr[:14],
             "token_symbol": token_sym,
             "address": addr,
@@ -688,14 +670,14 @@ async def compute_arbitrage_snapshot(
             "protocol_type": ptype,
             "standard": prof.get("standard") or eco,
             "mining_mode": mining_mode,
-            "is_cuda_pow": is_cuda_pow,
-            "is_gpu_pow": is_gpu_pow,
-            "gpu_algo": matched_algo,
-            "gpu_hashrate": gpu_hashrate_label,
-            "est_coins_day": round(est_coins_day, 5) if est_coins_day is not None else None,
-            "gross_day_usd": round(gross_day_usd, 3) if gross_day_usd is not None else None,
-            "net_day_usd": round(net_day_usd, 3) if net_day_usd is not None else None,
-            "breakeven_coin_price_usd": round(breakeven_coin_px, 6) if breakeven_coin_px is not None else None,
+            "is_cuda_pow": bool(sb.get("onchain_pow_state") or sb.get("pow_functions")),
+            "is_gpu_pow": False,
+            "gpu_algo": "",
+            "gpu_hashrate": "",
+            "est_coins_day": None,
+            "gross_day_usd": None,
+            "net_day_usd": None,
+            "breakeven_coin_price_usd": None,
             "verification_level": ver_level,
             "verification_label": ver_label,
             "is_code_confirmed": is_code_ok,
@@ -705,6 +687,8 @@ async def compute_arbitrage_snapshot(
             "liquidity_usd": round(liq, 2) if liq > 0 else 0.0,
             "volume_24h_usd": round(vol24, 2) if vol24 > 0 else 0.0,
             "gas_cost_tx_usd": gas_tx,
+            "mint_fee_usd": round(mint_fee_usd, 4),
+            "total_cost_tx_usd": round(total_cost_tx, 5),
             "total_cost_hr_usd": round(total_cost_hr, 4),
             "breakeven_usd_hr": breakeven_usd_hr,
             "breakeven_usd_tx": breakeven_usd_tx,
@@ -725,6 +709,15 @@ async def compute_arbitrage_snapshot(
             "discovery_source": item.get("discovery_source") or "verified_registry",
             "agent_reasoning": item.get("agent_reasoning") or "",
             "decoded_functions": (item.get("decoded_functions") or [])[:4],
+            "sandbox_wallet": sb.get("sandbox_wallet") or agent_mem.get("sandbox_wallet") or "",
+            "trial_status": sb.get("trial_status") or "UNVERIFIED",
+            "trial_verdict_ar": sb.get("trial_verdict_ar") or "",
+            "tested_fn": sb.get("tested_fn") or "",
+            "est_gas_units": int(sb.get("est_gas_units") or 0),
+            "has_connect_wallet": bool(sb.get("has_connect_wallet")),
+            "has_mint_ui": bool(sb.get("has_mint_ui")),
+            "onchain_pow_state": sb.get("onchain_pow_state") or {},
+            "site_live": bool(sb.get("site_live")),
         })
 
     onchain_rows.sort(
@@ -737,8 +730,8 @@ async def compute_arbitrage_snapshot(
         reverse=True,
     )
 
-    profitable_l1_count = sum(1 for c in gpu_coins if c["net_day_usd"] > 0)
     strong_onchain_count = sum(1 for r in onchain_rows if r["arbitrage_score"] >= 60)
+    simulated_open_count = sum(1 for r in onchain_rows if r.get("trial_status") in ("SIMULATED_OPEN", "POW_OR_MINT_ACTIVE"))
 
     return {
         "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -761,6 +754,8 @@ async def compute_arbitrage_snapshot(
         ],
         "agent": {
             "name": agent_mem.get("agent_name") or "OmniRPC Autonomous Mining Agent",
+            "sandbox_wallet": agent_mem.get("sandbox_wallet") or reg.get("sandbox_wallet") or "",
+            "sandbox_trials_last_cycle": agent_mem.get("sandbox_trials_last_cycle") or {},
             "total_cycles": int(agent_mem.get("total_cycles") or reg.get("total_scans_completed") or 0),
             "last_cycle_at": agent_mem.get("last_cycle_at") or last_scan_at,
             "newly_added_last_cycle": int(agent_mem.get("newly_added_last_cycle") or (reg.get("last_scan_stats") or {}).get("newly_registered") or 0),
@@ -773,6 +768,7 @@ async def compute_arbitrage_snapshot(
             "total_onchain_protocols": len(onchain_rows),
             "excluded_non_mining_count": excluded_non_mining_count,
             "cuda_pow_protocols": sum(1 for r in onchain_rows if r["is_cuda_pow"]),
+            "simulated_open_protocols": simulated_open_count,
             "strong_onchain_opportunities": strong_onchain_count,
             "last_scan_at": last_scan_at,
         },

@@ -31,76 +31,80 @@ from mining_registry import is_actionable_mining_protocol, load_registry, save_r
 from omnirpc_client import OmniRPC
 import onchain_mining_scanner
 from protocol_profiler import CURATED_MINING_SEEDS, enrich_registry_items_onchain
+from wallet_simulator import (
+    DEFAULT_SANDBOX_EVM_WALLET,
+    DEFAULT_SANDBOX_SOL_WALLET,
+    inspect_evm_contract_onchain,
+    simulate_sandbox_wallet_mint,
+)
 
 ROOT = Path(__file__).resolve().parent
 AGENT_MEMORY_PATH = ROOT / "agent_memory.json"
 
-# Extra adaptive search rotations added every hour beyond base queries
+# Extra adaptive search rotations added every hour beyond base queries (ONLY Web3 Connect-Wallet Mint & On-Chain PoW)
 ADAPTIVE_QUERY_POOL = [
-    ["proof of work", "mineable", "epow", "glaze", "drillx", "xen", "0xbtc", "nonce", "miner"],
-    ["hashrate", "fodina", "titanx", "orx", "gram ton", "mrdn", "pmint", "pulsechain mint", "octaspace"],
-    ["firo", "aipg", "dynex", "zano", "rserg", "clore", "conflux", "mine token", "fair mint"],
-    ["pow token", "solo mine", "erc918", "mineable token", "giver", "kaspa pow", "kawpow", "autolykos"],
-    ["epoch mine", "proof of useful work", "gpu mine", "fair launch pow", "titan", "pulsechain pow", "ton pow"],
+    ["claimrank", "startmint", "titanx", "glaze", "drillx", "xen mint", "pmint", "fair mint", "mint to earn"],
+    ["orx minter", "mrdn", "pulsechain mint", "base mine", "shogun", "x28", "titanfarms", "burnandmint"],
+    ["dragonx", "volt mint", "hyper mint", "pow token", "epow", "web3 miner", "mine token", "enterauction"],
+    ["ore supply", "coal solana", "claim mint", "batchmint", "challengeNumber", "nonce mint", "epoch mine"],
 ]
 
 DEFAULT_USER_DIRECTIVES: list[dict[str, Any]] = [
     {
         "timestamp": "2026-11-13T21:40:00Z",
         "category": "directive",
-        "text": "عدم تصفير mining_registry.json أبداً؛ الحفاظ على كل البروتوكولات القديمة (first_seen_at, seen_scans) وإضافة البروتوكولات الجديدة فقط كل ساعة.",
+        "text": "عدم تصفير mining_registry.json أبداً؛ الحفاظ على كل البروتوكولات الصالحة القديمة (first_seen_at, seen_scans) وإضافة الجديد كل ساعة مع حذف المواقع الطايحة والعملات الممنوعة.",
+        "active": True,
+    },
+    {
+        "timestamp": "2026-11-13T22:20:00Z",
+        "category": "directive",
+        "text": "التركيز 100% فقط على بروتوكولات Web3 (Connect Wallet -> Mint / Mine -> بيع التوكن فـ DEX وربح) وفحص عقودها On-Chain وتجريبها بالمحفظة التجريبية (Sandbox Wallet) — مع حظر تام لعملات L1/HiveOS بحال Dynex و Firo و Zano و Ergo و ETC.",
         "active": True,
     },
     {
         "timestamp": "2026-11-13T21:40:00Z",
         "category": "directive",
-        "text": "التركيز على بروتوكولات GPU PoW القابلة للتعدين ببطاقات NVIDIA وبروتوكولات Fair-Mint ذات واجهة Web3 رسمية حقيقية + سعر وسيولة موثقين على DexScreener.",
+        "text": "تغطية الشبكات الصغيرة والمغمورة والـ L2s (PulseChain, Base, Polygon, Arbitrum, BSC, Solana, TON, Ethereum) بحثاً عن عقود PoW و Mint حقيقية شغالة on-chain.",
         "active": True,
     },
     {
         "timestamp": "2026-11-13T21:40:00Z",
         "category": "directive",
-        "text": "تغطية الشبكات الصغيرة والمغمورة (PulseChain, Conflux, TON, Cardano, Base, Polygon, Arbitrum, Solana, Cosmos, Substrate) بالإضافة للشبكات الكبيرة.",
-        "active": True,
-    },
-    {
-        "timestamp": "2026-11-13T21:40:00Z",
-        "category": "directive",
-        "text": "الرفض الصارم لشبكات التجربة (testnets: robinhood, arc, sepolia)، ألعاب النقرات (idle clickers)، مخططات AI-agent-only (amber, jagent)، صناديق ETF، مواقع القمار، والميم كوينز بدون عقود حقيقية.",
+        "text": "الرفض الصارم لشبكات التجربة (testnets: robinhood, arc, sepolia)، ألعاب النقرات (idle clickers)، عملات L1 PoW التقليدية، مواقع L1/CLI، والمواقع الطايحة DNS.",
         "active": True,
     },
     {
         "timestamp": "2026-11-13T21:52:00Z",
         "category": "directive",
-        "text": "فين ما تلقى شي بروتوكول جديد ديال تعدين GPU PoW أو Fair-Mint، صيفطو لينا هنا فوراً بجميع التفاصيل ديالو عبر صندوق التنبيهات (notifications_queue).",
+        "text": "فين ما تلقى شي بروتوكول Connect Wallet -> Mint جديد مجرّب وناجح، صيفطو لينا هنا فوراً عبر notifications_queue.",
         "active": True,
     },
 ]
 
 DEFAULT_PRIORITY_CHAINS: list[str] = [
     "PulseChain",
-    "Conflux eSpace",
-    "TON",
-    "Cardano",
     "Base",
+    "TON",
+    "Solana",
     "Polygon",
     "Arbitrum",
-    "Solana",
-    "Cosmos",
-    "Substrate",
     "BNB Smart Chain",
     "Ethereum",
+    "Avalanche",
 ]
 
 DEFAULT_WATCHLIST_QUERIES: list[str] = [
-    "tari wxtm",
-    "quai network",
-    "neoxa",
-    "karlsen",
-    "xelis",
-    "pulsechain pow",
-    "conflux mine",
-    "fair mint pow",
+    "claimrank",
+    "startmint",
+    "glaze",
+    "pmint",
+    "titanx",
+    "orx",
+    "shogun",
+    "mrdn",
+    "ore",
+    "coal",
 ]
 
 DEFAULT_REJECTED_PATTERNS: list[str] = [
@@ -115,6 +119,21 @@ DEFAULT_REJECTED_PATTERNS: list[str] = [
     "idle clicker",
     "mint.club",
     "pump.fun",
+    "dynexcoin.org",
+    "firo.org",
+    "zano.org",
+    "ergoplatform.org",
+    "confluxnetwork.org",
+    "octa.space",
+    "ethereumclassic.org",
+    "clore.ai",
+    "runonflux.io",
+    "aipowergrid.io",
+    "tari.com",
+    "qu.ai",
+    "alephium.org",
+    "0xbitcoin.org",
+    "gramcoin.org",
 ]
 
 
@@ -132,7 +151,9 @@ def _dedupe_str_list(values: list[Any]) -> list[str]:
 def _ensure_long_term_memory(mem: dict[str, Any]) -> dict[str, Any]:
     """Backfill persistent long-term memory fields without erasing existing user data."""
     mem.setdefault("agent_name", "OmniRPC Autonomous Mining Agent")
-    mem.setdefault("version", "1.1")
+    mem.setdefault("version", "2.0")
+    mem.setdefault("sandbox_wallet", DEFAULT_SANDBOX_EVM_WALLET)
+    mem.setdefault("sandbox_sol_wallet", DEFAULT_SANDBOX_SOL_WALLET)
     mem.setdefault("total_cycles", 0)
     mem.setdefault("cursor_evm_offset", 0)
     mem.setdefault("cursor_bs_offset", 0)
@@ -178,7 +199,7 @@ def _ensure_long_term_memory(mem: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(existing_rej, list) or not existing_rej:
         mem["rejected_patterns"] = list(DEFAULT_REJECTED_PATTERNS)
     else:
-        mem["rejected_patterns"] = _dedupe_str_list(existing_rej)
+        mem["rejected_patterns"] = _dedupe_str_list(list(existing_rej) + list(DEFAULT_REJECTED_PATTERNS))
 
     return mem
 
@@ -459,15 +480,19 @@ async def run_agent_cycle(
     watchlist_queries = _dedupe_str_list(mem.get("watchlist_queries") or [])
     rejected_patterns = _dedupe_str_list(mem.get("rejected_patterns") or [])
 
+    sandbox_wallet = str(mem.get("sandbox_wallet") or DEFAULT_SANDBOX_EVM_WALLET)
     omni = OmniRPC()
     evm_pool_size = max(1, len(omni.pool.get("evm") or []))
     evm_offset = int(mem.get("cursor_evm_offset") or 0) % evm_pool_size
     bs_offset = int(mem.get("cursor_bs_offset") or 0) % 90
     q_idx = int(mem.get("cursor_query_batch") or 0) % len(ADAPTIVE_QUERY_POOL)
+    # Purge old L1 watchlist queries from memory pool while preserving custom user mint queries
+    _l1_watch_block = {"tari wxtm", "quai network", "neoxa", "karlsen", "xelis", "conflux mine", "pulsechain pow"}
+    watchlist_queries = [q for q in watchlist_queries if q.lower() not in _l1_watch_block] or list(DEFAULT_WATCHLIST_QUERIES)
     cycle_queries = list(dict.fromkeys(SEARCH_QUERIES + ADAPTIVE_QUERY_POOL[q_idx] + watchlist_queries))
     chain_resolver = _build_chain_resolver(omni)
 
-    # 3. ACT: Execute RPC block scan + WhatToMine/WoolyPooly + Blockscout + DexScreener discovery
+    # 3. ACT: Execute On-Chain RPC block/tx scan + Blockscout Verified Contracts + DexScreener Mint dApps
     if no_blocks:
         onchain_report: dict[str, Any] = {"evm_chains_scanned": 0, "total_chains_scanned": 0, "evm_results": []}
     else:
@@ -478,14 +503,12 @@ async def run_agent_cycle(
             evm_offset=evm_offset,
         )
 
-    connector = aiohttp.TCPConnector(limit=30, ssl=False)
+    connector = aiohttp.TCPConnector(limit=32, ssl=False)
     async with aiohttp.ClientSession(connector=connector) as session:
-        wtm_wooly, bs_hits, refreshed_old = await asyncio.gather(
-            _fetch_wtm_and_woolypooly(session),
+        bs_hits, refreshed_old = await asyncio.gather(
             _discover_blockscout_small_chains(session, max_explorers=28, offset=bs_offset),
             _refresh_existing_market_prices(session, prev_items),
         )
-        # Temporarily expand module SEARCH_QUERIES during discovery (including watchlist_queries)
         import hourly_mint_scanner as _hms
         orig_queries = list(_hms.SEARCH_QUERIES)
         _hms.SEARCH_QUERIES = cycle_queries
@@ -495,6 +518,34 @@ async def run_agent_cycle(
             _hms.SEARCH_QUERIES = orig_queries
 
         ai_notes = await _gemini_verify_candidates(session, discovered_dex)
+
+        # Deep On-Chain PoW/Mint Bytecode Inspection on active contracts seen directly in EVM blocks
+        onchain_pow_promoted = 0
+        oc_sem = asyncio.Semaphore(10)
+        raw_evm_contracts: list[tuple[dict[str, Any], dict[str, Any]]] = []
+        for evm_ch in onchain_report.get("evm_results") or []:
+            cid = str(evm_ch.get("chain_id") or "")
+            cname = str(evm_ch.get("chain_name") or "")
+            if _is_testnet_chain(cname, cid):
+                continue
+            for c in (evm_ch.get("top_active_contracts") or [])[:5]:
+                if int(c.get("unique_callers") or 0) >= 2:
+                    raw_evm_contracts.append((evm_ch, c))
+
+        async def _probe_evm_pow(evm_ch: dict[str, Any], c: dict[str, Any]) -> None:
+            nonlocal onchain_pow_promoted
+            async with oc_sem:
+                oc = await inspect_evm_contract_onchain(
+                    session, omni, evm_ch.get("chain_id"), str(c.get("address") or ""), decoded_functions=c.get("decoded_functions") or []
+                )
+            if oc.get("is_onchain_pow_or_mint") and not oc.get("paused"):
+                extra_fns = (oc.get("pow_functions_found") or []) + (oc.get("mint_functions_found") or [])
+                c["decoded_functions"] = list(dict.fromkeys((c.get("decoded_functions") or []) + extra_fns))
+                c["onchain_pow_verified"] = True
+                onchain_pow_promoted += 1
+
+        if raw_evm_contracts:
+            await asyncio.gather(*(_probe_evm_pow(ch, ct) for ch, ct in raw_evm_contracts[:40]), return_exceptions=True)
 
     # Collect curated + newly discovered + live on-chain candidates
     raw_candidates: list[dict[str, Any]] = []
@@ -545,29 +596,100 @@ async def run_agent_cycle(
                     "address": c.get("address"),
                     "tx_count": c.get("tx_count", 0),
                     "decoded_functions": c.get("decoded_functions") or [],
+                    "onchain_pow_verified": bool(c.get("onchain_pow_verified")),
                     "is_curated_miner": False,
                 },
                 "onchain_rpc_scan",
             )
 
-    # 4. REASON & ENRICH
+    # 4. REASON, ENRICH & SANDBOX WALLET TRIAL ("Agent enters site + connects wallet + tests mint")
     await enrich_registry_items_onchain(raw_candidates)
+
+    # Fetch native USD gas prices once for fee valuation
+    native_usd_map: dict[str, float] = {}
+    try:
+        from arbitrage_engine import _fetch_live_market_inputs
+        mkt_in = await _fetch_live_market_inputs()
+        native_usd_map = dict(mkt_in.get("native_prices") or {})
+    except Exception:
+        pass
+
+    def _ready_for_sandbox(it: dict[str, Any]) -> bool:
+        mkt = it.get("market_profile") or {}
+        sites = [w for w in (mkt.get("websites") or []) if isinstance(w, str) and w.startswith(("http://", "https://")) and "github.com" not in w.lower()]
+        try:
+            px = float(mkt.get("price_usd") or 0)
+        except Exception:
+            px = 0.0
+        return bool(sites and px > 0 and not _matches_rejected_patterns(it, rejected_patterns))
+
+    trial_targets: list[dict[str, Any]] = [it for it in raw_candidates if _ready_for_sandbox(it)]
+    cand_uids = {str(it.get("uid") or f"{it.get('chain_id')}:{str(it.get('address') or '').lower()}") for it in trial_targets}
+    old_reverify: list[dict[str, Any]] = []
+    for uid, old_rec in prev_items.items():
+        if uid not in cand_uids and _ready_for_sandbox(old_rec):
+            old_reverify.append(old_rec)
+
+    all_to_test = trial_targets + old_reverify
+    sb_sem = asyncio.Semaphore(8)
+    sandbox_by_uid: dict[str, dict[str, Any]] = {}
+    connector2 = aiohttp.TCPConnector(limit=32, ssl=False)
+    async with aiohttp.ClientSession(connector=connector2) as sb_session:
+        async def _run_trial(it: dict[str, Any]) -> None:
+            mkt = it.get("market_profile") or {}
+            eco = str(it.get("ecosystem") or "EVM")
+            uid_t = str(it.get("uid") or f"{it.get('chain_id')}:{str(it.get('address') or '').lower()}")
+            test_item = {
+                "chain_type": "TON" if eco == "TON" else ("SOLANA" if eco == "Solana" else "EVM"),
+                "evm_chain_id": it.get("chain_id") if eco == "EVM" else None,
+                "contract": it.get("address"),
+                "websites": mkt.get("websites") or [],
+                "decoded_functions": it.get("decoded_functions") or [],
+            }
+            async with sb_sem:
+                trial = await simulate_sandbox_wallet_mint(
+                    sb_session, omni, test_item, sandbox_wallet=sandbox_wallet, native_usd_map=native_usd_map
+                )
+            it["sandbox_test"] = trial
+            sandbox_by_uid[uid_t] = trial
+            if trial.get("tested_fn") and trial["tested_fn"] not in (it.get("decoded_functions") or []):
+                it["decoded_functions"] = list(dict.fromkeys([trial["tested_fn"]] + list(it.get("decoded_functions") or [])))
+
+        if all_to_test:
+            await asyncio.gather(*(_run_trial(it) for it in all_to_test), return_exceptions=True)
+
     verified_this_cycle = [
         it for it in raw_candidates
         if is_actionable_mining_protocol(it) and not _matches_rejected_patterns(it, rejected_patterns)
     ]
 
-    # 5. MEMORIZE (NON-DESTRUCTIVE CUMULATIVE MERGE: Keep ALL valid old protocols + add new ones!)
+    # 5. MEMORIZE (NON-DESTRUCTIVE CUMULATIVE MERGE: Keep ALL valid old Web3 Mint protocols + add new ones!)
     now_iso = utc_now_iso()
     merged_items: dict[str, dict[str, Any]] = {}
 
-    # Preserve ALL valid previously stored protocols first (never reset to 0!)
+    def _tok_dedup_key(rec: dict[str, Any]) -> tuple[str, str]:
+        eco = str(rec.get("ecosystem") or "").lower()
+        chain_bucket = eco if eco in ("solana", "ton", "sui", "aptos") else str(rec.get("chain_id") or "").lower()
+        tok = str((rec.get("market_profile") or {}).get("resolved_token_address") or rec.get("token_address") or rec.get("address") or "").lower()
+        return (chain_bucket, tok) if tok else ("", "")
+
+    # Preserve ALL valid previously stored protocols first (applying fresh sandbox trials & pruning L1/dead/memes)
     pruned_old = 0
-    for uid, old_rec in prev_items.items():
-        if is_actionable_mining_protocol(old_rec):
-            kept = dict(old_rec)
+    seen_tok_keys: set[tuple[str, str]] = set()
+    ordered_prev = sorted(prev_items.items(), key=lambda kv: (0 if kv[1].get("is_curated_miner") else 1, kv[0]))
+    for uid, old_rec in ordered_prev:
+        kept = dict(old_rec)
+        if uid in sandbox_by_uid:
+            kept["sandbox_test"] = sandbox_by_uid[uid]
+        tkey = _tok_dedup_key(kept)
+        if tkey[1] and tkey in seen_tok_keys:
+            pruned_old += 1
+            continue
+        if is_actionable_mining_protocol(kept) and not _matches_rejected_patterns(kept, rejected_patterns):
             kept["is_new_in_last_scan"] = False
             merged_items[uid] = kept
+            if tkey[1]:
+                seen_tok_keys.add(tkey)
         else:
             pruned_old += 1
 
@@ -579,7 +701,11 @@ async def run_agent_cycle(
         cid = str(it.get("chain_id") or "")
         addr = str(it.get("address") or "").strip()
         uid = it.get("uid") or f"{cid}:{addr.lower()}"
+        _tok_key = _tok_dedup_key(it)
+        _tok_new = _tok_key[1]
         prev = merged_items.get(uid)
+        if prev is None and _tok_new and _tok_key in seen_tok_keys:
+            continue
         is_brand_new = prev is None
         if is_brand_new:
             new_added_names.append(str(it.get("protocol_name") or uid))
@@ -602,10 +728,13 @@ async def run_agent_cycle(
         if not it.get("agent_reasoning") and prev_base.get("agent_reasoning"):
             it["agent_reasoning"] = prev_base["agent_reasoning"]
         elif not it.get("agent_reasoning"):
-            kind_tag = "تعدين GPU PoW" if "gpu" in str(it.get("protocol_type") or "").lower() else "تعدين / Mint عبر الموقع الرسمي"
-            it["agent_reasoning"] = f"{kind_tag} • موثّق على {it.get('chain_name')}"
+            sb = it.get("sandbox_test") or {}
+            verdict = sb.get("trial_verdict_ar") or "Connect Wallet -> Mint موثّق"
+            it["agent_reasoning"] = f"{verdict} • {it.get('chain_name')}"
 
         merged_items[uid] = it
+        if _tok_new:
+            seen_tok_keys.add(_tok_key)
         if is_brand_new:
             alert = _build_discovery_alert(it, cycle_num, now_iso)
             new_alerts.append(alert)
@@ -619,14 +748,20 @@ async def run_agent_cycle(
     duration_s = round(time.perf_counter() - t0, 1)
     evm_scanned = int(onchain_report.get("evm_chains_scanned") or 0)
     total_chains = int(onchain_report.get("total_chains_scanned") or 0)
+    sim_open_count = sum(
+        1 for it in merged_items.values()
+        if (it.get("sandbox_test") or {}).get("trial_status") in ("SIMULATED_OPEN", "POW_OR_MINT_ACTIVE")
+    )
 
     stats = {
         "evm_chains_scanned": evm_scanned,
         "total_chains_scanned": total_chains,
         "evm_offset": evm_offset,
         "bs_offset": bs_offset,
-        "wtm_gpu_coins": wtm_wooly.get("wtm_count", 0),
-        "wooly_pools": wtm_wooly.get("wooly_count", 0),
+        "onchain_pow_promoted": onchain_pow_promoted,
+        "sandbox_trials_run": len(all_to_test),
+        "sandbox_trials_passed": len(merged_items),
+        "sandbox_simulated_open": sim_open_count,
         "blockscout_hits": len(bs_hits),
         "dex_discovered_verified": len(discovered_dex),
         "refreshed_existing_prices": refreshed_old,
@@ -652,8 +787,9 @@ async def run_agent_cycle(
     }
 
     out_reg = {
-        "schema_version": 5,
+        "schema_version": 6,
         "agent_managed": True,
+        "sandbox_wallet": sandbox_wallet,
         "updated_at": now_iso,
         "updated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "scan_interval_seconds": 3600,
@@ -669,17 +805,26 @@ async def run_agent_cycle(
     # 6. REPORT & UPDATE AGENT LONG-TERM MEMORY (preserve all directives, notes, chains, watchlist, rejections)
     if new_added_names:
         brief = (
-            f"الدورة #{cycle_num}: فحص الإيجنت {total_chains} شبكة، زاد +{len(new_added_names)} بروتوكولات جديدة "
-            f"({', '.join(new_added_names[:3])}) فوق القديم، المجموع المخزن دابا {len(merged_items)} بروتوكول."
+            f"الدورة #{cycle_num}: دخل الإيجنت l-on-chain ({total_chains} شبكة)، جرّب {len(all_to_test)} داب بالمحفظة التجريبية "
+            f"{sandbox_wallet[:8]}..، زاد +{len(new_added_names)} بروتوكول Connect Wallet -> Mint ({', '.join(new_added_names[:3])}) "
+            f"والمجموع الصافي دابا {len(merged_items)} بروتوكول."
         )
     else:
         brief = (
-            f"الدورة #{cycle_num}: فحص الإيجنت {total_chains} شبكة وحدّث الأسعار، وبقى محافظ على كل البروتوكولات القديمة "
-            f"({len(merged_items)} بروتوكول جاهز للتعدين)."
+            f"الدورة #{cycle_num}: دخل الإيجنت l-on-chain ({total_chains} شبكة)، جرّب {len(all_to_test)} داب بالمحفظة التجريبية "
+            f"{sandbox_wallet[:8]}..، وصفّى اللستة غير لبروتوكولات Connect Wallet -> Mint الصالحة ({len(merged_items)} بروتوكول، "
+            f"{sim_open_count} مجرّب On-Chain)."
         )
 
     mem["agent_name"] = "OmniRPC Autonomous Mining Agent"
-    mem["version"] = "1.1"
+    mem["version"] = "2.0"
+    mem["sandbox_wallet"] = sandbox_wallet
+    mem["sandbox_trials_last_cycle"] = {
+        "tested": len(all_to_test),
+        "passed": len(merged_items),
+        "simulated_open": sim_open_count,
+        "onchain_pow_promoted": onchain_pow_promoted,
+    }
     mem["total_cycles"] = cycle_num
     mem["cursor_evm_offset"] = (evm_offset + 90) % evm_pool_size
     mem["cursor_bs_offset"] = (bs_offset + 14) % 90
@@ -693,7 +838,10 @@ async def run_agent_cycle(
     mem["priority_chains"] = priority_chains
     mem["watchlist_queries"] = watchlist_queries
     mem["rejected_patterns"] = rejected_patterns
-    existing_queue = [a for a in (mem.get("notifications_queue") or []) if isinstance(a, dict)]
+    existing_queue = [
+        a for a in (mem.get("notifications_queue") or [])
+        if isinstance(a, dict) and str(a.get("uid") or "") in merged_items
+    ]
     if new_alerts:
         seen_uids = {str(a.get("uid") or "") for a in existing_queue}
         for alert in new_alerts:

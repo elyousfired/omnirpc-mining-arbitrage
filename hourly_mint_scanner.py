@@ -51,6 +51,10 @@ BAD_DOMAIN_FRAGMENTS = (
     "thevirusonton", "proofofcapital.org", "zendawg.io", "globalxetfs.com",
     "nevergiveup.art", "minted.team", "mtonga.com", "toninu.tech",
     "bonkcoin.com", "pump.tires",
+    "dynexcoin.org", "firo.org", "zano.org", "ergoplatform.org",
+    "confluxnetwork.org", "octa.space", "ethereumclassic.org",
+    "clore.ai", "runonflux.io", "aipowergrid.io", "tari.com", "qu.ai",
+    "alephium.org", "0xbitcoin.org",
 )
 
 # Extra non-EVM / alt-L1 DexScreener slug mappings beyond live_rpc_pool.json
@@ -91,30 +95,28 @@ ALT_DEX_CHAIN_MAP: dict[str, tuple[str, str, str, str]] = {
 }
 
 SEARCH_QUERIES = [
-    "proof of work", "mineable", "epow", "glaze", "drillx",
-    "xen", "0xbtc", "nonce", "miner", "hashrate", "fodina",
-    "titanx", "orx", "gram ton", "mrdn", "pmint", "pulsechain mint",
-    "octaspace", "firo", "aipg", "dynex", "zano", "rserg", "clore",
-    "conflux", "mine token", "fair mint",
+    "claimrank", "startmint", "titanx", "xen mint", "fair mint",
+    "mint to earn", "web3 miner", "mine token", "pulsechain mint", "glaze",
+    "transform", "dragonx", "volt", "hyper", "pmint", "mrdn",
+    "ore", "drillx", "epow", "pow token", "proof of work", "nonce",
+    "burnandmint", "blockreward",
 ]
 
-# Unambiguous Mint UI or GPU PoW phrases matched strictly against visible page text (scripts/styles stripped)
+# Unambiguous Web3 Connect-Wallet Mint phrases (delegated to JS-bundle inspector in wallet_simulator.py)
 MINT_OR_GPU_POW_PHRASES = (
     "connect wallet", "start mining", "mine now", "claim mint", "start mint",
-    "claim rank", "proof of work", "proof-of-work", "hashrate", "stratum",
-    "lolminer", "rigel", "bzminer", "srbminer", "teamredminer", "t-rex",
-    "gminer", "kawpow", "ethash", "etchash", "autolykos", "firopow",
-    "progpow", "dynexsolve", "ton giver", "giver contract", "gpu mining",
-    "mining pool", "block reward", "erc-918", "erc918", "transform",
+    "claim rank", "proof of work", "proof-of-work", "glaze", "transform",
+    "enter auction", "mint now", "nonce", "difficulty",
 )
 
-MINT_OR_GPU_POW_WORDS = ("pow", "gpu", "nonce", "difficulty", "octopus", "blake3", "minter")
+MINT_OR_GPU_POW_WORDS = ("pow", "mint", "mine", "nonce", "difficulty", "claimrank", "minter")
 
 REJECT_SITE_MARKERS = (
     "ai agents mine for you", "autonomous agent mining", "no wallet needed to play",
     "tap to earn", "idle clicker", "domain for sale", "buy this domain",
     "memecoin", "meme coin", "copper miners etf", "global x etf",
     "sportsbook", "casino", "?click=", "music is the meme",
+    "stratum+tcp", "hiveos", "lolminer", "rigel", "bzminer", "srbminer",
 )
 
 
@@ -162,48 +164,21 @@ async def _verify_site_mint_or_gpu_pow(
     session: aiohttp.ClientSession,
     url: str,
 ) -> tuple[bool, str]:
-    """Fetch official website and confirm HTTP 200 + visible interactive Mint UI or GPU PoW guide."""
+    """Fetch HTML + JS SPA bundles to confirm HTTP 200 + real Web3 Connect-Wallet Mint UI (no L1 CLI sites)."""
     if not _is_good_project_site(url):
         return False, "invalid_domain"
-    try:
-        headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-            ),
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        }
-        async with session.get(
-            url,
-            headers=headers,
-            timeout=aiohttp.ClientTimeout(total=8),
-            allow_redirects=True,
-        ) as resp:
-            if resp.status >= 400:
-                return False, f"http_{resp.status}"
-            raw_html = (await resp.text(errors="ignore"))[:90000]
-            raw_low = raw_html.lower()
-            visible = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", raw_low, flags=re.S | re.I)
-            visible = re.sub(r"<[^>]+>", " ", visible)
-            visible = re.sub(r"\s+", " ", visible)
-            if any(rej in visible or rej in raw_low for rej in REJECT_SITE_MARKERS):
-                return False, "rejected_type"
-            phrase_hits = [k for k in MINT_OR_GPU_POW_PHRASES if k in visible]
-            word_hits = [w for w in MINT_OR_GPU_POW_WORDS if re.search(rf"\b{re.escape(w)}\b", visible)]
-            total_hits = len(phrase_hits) + len(word_hits)
-            # Require either >=2 distinct visible signals, or an explicit mining/mint UI phrase
-            if len(phrase_hits) >= 2 or (phrase_hits and total_hits >= 2) or any(
-                strong in phrase_hits
-                for strong in ("proof of work", "proof-of-work", "start mining", "lolminer", "rigel", "bzminer", "kawpow", "ethash", "autolykos", "firopow", "progpow", "ton giver", "erc-918")
-            ):
-                return True, f"ok_hits_{total_hits}"
-            if ("<div id=\"root\"" in raw_low or "<div id=\"__next\"" in raw_low) and any(
-                hint in url.lower() for hint in ("mint", "mine", "fodina", "titan", "x28", "orx", "shogun")
-            ):
-                return True, "ok_spa_shell"
-            return False, "no_mint_or_pow_keywords"
-    except Exception as exc:
-        return False, f"err_{str(exc)[:30]}"
+    from wallet_simulator import verify_web3_mint_ui
+
+    ui = await verify_web3_mint_ui(session, url)
+    if not ui.get("site_live"):
+        return False, str(ui.get("error") or "site_down")
+    if ui.get("is_l1_cli_miner"):
+        return False, "l1_cli_miner_rejected"
+    if ui.get("is_web3_mint_dapp"):
+        w_cnt = len(ui.get("wallet_signals") or [])
+        m_cnt = len(ui.get("mint_signals") or [])
+        return True, f"web3_dapp_w{w_cnt}_m{m_cnt}"
+    return False, "no_connect_wallet_mint_ui"
 
 
 async def _fetch_wtm_and_woolypooly(session: aiohttp.ClientSession) -> dict[str, Any]:
@@ -279,30 +254,40 @@ async def _discover_blockscout_small_chains(
                     f"{base_url}/api/v2/tokens?q={q}",
                     timeout=aiohttp.ClientTimeout(total=6),
                 ) as r:
-                    if r.status != 200:
-                        return
-                    data = await r.json(content_type=None)
-                    for tok in (data.get("items") or [])[:5]:
-                        addr = str(tok.get("address_hash") or tok.get("address") or "").strip()
-                        sym = str(tok.get("symbol") or "").strip()
-                        holders = int(tok.get("holders_count") or tok.get("holders") or 0)
-                        if not addr or not sym or len(sym) > 15 or holders < 20:
-                            continue
-                        found.append(
-                            {
-                                "cid": cid,
-                                "address": addr,
-                                "symbol": sym,
-                                "name": str(tok.get("name") or sym),
-                                "holders": holders,
-                            }
-                        )
+                    if r.status == 200:
+                        data = await r.json(content_type=None)
+                        for tok in (data.get("items") or [])[:5]:
+                            addr = str(tok.get("address_hash") or tok.get("address") or "").strip()
+                            sym = str(tok.get("symbol") or "").strip()
+                            holders = int(tok.get("holders_count") or tok.get("holders") or 0)
+                            if not addr or not sym or len(sym) > 15 or holders < 20:
+                                continue
+                            found.append({"cid": cid, "address": addr, "symbol": sym, "name": str(tok.get("name") or sym), "holders": holders})
+            except Exception:
+                pass
+            # Also query Blockscout v2 verified smart contracts directly for PoW / Miner / FairMint contracts!
+            try:
+                async with session.get(
+                    f"{base_url}/api/v2/smart-contracts?q={q}",
+                    timeout=aiohttp.ClientTimeout(total=6),
+                ) as r2:
+                    if r2.status == 200:
+                        d2 = await r2.json(content_type=None)
+                        for sc in (d2.get("items") or [])[:5]:
+                            addr_obj = sc.get("address") or {}
+                            addr = str(addr_obj.get("hash") or sc.get("address_hash") or "").strip()
+                            sc_name = str(sc.get("name") or addr_obj.get("name") or "").strip()
+                            txc = int(sc.get("transactions_count") or 0)
+                            if not addr.startswith("0x") or len(addr) != 42 or txc < 10:
+                                continue
+                            if any(k in sc_name.lower() for k in ("mine", "mint", "pow", "xen", "titan", "glaze", "claim")):
+                                found.append({"cid": cid, "address": addr, "symbol": sc_name[:12], "name": sc_name, "holders": txc})
             except Exception:
                 pass
 
     tasks = []
     for idx, (cid, base_url) in enumerate(rotated):
-        q = ("mine", "pow", "xen")[idx % 3]
+        q = ("mine", "mint", "pow", "xen")[idx % 4]
         tasks.append(probe_one(cid, base_url, q))
     await asyncio.gather(*tasks)
     return found
@@ -401,12 +386,7 @@ async def _discover_dexscreener_candidates(
             ok, reason = await _verify_site_mint_or_gpu_pow(session, sites[0])
         if not ok:
             return
-        blob = f"{sym} {name} {sites[0]} {reason}".lower()
-        is_pow_site = any(
-            k in blob
-            for k in ("pow", "gpu", "stratum", "kawpow", "ethash", "autolykos", "octopus", "firopow", "dynex", "octa", "zano", "clore", "aipg")
-        )
-        ptype = "تعدين GPU Proof-of-Work" if is_pow_site else "تعدين PoW / Fair-Mint (موقع + DexScreener)"
+        ptype = "تعدين PoW / Fair-Mint (Connect Wallet + Mint UI)"
         verified.append(
             {
                 "ecosystem": eco,
@@ -416,13 +396,13 @@ async def _discover_dexscreener_candidates(
                 "address": addr,
                 "protocol_name": f"{name} ({sym})",
                 "protocol_type": ptype,
-                "decoded_functions": ["proof_of_work", "gpu_mine"] if is_pow_site else ["fair_mint", "mine"],
+                "decoded_functions": ["fair_mint", "mine"],
                 "tx_count": max(1, int((p.get("txns") or {}).get("h24", {}).get("buys", 0) or 1)),
                 "explorer_url": p.get("url") or "",
                 "token_address": addr,
                 "is_curated_miner": True,
                 "is_standard_token_noise": False,
-                "category": "GPU Proof-of-Work" if is_pow_site else "Discovered PoW / Mint",
+                "category": "Web3 Connect-Wallet Mint",
                 "verification_note": f"Auto-discovered via {chain_slug} ({reason})",
                 "market_profile": {
                     "probed": True,

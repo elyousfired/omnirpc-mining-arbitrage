@@ -44,6 +44,23 @@ NON_MINING_ADDRESSES = {
     "0x3ae2dfc3b795267e284cbab7eff9a0cefdab401d",  # Apertum Virtual Miner (no DexScreener token)
     "6ef8rrecthr5dkzon8nwu78hrvfckubj14m5ubewf6p",  # Pump.fun bonding-curve launchpad
     "6vo3245eszab5wuqemw8mgdbfrudkbhhdhp5lcagutab", # Pump app launchpad router
+    # Traditional L1 / HiveOS GPU Pool Coins (NO Web3 Connect-Wallet Mint UI)
+    "0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b",   # Conflux wrapped
+    "0x3d6545b08693dae087e957cb1180ee38b9e3c25e",   # ETC bridged
+    "0xdb85f6685950e285b1e611037bebe5b34e2b7d78",   # WZANO
+    "04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247",  # rsERG Cardano
+    "0xe0e8a04242f35b95dc64b07e0eae23a8e43a78e4",   # rsERG BSC
+    "0xe60201989b8628f43dc0605f585a72bcf1f1e977",   # CLORE
+    "0x9928a8600d14ac22c0be1e8d58909834d7ceaf13",   # 0xDNX (Dynex)
+    "0xd5d0322b6bab6a762c79f8c81a0b674778e13aed",   # FIRO
+    "0xfa704148d516b209d52c2d75f239274c8f8eaf1a",   # OCTA
+    "0xaff9084f2374585879e8b434c399e29e80cce635",   # FLUX
+    "0xa1c0decafe3e9bf06a5f29b7015cd373a9854608",   # AIPG
+    "0xfd36fa88bb3fea8d1264fc89d70723b6a2b56958",   # Tari wXTM
+    "0x5c97d726bf5130ae15408ce32bc764e458320d2f",   # Quai wrapped
+    "0x590f820444fa3638e022776752c5eef34e2f89a6",   # Alephium wrapped
+    "0xb6ed7644c69416d67b522e20bc294a9a9b405b31",   # 0xBTC CLI miner (no Web3 Mint UI)
+    "0x71b821aa52a49f32eed535fca6eb5aa130085978",   # 0xBTC Polygon CLI miner
 }
 
 NON_MINING_KEYWORDS = (
@@ -59,6 +76,9 @@ NON_MINING_KEYWORDS = (
     "dragon coin", "zendawg", "never give up", "antminer", "minted hub",
     "staking / yield", "سيولة defi", "سكّ nft", "توكن عادي", "لعبة ويب 3",
     "مطالبة ومكافآت", "ستيكينغ",
+    "dynex", "firo", "zano", "ergo", "conflux", "octaspace", "ethereum classic",
+    "clore.ai", "runonflux", "ai power grid", "alephium", "tari (", "quai network",
+    "0xbitcoin", "fodinamine", "gram (grm)",
 )
 
 ADMIN_NOISE_PREFIXES = (
@@ -95,11 +115,25 @@ def is_actionable_mining_protocol(item: dict[str, Any]) -> bool:
         return False
     pname = str(item.get("protocol_name") or "").lower()
     ptype = str(item.get("protocol_type") or "").lower()
+    cat_l = str(item.get("category") or "").lower()
     vname = str(mkt.get("verified_contract_name") or "").lower()
-    blob = f"{pname} {ptype} {vname}"
+    blob = f"{pname} {ptype} {cat_l} {vname}"
+    if item.get("wtm_name") or "gpu proof-of-work" in blob or "gpu_pow(" in " ".join(item.get("decoded_functions") or []).lower():
+        return False
     if any(bad in blob for bad in NON_MINING_KEYWORDS):
         return False
     if "amber" in blob or "jagent" in blob:
+        return False
+
+    # Strictly require passing live Sandbox Wallet & Web3 Connect-Wallet Mint UI verification
+    sb = item.get("sandbox_test")
+    if not (
+        isinstance(sb, dict)
+        and sb.get("tested")
+        and sb.get("site_live")
+        and sb.get("is_actionable_web3_mint")
+        and not sb.get("paused")
+    ):
         return False
 
     # 1. Must have a real non-GitHub Mint / Mine interface website
@@ -125,7 +159,8 @@ def is_actionable_mining_protocol(item: dict[str, Any]) -> bool:
         k in f"{ptype} {fns}"
         for k in (
             "pow", "mine", "drill", "nonce", "difficulty", "glaze",
-            "claimmintreward", "claimrank", "l2_claim", "blockreward", "fair-mint",
+            "claimmintreward", "claimrank", "startmint", "claimmint", "transform",
+            "mintx28", "mintreward", "blockreward", "fair-mint",
         )
     )
     return has_mining_signal

@@ -175,10 +175,10 @@
 <body>
   <header>
     <div class="brand">
-      <div class="logo-badge">ARB</div>
+      <div class="logo-badge">WEB3</div>
       <div>
-        <h1>رادار وأربيتراج تعدين GPU PoW والـ Fair-Mint</h1>
-        <p>فحص كل الشبكات (الصغيرة والكبيرة) • فقط مشاريع تقدر تعدّنها بـ GPU أو تمنتيها من الموقع الرسمي + DexScreener</p>
+        <h1>رادار الإيجنت لبروتوكولات Connect Wallet -&gt; Mint / PoW</h1>
+        <p>فحص On-Chain + دخول أوتوماتيكي للمواقع + تجريب بالمحفظة التجريبية (Sandbox Wallet) • فقط مشاريع تقدر تمنتيها وتبيع فـ DEX</p>
       </div>
     </div>
 
@@ -254,18 +254,18 @@
         <span class="badge b-cyan" id="agentCyclePill">دورة #0</span>
         <span id="agentBriefText" style="margin-right:6px;">جاري تحميل ذاكرة الإيجنت...</span>
       </div>
-      <div class="ltr" style="font-size:11px;color:var(--muted);" id="agentSyncNote">قاعدة تراكمية: القديم محفوظ + الجديد يتزاد كل ساعة</div>
+      <div class="ltr" style="font-size:11px;color:var(--muted);" id="agentSyncNote">Sandbox Wallet: 0x5e71.. • On-Chain PoW + Mint UI</div>
     </section>
 
     <div id="tab-onchain" class="panel active">
       <div class="toolbar">
         <div class="toolbar-group">
           <input type="text" id="searchBox" placeholder="ابحث بالاسم، التوكن، الموقع، العنوان 0x... أو الشبكة..." style="min-width:250px;" oninput="renderOnchainTable()" />
-          <button class="pill-filter active" onclick="setFilter('ALL', this)">الكل (GPU PoW + Fair-Mint)</button>
-          <button class="pill-filter" onclick="setFilter('GPU_POW', this)">تعدين GPU PoW فقط</button>
-          <button class="pill-filter" onclick="setFilter('MINT_TX', this)">واجهة Mint / On-Chain فقط</button>
+          <button class="pill-filter active" onclick="setFilter('ALL', this)">الكل (Connect Wallet + Mint مجرّب)</button>
+          <button class="pill-filter" onclick="setFilter('SIMULATED', this)">مجرّب بالمحفظة (Simulated Open)</button>
+          <button class="pill-filter" onclick="setFilter('POW_ONCHAIN', this)">عقود PoW On-Chain</button>
           <button class="pill-filter" onclick="setFilter('VERIFIED', this)">موثّق فقط (Verified)</button>
-          <button class="pill-filter" onclick="setFilter('STRONG', this)">فرص عالية (Score &gt;= 60)</button>
+          <button class="pill-filter" onclick="setFilter('LOW_GAS', this)">غـاز رخيص (&lt; $0.05)</button>
         </div>
         <span class="badge b-cyan" id="onchainCountBadge">0 بروتوكول</span>
       </div>
@@ -274,11 +274,11 @@
         <table>
           <thead>
             <tr>
-              <th>التقييم والأمان</th>
-              <th>البروتوكول والموقع الرسمي</th>
+              <th>تجربة المحفظة والأمان</th>
+              <th>البروتوكول وواجهة Mint UI</th>
               <th>التوكن والسعر والسيولة</th>
-              <th>العناوين (Protocol &amp; Token)</th>
-              <th>الشبكة والماكينة والكلفة</th>
+              <th>العناوين ودالة المينت</th>
+              <th>الشبكة وكلفة الغاز / المينت</th>
               <th>نقطة التعادل (Break-Even)</th>
             </tr>
           </thead>
@@ -372,14 +372,18 @@
       document.getElementById("kpiMachineCost").textContent = `$${fmtNum(m.machine_cost_hr_usd, 3)} / hr`;
       document.getElementById("kpiMachineSub").textContent = `$${fmtNum(m.machine_cost_day_usd, 2)} / يوم • ${m.label} (${m.watts}W)`;
 
-      document.getElementById("kpiOnchainPow").textContent = `${s.total_onchain_protocols} محفوظ`;
+      document.getElementById("kpiOnchainPow").textContent = `${s.total_onchain_protocols} Web3 Mint`;
       const newly = ag.newly_added_last_cycle || 0;
-      document.getElementById("kpiOnchainSub").textContent = `دورة #${ag.total_cycles || 1} • +${newly} جداد فـ آخر ساعة • فرص قوية: ${s.strong_onchain_opportunities}`;
+      const simCnt = s.simulated_open_protocols || 0;
+      document.getElementById("kpiOnchainSub").textContent = `دورة #${ag.total_cycles || 1} • مجرّب On-Chain: ${simCnt} • +${newly} جداد • فرص قوية: ${s.strong_onchain_opportunities}`;
       document.getElementById("kpiBtcPrice").textContent = `$${fmtNum(d.btc_usd, 0)}`;
       document.getElementById("kpiUpdatedAt").textContent = `آخر دورة 1h: ${ag.last_cycle_at || s.last_scan_at || d.updated_at}`;
 
       document.getElementById("agentCyclePill").textContent = `🤖 دورة #${ag.total_cycles || 1}`;
-      document.getElementById("agentBriefText").textContent = ag.last_brief_ar || `محفوظين ${s.total_onchain_protocols} بروتوكول (القديم + الجديد كل ساعة).`;
+      document.getElementById("agentBriefText").textContent = ag.last_brief_ar || `محفوظين ${s.total_onchain_protocols} بروتوكول Connect Wallet -> Mint.`;
+      if (ag.sandbox_wallet) {
+        document.getElementById("agentSyncNote").textContent = `Sandbox Wallet: ${shortAddr(ag.sandbox_wallet)} • On-Chain PoW + Mint UI`;
+      }
       document.getElementById("agentHeaderBadge").textContent = `🤖 AI Agent • دورة #${ag.total_cycles || 1} (+${newly} جداد)`;
     }
 
@@ -413,15 +417,13 @@
       const rows = (STATE.data && STATE.data.onchain_protocols) || [];
       const q = document.getElementById("searchBox").value.trim().toLowerCase();
       const filtered = rows.filter(r => {
-        if (STATE.filter === "GPU_POW" && !r.is_gpu_pow) return false;
-        if (STATE.filter === "MINT_TX" && r.is_gpu_pow) return false;
+        if (STATE.filter === "SIMULATED" && r.trial_status !== "SIMULATED_OPEN" && r.trial_status !== "POW_OR_MINT_ACTIVE") return false;
+        if (STATE.filter === "POW_ONCHAIN" && !r.is_cuda_pow) return false;
         if (STATE.filter === "VERIFIED" && r.verification_level !== "verified") return false;
-        if (STATE.filter === "CUDA" && !r.is_cuda_pow) return false;
-        if (STATE.filter === "PRICED" && !r.price_usd) return false;
-        if (STATE.filter === "STRONG" && r.arbitrage_score < 60) return false;
+        if (STATE.filter === "LOW_GAS" && Number(r.gas_cost_tx_usd ?? 99) >= 0.05) return false;
         if (!q) return true;
         const websitesStr = (r.websites || []).join(" ");
-        return `${r.protocol_name} ${r.token_symbol} ${r.address} ${r.token_address || ""} ${websitesStr} ${r.chain_name} ${r.protocol_type}`.toLowerCase().includes(q);
+        return `${r.protocol_name} ${r.token_symbol} ${r.address} ${r.token_address || ""} ${websitesStr} ${r.chain_name} ${r.protocol_type} ${r.tested_fn || ""}`.toLowerCase().includes(q);
       });
 
       document.getElementById("onchainCountBadge").textContent = `${filtered.length} بروتوكول`;
@@ -437,26 +439,27 @@
         const verCls = r.verification_level === "verified" ? "b-green" : (r.verification_level === "onchain_confirmed" ? "b-cyan" : "b-rose");
         const verBadge = r.verification_label ? `<span class="badge ${verCls}" style="margin-top:3px;">${esc(r.verification_label)}</span>` : "";
 
+        const trialCls = r.trial_status === "SIMULATED_OPEN" || r.trial_status === "POW_OR_MINT_ACTIVE" ? "b-green" : "b-cyan";
+        const trialLabel = r.trial_status === "SIMULATED_OPEN"
+          ? `✅ مجرّب On-Chain (${fmtNum(r.est_gas_units, 0)} gas)`
+          : (r.trial_status === "POW_OR_MINT_ACTIVE" ? "✅ عقد PoW/Mint نشط" : (r.trial_status === "WEB3_DAPP_LIVE" ? "✅ Web3 Mint Live" : "🔎 موثّق UI"));
+
         const websitesHtml = (r.websites || []).slice(0, 2).map(u =>
-          `<a class="btn btn-sm" style="border-color:rgba(16,185,129,0.45);color:#6ee7b7;" target="_blank" href="${esc(u)}">🌐 الموقع الرسمي</a>`
+          `<a class="btn btn-sm" style="border-color:rgba(16,185,129,0.45);color:#6ee7b7;" target="_blank" href="${esc(u)}">🌐 فتح Mint UI</a>`
         ).join("");
         const socialsHtml = (r.socials || []).slice(0, 1).map((u, idx) => {
           const label = u.includes("twitter") || u.includes("x.com") ? "𝕏" : (u.includes("t.me") ? "TG" : (u.includes("discord") ? "DC" : `رابط`));
           return `<a class="btn btn-sm" target="_blank" href="${esc(u)}">${esc(label)}</a>`;
         }).join("");
 
+        const uiFlagsHtml = `<div style="font-size:10px;color:#94a3b8;margin-top:4px;">${r.has_connect_wallet ? "✅ Connect Wallet" : "Wallet UI"} • ${r.has_mint_ui ? "✅ Mint UI" : "dApp Live"}</div>`;
+
         const priceHtml = r.price_usd
           ? `<strong class="ltr" style="color:#6ee7b7;">$${r.price_usd < 0.01 ? r.price_usd.toPrecision(4) : fmtNum(r.price_usd, 4)}</strong><br><small class="ltr" style="color:var(--muted);">Liq: $${fmtNum(r.liquidity_usd, 0)} | Vol: $${fmtNum(r.volume_24h_usd, 0)}</small>`
           : `<span style="color:var(--muted);">بدون سعر DEX بعد</span>`;
 
         let beHtml = "";
-        if (r.is_gpu_pow && r.est_coins_day !== null && r.est_coins_day !== undefined) {
-          const coinsStr = r.est_coins_day < 0.01 ? r.est_coins_day.toFixed(5) : fmtNum(r.est_coins_day, 3);
-          const netCls = (r.net_day_usd ?? 0) >= 0 ? "#6ee7b7" : "#fb7185";
-          const netSign = (r.net_day_usd ?? 0) >= 0 ? "+" : "";
-          const bePxStr = r.breakeven_coin_price_usd ? `$${r.breakeven_coin_price_usd < 0.01 ? r.breakeven_coin_price_usd.toPrecision(3) : fmtNum(r.breakeven_coin_price_usd, 3)}` : "—";
-          beHtml = `<strong class="ltr" style="color:${netCls};">Net: ${netSign}$${fmtNum(r.net_day_usd, 2)} / يوم</strong><br><small class="ltr" style="color:var(--muted);">${coinsStr} ${esc(r.token_symbol)}/day ($${fmtNum(r.gross_day_usd, 2)}) • BE: ${bePxStr}</small>`;
-        } else if (r.breakeven_tokens_tx !== null && r.breakeven_tokens_tx !== undefined) {
+        if (r.breakeven_tokens_tx !== null && r.breakeven_tokens_tx !== undefined) {
           const beTxStr = r.breakeven_tokens_tx > 0 && r.breakeven_tokens_tx < 0.01 ? r.breakeven_tokens_tx.toFixed(4) : fmtNum(r.breakeven_tokens_tx, 3);
           const beHrStr = r.breakeven_tokens_hr > 0 && r.breakeven_tokens_hr < 0.1 ? r.breakeven_tokens_hr.toFixed(4) : fmtNum(r.breakeven_tokens_hr, 2);
           beHtml = `<strong class="ltr" style="color:#6ee7b7;">${beTxStr} ${esc(r.token_symbol)} / tx</strong><br><small class="ltr" style="color:var(--muted);">${beHrStr} / hr ($${fmtNum(r.breakeven_usd_tx, 5)}/tx)</small>`;
@@ -464,6 +467,7 @@
           beHtml = `<strong class="ltr" style="color:#fbbf24;">&gt;= $${fmtNum(r.breakeven_usd_tx, 5)} / tx</strong><br><small class="ltr" style="color:var(--muted);">&gt;= $${fmtNum(r.breakeven_usd_hr, 3)} / hr (قبل الإدراج)</small>`;
         }
 
+        const fnBadge = r.tested_fn ? `<div class="ltr" style="font-size:10px;color:#7dd3fc;margin-top:3px;">fn: ${esc(r.tested_fn)}</div>` : "";
         const tokenAddrHtml = r.token_differs_from_protocol && r.token_address
           ? `<div class="addr-box" style="margin-top:4px;">
                <span style="font-size:10px;color:#6ee7b7;">Tok:</span>
@@ -473,16 +477,19 @@
           : `<div style="font-size:10px;color:var(--muted);margin-top:3px;">التوكن = نفس العقد</div>`;
 
         const secCls = r.risk_level === "high" ? "b-rose" : (r.risk_level === "low" ? "b-green" : "b-cyan");
+        const feeNote = Number(r.mint_fee_usd || 0) > 0 ? ` | Fee: $${fmtNum(r.mint_fee_usd, 3)}` : "";
 
         return `<tr>
           <td>
             <span class="badge ${scoreCls}">${r.arbitrage_score}/100</span><br>
             <small style="display:block;margin:3px 0;">${esc(r.verdict)}</small>
+            <span class="badge ${trialCls}" style="margin-bottom:3px;">${esc(trialLabel)}</span><br>
             <span class="badge ${secCls}">${esc(r.security_verdict)}</span>
           </td>
           <td>
             <strong>${esc(r.protocol_name)}</strong>${r.is_new ? ' <span class="badge b-green">جديد</span>' : ''}<br>
             ${verBadge}
+            ${uiFlagsHtml}
             <div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;">
               ${websitesHtml}
               ${socialsHtml}
@@ -498,10 +505,11 @@
               <button class="btn btn-sm" onclick="copyText('${esc(r.address)}', this)">نسخ</button>
             </div>
             ${tokenAddrHtml}
+            ${fnBadge}
           </td>
           <td>
             <strong>${esc(r.chain_name)}</strong><br>${modeBadge}<br>
-            <small class="ltr" style="color:var(--muted);">Gas: $${fmtNum(r.gas_cost_tx_usd, 5)}/tx | Total: $${fmtNum(r.total_cost_hr_usd, 3)}/hr</small>
+            <small class="ltr" style="color:var(--muted);">Gas: $${fmtNum(r.gas_cost_tx_usd, 5)}/tx${esc(feeNote)}</small>
           </td>
           <td>${beHtml}</td>
         </tr>`;

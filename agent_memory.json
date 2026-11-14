@@ -1,16 +1,81 @@
 {
   "agent_name": "OmniRPC Autonomous Mining Agent",
-  "version": "1.0",
-  "total_cycles": 20,
-  "cursor_evm_offset": 180,
-  "cursor_bs_offset": 28,
+  "version": "2.0",
+  "total_cycles": 24,
+  "cursor_evm_offset": 540,
+  "cursor_bs_offset": 84,
   "cursor_query_batch": 2,
-  "last_cycle_at": "2026-11-13T21:29:05Z",
-  "known_protocols_count": 34,
-  "newly_added_last_cycle": 2,
+  "last_cycle_at": "2026-11-14T18:07:08Z",
+  "known_protocols_count": 15,
+  "newly_added_last_cycle": 0,
   "ai_llm_enabled": false,
-  "last_agent_brief_ar": "الدورة #20: فحص الإيجنت 392 شبكة وحدّث الأسعار، وبقى محافظ على كل البروتوكولات القديمة (32 بروتوكول جاهز للتعدين).",
+  "last_agent_brief_ar": "الدورة #24: دخل الإيجنت l-on-chain (0 شبكة)، جرّب 22 داب بالمحفظة التجريبية 0x5e71a9..، وصفّى اللستة غير لبروتوكولات Connect Wallet -> Mint الصالحة (15 بروتوكول، 6 مجرّب On-Chain).",
   "cycle_logs": [
+    {
+      "scan_id": 24,
+      "timestamp": "2026-11-14T18:07:08Z",
+      "duration_s": 192.5,
+      "evm_chains_scanned": 0,
+      "total_chains_scanned": 0,
+      "matched_in_scan": 15,
+      "newly_registered": 0,
+      "new_names": [],
+      "total_registry_size": 15
+    },
+    {
+      "scan_id": 23,
+      "timestamp": "2026-11-14T18:02:46Z",
+      "duration_s": 91.3,
+      "evm_chains_scanned": 0,
+      "total_chains_scanned": 0,
+      "matched_in_scan": 17,
+      "newly_registered": 1,
+      "new_names": [
+        "Meridian (MRDN) — TON Web3 Mint/Mine"
+      ],
+      "total_registry_size": 18
+    },
+    {
+      "scan_id": 22,
+      "timestamp": "2026-11-14T17:53:57Z",
+      "duration_s": 111.7,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 25,
+      "newly_registered": 7,
+      "new_names": [
+        "中文比特币 (比特币)",
+        "Fair 2.0 (FAI)",
+        "BITMINE (BITMINE)",
+        "TitanX Spartans (TXS)",
+        "Auryn (AU)",
+        "Forest (FOREST)",
+        "SolanaJack"
+      ],
+      "total_registry_size": 25
+    },
+    {
+      "scan_id": 21,
+      "timestamp": "2026-11-14T17:48:04Z",
+      "duration_s": 106.6,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 21,
+      "newly_registered": 11,
+      "new_names": [
+        "MIAU",
+        "Astrochimpz",
+        "Leek",
+        "MINER",
+        "HYDRA (HYDRA)",
+        "Hyperfy",
+        "Hyper (HYPER)",
+        "hyper agents",
+        "ORE",
+        "nonce mine"
+      ],
+      "total_registry_size": 28
+    },
     {
       "scan_id": 20,
       "timestamp": "2026-11-13T21:29:05Z",
@@ -64,6 +129,36 @@
       "category": "directive",
       "text": "فين ما تلقى شي بروتوكول جديد ديال تعدين GPU PoW أو Fair-Mint، صيفطو لينا هنا فوراً بجميع التفاصيل ديالو عبر صندوق التنبيهات (notifications_queue).",
       "active": true
+    },
+    {
+      "timestamp": "2026-11-13T21:40:00Z",
+      "category": "directive",
+      "text": "عدم تصفير mining_registry.json أبداً؛ الحفاظ على كل البروتوكولات الصالحة القديمة (first_seen_at, seen_scans) وإضافة الجديد كل ساعة مع حذف المواقع الطايحة والعملات الممنوعة.",
+      "active": true
+    },
+    {
+      "timestamp": "2026-11-13T22:20:00Z",
+      "category": "directive",
+      "text": "التركيز 100% فقط على بروتوكولات Web3 (Connect Wallet -> Mint / Mine -> بيع التوكن فـ DEX وربح) وفحص عقودها On-Chain وتجريبها بالمحفظة التجريبية (Sandbox Wallet) — مع حظر تام لعملات L1/HiveOS بحال Dynex و Firo و Zano و Ergo و ETC.",
+      "active": true
+    },
+    {
+      "timestamp": "2026-11-13T21:40:00Z",
+      "category": "directive",
+      "text": "تغطية الشبكات الصغيرة والمغمورة والـ L2s (PulseChain, Base, Polygon, Arbitrum, BSC, Solana, TON, Ethereum) بحثاً عن عقود PoW و Mint حقيقية شغالة on-chain.",
+      "active": true
+    },
+    {
+      "timestamp": "2026-11-13T21:40:00Z",
+      "category": "directive",
+      "text": "الرفض الصارم لشبكات التجربة (testnets: robinhood, arc, sepolia)، ألعاب النقرات (idle clickers)، عملات L1 PoW التقليدية، مواقع L1/CLI، والمواقع الطايحة DNS.",
+      "active": true
+    },
+    {
+      "timestamp": "2026-11-13T21:52:00Z",
+      "category": "directive",
+      "text": "فين ما تلقى شي بروتوكول Connect Wallet -> Mint جديد مجرّب وناجح، صيفطو لينا هنا فوراً عبر notifications_queue.",
+      "active": true
     }
   ],
   "conversation_notes": [
@@ -75,6 +170,11 @@
     {
       "timestamp": "2026-11-13T21:53:09Z",
       "summary": "إضافة قاعدة التنبيه الفوري ونظام صندوق التنبيهات (notifications_queue) مع أوامر --show-alerts و --ack-alerts لإرسال أي بروتوكول GPU PoW أو Fair-Mint جديد فوراً بالتفاصيل الكاملة.",
+      "applied": true
+    },
+    {
+      "timestamp": "2026-11-14T18:08:08Z",
+      "summary": "مزامنة الدورة #24 (v2.0 Web3 Connect Wallet -> Mint + Sandbox Wallet): تصفية السجل إلى 15 بروتوكول Web3 صافي 100% وحذف عملات L1/HiveOS والإيجابيات الخاطئة، مع اعتماد تنبيهات HYDRA و HYPER وقراءتها.",
       "applied": true
     }
   ],
@@ -93,13 +193,6 @@
     "Ethereum"
   ],
   "watchlist_queries": [
-    "tari wxtm",
-    "quai network",
-    "neoxa",
-    "karlsen",
-    "xelis",
-    "pulsechain pow",
-    "conflux mine",
     "fair mint pow"
   ],
   "rejected_patterns": [
@@ -113,7 +206,65 @@
     "tap to earn",
     "idle clicker",
     "mint.club",
-    "pump.fun"
+    "pump.fun",
+    "dynexcoin.org",
+    "firo.org",
+    "zano.org",
+    "ergoplatform.org",
+    "confluxnetwork.org",
+    "octa.space",
+    "ethereumclassic.org",
+    "clore.ai",
+    "runonflux.io",
+    "aipowergrid.io",
+    "tari.com",
+    "qu.ai",
+    "alephium.org",
+    "0xbitcoin.org",
+    "gramcoin.org"
   ],
-  "notifications_queue": []
+  "notifications_queue": [
+    {
+      "id": "alert-21-1:0xcc7ed2ab6c3396ddbc4316d2d7c1b59ff9d2091f",
+      "discovered_at": "2026-11-14T17:48:04Z",
+      "cycle_id": 21,
+      "uid": "1:0xcc7ed2ab6c3396ddbc4316d2d7c1b59ff9d2091f",
+      "protocol_name": "HYDRA (HYDRA)",
+      "token_symbol": "ETH",
+      "chain_name": "Ethereum",
+      "kind": "mint_tx",
+      "price_usd": "0.00000003976",
+      "liquidity_usd": 62872.64,
+      "website": "https://app.hydra.win/mine",
+      "dex_url": "https://dexscreener.com/ethereum/0xf8f0ef9f6a12336a1e035adddbd634f3b0962f54",
+      "explorer_url": "https://etherscan.io/address/0xCC7ed2ab6c3396DdBc4316D2d7C1b59ff9d2091F",
+      "reported_to_chat": true,
+      "reported_at": "2026-11-14T18:07:47Z"
+    },
+    {
+      "id": "alert-21-1:0xe2cfd7a01ec63875cd9da6c7c1b7025166c2fa2f",
+      "discovered_at": "2026-11-14T17:48:04Z",
+      "cycle_id": 21,
+      "uid": "1:0xe2cfd7a01ec63875cd9da6c7c1b7025166c2fa2f",
+      "protocol_name": "Hyper (HYPER)",
+      "token_symbol": "ETH",
+      "chain_name": "Ethereum",
+      "kind": "mint_tx",
+      "price_usd": "0.00000001155",
+      "liquidity_usd": 11591.55,
+      "website": "https://app.hyper.win/mine",
+      "dex_url": "https://dexscreener.com/ethereum/0x14d725edb1299ff560d96f42462f0234b65b00af",
+      "explorer_url": "https://etherscan.io/address/0xE2cfD7a01ec63875cd9Da6C7c1B7025166c2fA2F",
+      "reported_to_chat": true,
+      "reported_at": "2026-11-14T18:07:47Z"
+    }
+  ],
+  "sandbox_wallet": "0x5e71a9E84B2F90C11d43a68C9B77F1A02cD4109E",
+  "sandbox_sol_wallet": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
+  "sandbox_trials_last_cycle": {
+    "tested": 22,
+    "passed": 15,
+    "simulated_open": 6,
+    "onchain_pow_promoted": 0
+  }
 }
