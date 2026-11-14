@@ -30,6 +30,7 @@ from protocol_profiler import enrich_registry_items_onchain
 OUT_DIR = Path(__file__).resolve().parent
 
 ERC20_TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+ERC918_MINT_TOPIC = "0xcf6fbb9dcea7d07263ab4f5c3a92f53af33dffc421d9d121e1c74b307e68189d"
 ZERO_TOPIC = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 
@@ -81,8 +82,29 @@ async def scan_evm_chain(
             blocks_res = await omni.evm_batch(session, cid, calls, timeout=10)
             blocks = [b for b in blocks_res if isinstance(b, dict)]
 
-            # Also query Transfer(0x0 -> any) mint logs in the same block range
+            # Also query ERC-918 Mint(address,uint256,uint256,bytes32) & Transfer(0x0 -> any) logs
             mint_contracts: Counter[str] = Counter()
+            try:
+                from wallet_simulator import _raw_evm_rpc
+                pow_logs = await _raw_evm_rpc(
+                    session,
+                    omni,
+                    cid,
+                    "eth_getLogs",
+                    [{
+                        "fromBlock": hex(max(0, latest - max(blocks_back, 60))),
+                        "toBlock": hex(latest),
+                        "topics": [ERC918_MINT_TOPIC],
+                    }],
+                    timeout=7,
+                )
+                if isinstance(pow_logs, list):
+                    for lg in pow_logs:
+                        addr = (lg.get("address") or "").lower()
+                        if addr:
+                            mint_contracts[addr] += 5
+            except Exception:
+                pass
             try:
                 logs = await omni.evm_call(
                     session,

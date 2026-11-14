@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OmniRPC — ألعاب التعدين بنظام المربعات (ORE) ومزادات KOTH</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-elev: #0f1626;
+      --bg-card: #131c31;
+      --border: #24314f;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.16);
+      --cyan: #38bdf8;
+      --cyan-soft: rgba(56, 189, 248, 0.14);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.16);
+      --purple: #a78bfa;
+      --purple-soft: rgba(167, 139, 250, 0.15);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, #1e133b 0%, var(--bg) 52%);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .ltr { direction: ltr; unicode-bidi: embed; font-family: var(--mono); }
+    header {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(7, 11, 20, 0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 24px;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo-badge {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--purple), var(--amber));
+      display: grid; place-items: center;
+      font-weight: 900; color: #05131c; font-family: var(--mono); font-size: 13px;
+    }
+    .brand h1 { margin: 0; font-size: 18px; font-weight: 800; }
+    .brand p { margin: 0; font-size: 12px; color: var(--muted); }
+    .nav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .nav-link {
+      text-decoration: none; color: var(--muted); background: var(--bg-card);
+      border: 1px solid var(--border); padding: 7px 13px; border-radius: 8px;
+      font-size: 13px; font-weight: 700; transition: 0.15s;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--cyan); }
+    .nav-link.active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(167, 139, 250, 0.24), rgba(245, 158, 11, 0.2));
+      border-color: var(--purple);
+    }
+    main { max-width: 1480px; margin: 0 auto; padding: 20px 24px 60px; }
+    .info-banner {
+      background: linear-gradient(135deg, rgba(167, 139, 250, 0.12), rgba(245, 158, 11, 0.08));
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      border-radius: 14px; padding: 14px 18px; margin-bottom: 18px; font-size: 13px;
+    }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .kpi-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 16px; position: relative; overflow: hidden;
+    }
+    .kpi-card::after {
+      content: ""; position: absolute; top: 0; right: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--purple), var(--amber));
+    }
+    .kpi-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    .kpi-value { font-size: 24px; font-weight: 800; font-family: var(--mono); }
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; background: var(--bg-elev); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px;
+    }
+    .toolbar-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .pill-filter {
+      border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+      padding: 6px 11px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: var(--sans);
+    }
+    .pill-filter.active { background: var(--purple-soft); color: #ddd6fe; border-color: var(--purple); }
+    .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.2px; }
+    th, td { padding: 10px 8px; text-align: right; border-bottom: 1px solid rgba(36, 49, 79, 0.65); vertical-align: middle; }
+    th { background: var(--bg-elev); color: var(--muted); font-size: 11px; font-weight: 700; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .b-purple { background: var(--purple-soft); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .b-amber { background: var(--amber-soft); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .b-green { background: var(--emerald-soft); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .b-cyan { background: var(--cyan-soft); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .btn {
+      display: inline-block; text-decoration: none; border-radius: 7px; padding: 4px 9px;
+      font-size: 11px; font-weight: 700; border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo-badge">5x5</div>
+      <div>
+        <h1>ألعاب التعدين بنظام المربعات (ORE) ومزادات التاج (KOTH)</h1>
+        <p>صفحة مستقلة لألعاب الرهان والمربعات بحال ORE (5x5 Grid) ومزادات King-of-the-Hill بحال DONUT — معزولة 100% عن رادار PoW الحقيقي</p>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" href="/">⛏️ رادار PoW الحقيقي</a>
+      <a class="nav-link active" href="/games">🎮 ألعاب المربعات (ORE)</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="info-banner">
+      <strong>🧠 فاهمين الفرق 100%:</strong>
+      ألعاب بحال <strong>ORE (5x5 Grid)</strong> كتعتمد على المراهنة على مربع من 25 مربع بعملة SOL كل جولة، بينما <strong>DONUT (Glaze)</strong> هي مزاد King-of-the-Hill بعملة ETH. هاد الألعاب ماشي تعدين PoW كلاسيكي أو ERC-918، داكشي علاش الـ AI Agent كيراقبها هنا بوحدها.
+    </section>
+
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">إجمالي الألعاب المرصودة</div>
+        <div class="kpi-value" id="kpiTotalGames">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">ألعاب نظام المربعات (5x5 Grid)</div>
+        <div class="kpi-value" style="color:var(--purple);" id="kpiGridCount">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">مزادات التاج (KOTH) وألعاب التعدين</div>
+        <div class="kpi-value" style="color:var(--amber);" id="kpiKothCount">—</div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button class="pill-filter active" onclick="setGameFilter('ALL', this)">الكل</button>
+        <button class="pill-filter" onclick="setGameFilter('GRID_5X5_BETTING', this)">🟩 نظام المربعات 5x5 (ORE)</button>
+        <button class="pill-filter" onclick="setGameFilter('KOTH_AUCTION', this)">👑 مزاد التاج (KOTH)</button>
+        <button class="pill-filter" onclick="setGameFilter('IDLE_CRAFTING_MINER', this)">⚒️ Crafting / Idle</button>
+      </div>
+      <span class="badge b-purple" id="gamesCountBadge">0 لعبة</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>اللعبة والشبكة</th>
+            <th>النوع ونظام اللعب</th>
+            <th>الشبكة / الجولة / اقتطاع البروتوكول</th>
+            <th>السعر والسيولة فـ DEX</th>
+            <th>روابط سريعة</th>
+          </tr>
+        </thead>
+        <tbody id="gamesTbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const GSTATE = { items: [], filter: "ALL" };
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+    }
+    function fmtNum(n, d = 2) {
+      const v = Number(n);
+      return Number.isFinite(v) ? v.toLocaleString("en-US", { maximumFractionDigits: d }) : "—";
+    }
+    function setGameFilter(f, btn) {
+      GSTATE.filter = f;
+      document.querySelectorAll(".pill-filter").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderGames();
+    }
+    async function loadGames() {
+      const res = await fetch("/api/games");
+      const data = await res.json();
+      GSTATE.items = Object.values(data.items || {});
+      document.getElementById("kpiTotalGames").textContent = data.total_games ?? GSTATE.items.length;
+      document.getElementById("kpiGridCount").textContent = data.grid_5x5_count ?? GSTATE.items.filter(x => x.game_type === "GRID_5X5_BETTING").length;
+      document.getElementById("kpiKothCount").textContent = (data.koth_count ?? 0) + GSTATE.items.filter(x => x.game_type === "IDLE_CRAFTING_MINER").length;
+      renderGames();
+    }
+    function renderGames() {
+      const list = GSTATE.items.filter(g => GSTATE.filter === "ALL" || g.game_type === GSTATE.filter);
+      document.getElementById("gamesCountBadge").textContent = `${list.length} لعبة`;
+      const tbody = document.getElementById("gamesTbody");
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);">ما كاينش ألعاب فهاد الفلتر.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = list.map(g => {
+        const cls = g.game_type === "GRID_5X5_BETTING" ? "b-purple" : (g.game_type === "KOTH_AUCTION" ? "b-amber" : "b-cyan");
+        const px = Number(g.price_usd || 0);
+        const pxStr = px > 0 ? `$${px < 0.01 ? px.toPrecision(4) : fmtNum(px, 4)}` : "—";
+        return `<tr>
+          <td>
+            <strong>${esc(g.name)}</strong> <span class="badge b-cyan">${esc(g.symbol)}</span><br>
+            <small style="color:var(--muted);">${esc(g.chain)} • ${esc(g.bet_asset)}</small>
+          </td>
+          <td>
+            <span class="badge ${cls}">${esc(g.game_label_ar || g.game_type)}</span><br>
+            <small style="color:var(--muted);">${esc(g.mechanic_ar || "")}</small>
+          </td>
+          <td>
+            <span class="ltr">${esc(g.grid_layout || "—")}</span> • <span class="ltr">${esc(g.round_duration || "—")}</span><br>
+            <small style="color:#fcd34d;">House Cut: ${esc(g.house_cut_pct ?? 0)}% | Motherlode: ${esc(g.motherlode_chance || "—")}</small>
+          </td>
+          <td>
+            <strong class="ltr" style="color:#6ee7b7;">${pxStr}</strong><br>
+            <small class="ltr" style="color:var(--muted);">Liq: $${fmtNum(g.liquidity_usd || 0, 0)} | Vol: $${fmtNum(g.volume_24h_usd || 0, 0)}</small>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              ${g.official_url ? `<a class="btn" style="border-color:rgba(167,139,250,0.45);color:#ddd6fe;" target="_blank" href="${esc(g.official_url)}">🎮 فتح اللعبة</a>` : ""}
+              ${g.dex_url ? `<a class="btn" target="_blank" href="${esc(g.dex_url)}">DEX</a>` : ""}
+            </div>
+          </td>
+        </tr>`;
+      }).join("");
+    }
+    loadGames();
+  </script>
+</body>
+</html>

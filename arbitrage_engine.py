@@ -281,6 +281,47 @@ async def _fetch_live_market_inputs(session: aiohttp.ClientSession, omni: OmniRP
     return _MARKET_CACHE
 
 
+_VASTAI_CACHE: dict[str, tuple[float, float]] = {}
+_VASTAI_GPU_NAMES = {
+    "rtx3060ti": "RTX 3060 Ti",
+    "rtx4070": "RTX 4070",
+    "rtx4090": "RTX 4090",
+    "rtx5090": "RTX 5090",
+}
+
+
+async def _fetch_vastai_gpu_rate(
+    session: aiohttp.ClientSession,
+    gpu_id: str,
+    fallback_rate: float,
+) -> tuple[float, str]:
+    """Fetch live median on-demand Vast.ai hourly GPU rental rate, with clean fallback."""
+    now = time.time()
+    cached = _VASTAI_CACHE.get(gpu_id)
+    if cached and (now - cached[0] < 180):
+        return cached[1], "vast.ai"
+    gpu_label = _VASTAI_GPU_NAMES.get(gpu_id, "RTX 4090")
+    try:
+        q = json.dumps({"gpu_name": {"eq": gpu_label}, "rentable": {"eq": True}, "type": "on-demand"})
+        url = f"https://console.vast.ai/api/v0/bundles/?q={q}"
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as r:
+            if r.status == 200:
+                d = await r.json(content_type=None)
+                offers = [
+                    float(o.get("dph_total") or 0)
+                    for o in (d.get("offers") or [])
+                    if 0.05 <= float(o.get("dph_total") or 0) <= 5.0
+                ]
+                if offers:
+                    offers.sort()
+                    med = round(offers[min(len(offers) // 4, len(offers) - 1)], 3)
+                    _VASTAI_CACHE[gpu_id] = (now, med)
+                    return med, "vast.ai"
+    except Exception:
+        pass
+    return fallback_rate, "fallback"
+
+
 async def _fetch_wtm_exact_coin(
     sem: asyncio.Semaphore,
     session: aiohttp.ClientSession,
@@ -479,10 +520,7 @@ async def compute_arbitrage_snapshot(
 ) -> dict[str, Any]:
     """Compute live GPU PoW Coin Arbitrage and On-Chain Mining Protocol Arbitrage."""
     gpu = GPU_PROFILES.get(gpu_id) or GPU_PROFILES["rtx4090"]
-    effective_cloud_hr = float(cloud_rate) if cloud_rate is not None else float(gpu["default_cloud_hr"])
-    watts = float(gpu["watts"])
-    machine_cost_hr = effective_cloud_hr if mode == "cloud" else round((watts / 1000.0) * kwh_cost, 4)
-    machine_cost_day = round(machine_cost_hr * 24.0, 4)
+    fallback_hr = float(gpu["default_cloud_hr"])
 
     omni = OmniRPC()
     connector = aiohttp.TCPConnector(limit=30, ssl=False)
@@ -494,14 +532,18 @@ async def compute_arbitrage_snapshot(
         last_scan_at = reg.get("updated_at")
         active_cids = [str(x.get("chain_id")) for x in raw_items if x.get("ecosystem") == "EVM"]
 
-        mkt_cache = await _fetch_live_market_inputs(session, omni, active_cids)
-        chainid_map, bs_map = await asyncio.gather(
-            _load_chainid_explorers(session),
-            _load_blockscout_map(session),
+        mkt_cache, (vast_rate, vast_src), (chainid_map, bs_map) = await asyncio.gather(
+            _fetch_live_market_inputs(session, omni, active_cids),
+            _fetch_vastai_gpu_rate(session, gpu["id"], fallback_hr),
+            asyncio.gather(_load_chainid_explorers(session), _load_blockscout_map(session)),
         )
+        effective_cloud_hr = float(cloud_rate) if cloud_rate is not None else vast_rate
+        watts = float(gpu["watts"])
+        machine_cost_hr = effective_cloud_hr if mode == "cloud" else round((watts / 1000.0) * kwh_cost, 4)
+        machine_cost_day = round(machine_cost_hr * 24.0, 4)
         prices = mkt_cache["prices"]
         wtm_map = mkt_cache.get("wtm") or {}
-        btc_usd = prices.get("BTC", 80000.0)
+        btc_usd = prices.get("BTC", 90000.0)
 
     def _unit_mult(u: str) -> float:
         ul = u.lower()
@@ -573,31 +615,85 @@ async def compute_arbitrage_snapshot(
         tx_fee_total = round(gas_tx + mint_fee_usd, 6)
         gas_hr = tx_fee_total * tx_per_hr
 
+        is_gpu_l1 = bool(item.get("kind") == "gpu_l1_pow" or item.get("is_gpu_l1_pow"))
+        pow_track = "GPU_L1_POW" if is_gpu_l1 else "ONCHAIN_ERC918"
+        wtm_data = item.get("wtm_data") or {}
+        if is_gpu_l1 and not matched_algo:
+            matched_algo = str(wtm_data.get("algorithm") or "")
+
         est_coins_day = None
         gross_day_usd = None
         net_day_usd = None
         breakeven_coin_px = None
         gpu_hashrate_label = ""
-        is_gpu_pow = False
 
-        if sb.get("onchain_pow_state") or sb.get("pow_functions"):
-            mining_mode = "On-Chain PoW + Web3 Mint"
-        elif sb.get("trial_status") == "SIMULATED_OPEN":
-            mining_mode = "Web3 Mint (Simulated Open)"
-        elif eco == "Solana" or eco == "TON":
-            mining_mode = f"{eco} Web3 Mint/Mine UI"
+        if is_gpu_l1:
+            btc_rev = _to_float(wtm_data.get("btc_revenue"))
+            gpu_scale = {"rtx5090": 1.45, "rtx4090": 1.0, "rtx4070": 0.48, "rtx3060ti": 0.38}.get(gpu["id"], 1.0)
+            gross_day_usd = round(btc_rev * btc_usd * gpu_scale, 4)
+            net_day_usd = round(gross_day_usd - machine_cost_day, 4)
+            if px > 0:
+                est_coins_day = round(gross_day_usd / px, 4)
+            if algo_spec:
+                gpu_hashrate_label = f"{algo_spec[1]} {algo_spec[0]}"
+            mining_mode = f"GPU L1 PoW ({matched_algo or 'WhatToMine'})"
+            effective_machine_hr = machine_cost_hr
+            total_cost_hr = machine_cost_hr
+            total_cost_tx = 0.0
+            breakeven_usd_hr = round(machine_cost_hr, 4)
+            breakeven_usd_tx = 0.0
+            breakeven_tokens_hr = round(machine_cost_hr / px, 4) if px > 0 else None
+            breakeven_tokens_tx = None
+            gross_margin_pct = round((net_day_usd / machine_cost_day) * 100.0, 2) if machine_cost_day > 0 else 0.0
+            # AmineAI Stress Test: -20% price, +15% difficulty, 4% pool/slippage fee
+            stress_gross_day_usd = round(gross_day_usd * 0.80 / 1.15 * 0.96, 4)
+            stress_net_day_usd = round(stress_gross_day_usd - machine_cost_day, 4)
+            stress_margin_pct = round((stress_net_day_usd / machine_cost_day) * 100.0, 2) if machine_cost_day > 0 else -100.0
+            if stress_margin_pct >= 15.0 and liq >= 5000 and vol24 >= 500:
+                arb_verdict = "BUY"
+                arb_reason_ar = f"ربح صافي بعد Stress Test ({stress_margin_pct:+.1f}%) + سيولة متوفرة"
+            elif gross_margin_pct > 0 or (stress_margin_pct > -15.0 and px > 0):
+                arb_verdict = "WATCH"
+                arb_reason_ar = f"هامش قريب أو متذبذب تحت Stress Test ({stress_margin_pct:+.1f}%)"
+            else:
+                arb_verdict = "REJECT"
+                arb_reason_ar = f"خسارة تحت كلفة الكراء ({stress_margin_pct:+.1f}%) بعد Stress Test"
         else:
-            mining_mode = "Connect Wallet -> Mint UI"
+            if sb.get("onchain_pow_state") or sb.get("pow_functions"):
+                mining_mode = "On-Chain PoW (ERC-918 / Hash)"
+            elif eco in ("Solana", "TON"):
+                mining_mode = f"{eco} PoW Miner"
+            else:
+                mining_mode = "On-Chain PoW Contract"
 
-        # Pure Web3 Mint / Mine cost: on-chain gas + contract mint fee (+ minimal node overhead)
-        effective_machine_hr = 0.02 if mode == "cloud" else 0.01
-        total_cost_hr = effective_machine_hr + gas_hr
-        total_cost_tx = (effective_machine_hr / tx_per_hr if tx_per_hr > 0 else effective_machine_hr) + tx_fee_total
+            # Pure Web3 Mint / Mine cost: on-chain gas + contract mint fee (+ minimal node overhead)
+            effective_machine_hr = 0.02 if mode == "cloud" else 0.01
+            total_cost_hr = effective_machine_hr + gas_hr
+            total_cost_tx = (effective_machine_hr / tx_per_hr if tx_per_hr > 0 else effective_machine_hr) + tx_fee_total
 
-        breakeven_usd_hr = round(total_cost_hr, 4)
-        breakeven_usd_tx = round(total_cost_tx, 5)
-        breakeven_tokens_hr = round(total_cost_hr / px, 4) if px > 0 else None
-        breakeven_tokens_tx = round(total_cost_tx / px, 4) if px > 0 else None
+            breakeven_usd_hr = round(total_cost_hr, 4)
+            breakeven_usd_tx = round(total_cost_tx, 5)
+            breakeven_tokens_hr = round(total_cost_hr / px, 4) if px > 0 else None
+            breakeven_tokens_tx = round(total_cost_tx / px, 4) if px > 0 else None
+            stress_gross_day_usd = None
+            stress_net_day_usd = None
+
+            if px <= 0 or liq <= 0:
+                arb_verdict = "REJECT"
+                stress_margin_pct = -100.0
+                arb_reason_ar = "عقد PoW حقيقي ولكن ماكايناش سيولة DEX (no_pairs)"
+            elif liq < 1000:
+                arb_verdict = "REJECT"
+                stress_margin_pct = -50.0
+                arb_reason_ar = f"سيولة ضعيفة جداً (${liq:,.0f} < $1,000)"
+            elif liq >= 5000 and vol24 >= 500 and gas_tx < 0.50:
+                arb_verdict = "BUY"
+                stress_margin_pct = 25.0
+                arb_reason_ar = f"عقد PoW موثق + سيولة ${liq:,.0f} + غاز رخيص (${gas_tx:.4f})"
+            else:
+                arb_verdict = "WATCH"
+                stress_margin_pct = 5.0
+                arb_reason_ar = f"عقد PoW حقيقي — سيولة ${liq:,.0f} / حجم 24h ${vol24:,.0f}"
 
         ver_level, ver_label, is_code_ok = _compute_verification(item)
         websites = [w for w in (mkt.get("websites") or []) if isinstance(w, str) and w.startswith(("http://", "https://"))]
@@ -670,14 +766,20 @@ async def compute_arbitrage_snapshot(
             "protocol_type": ptype,
             "standard": prof.get("standard") or eco,
             "mining_mode": mining_mode,
-            "is_cuda_pow": bool(sb.get("onchain_pow_state") or sb.get("pow_functions")),
-            "is_gpu_pow": False,
-            "gpu_algo": "",
-            "gpu_hashrate": "",
-            "est_coins_day": None,
-            "gross_day_usd": None,
-            "net_day_usd": None,
-            "breakeven_coin_price_usd": None,
+            "is_cuda_pow": bool(sb.get("onchain_pow_state") or sb.get("pow_functions") or sb.get("is_real_pow_onchain")),
+            "is_gpu_pow": is_gpu_l1,
+            "pow_track": pow_track,
+            "arb_verdict": arb_verdict,
+            "arb_reason_ar": arb_reason_ar,
+            "stress_margin_pct": stress_margin_pct,
+            "stress_gross_day_usd": stress_gross_day_usd,
+            "stress_net_day_usd": stress_net_day_usd,
+            "gpu_algo": matched_algo if is_gpu_l1 else "",
+            "gpu_hashrate": gpu_hashrate_label,
+            "est_coins_day": est_coins_day,
+            "gross_day_usd": gross_day_usd,
+            "net_day_usd": net_day_usd,
+            "breakeven_coin_price_usd": breakeven_coin_px,
             "verification_level": ver_level,
             "verification_label": ver_label,
             "is_code_confirmed": is_code_ok,
@@ -743,6 +845,7 @@ async def compute_arbitrage_snapshot(
             "watts": gpu["watts"],
             "mode": mode,
             "cloud_rate_hr": effective_cloud_hr,
+            "cloud_rate_source": vast_src,
             "kwh_cost": kwh_cost,
             "tx_per_hr": tx_per_hr,
             "machine_cost_hr_usd": round(machine_cost_hr, 4),
@@ -760,12 +863,19 @@ async def compute_arbitrage_snapshot(
             "last_cycle_at": agent_mem.get("last_cycle_at") or last_scan_at,
             "newly_added_last_cycle": int(agent_mem.get("newly_added_last_cycle") or (reg.get("last_scan_stats") or {}).get("newly_registered") or 0),
             "known_protocols_count": len(onchain_rows),
+            "games_count": int(agent_mem.get("games_count") or 0),
+            "grid_5x5_count": int(agent_mem.get("grid_5x5_count") or 0),
             "last_brief_ar": agent_mem.get("last_agent_brief_ar") or "",
             "ai_llm_enabled": bool(agent_mem.get("ai_llm_enabled")),
             "cycle_logs": (agent_mem.get("cycle_logs") or reg.get("scan_history") or [])[:5],
         },
         "summary": {
             "total_onchain_protocols": len(onchain_rows),
+            "onchain_erc918_count": sum(1 for r in onchain_rows if r["pow_track"] == "ONCHAIN_ERC918"),
+            "gpu_l1_pow_count": sum(1 for r in onchain_rows if r["pow_track"] == "GPU_L1_POW"),
+            "buy_count": sum(1 for r in onchain_rows if r["arb_verdict"] == "BUY"),
+            "watch_count": sum(1 for r in onchain_rows if r["arb_verdict"] == "WATCH"),
+            "reject_count": sum(1 for r in onchain_rows if r["arb_verdict"] == "REJECT"),
             "excluded_non_mining_count": excluded_non_mining_count,
             "cuda_pow_protocols": sum(1 for r in onchain_rows if r["is_cuda_pow"]),
             "simulated_open_protocols": simulated_open_count,

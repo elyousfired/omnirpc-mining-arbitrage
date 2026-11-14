@@ -94,6 +94,14 @@ class handler(BaseHTTPRequestHandler):
         try:
             if path in ("/", "/index.html", "/dashboard/index.html", "/arbitrage", "/arbitrage.html", "/dashboard/arbitrage.html"):
                 return self._send_text(ARBITRAGE_HTML.read_text(encoding="utf-8"))
+            if path in ("/games", "/games.html", "/dashboard/games.html"):
+                games_html = BASE_DIR / "dashboard" / "games.html"
+                if not games_html.exists():
+                    return self._send_text("Games UI missing", content_type="text/plain", status=404)
+                return self._send_text(games_html.read_text(encoding="utf-8"))
+            if path == "/api/games":
+                from game_scanner import load_games_registry
+                return self._send_json(load_games_registry())
             if path in ("/mining", "/mining.html", "/dashboard/mining.html"):
                 self.send_response(302)
                 self.send_header("Location", "/")

@@ -1,3 +1,2 @@
 ﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
-1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,2,1,2,0.0,2,mine(uint256),ABI Tokens: mine
-100,Gnosis,XDAI,0x8c9a555402a8f14c20810ea1b8c6b27479f96669,22,11,7,0.0,0,"createChallenge(), submitProof(bytes,bytes32[])",ABI Tokens: challenge
+204,opBNB Mainnet,BNB,0xa596e82b0e7d9f5c3e7841cf3f53f66b34d2c1d2,2,2,1,0.0,0,"submitEpoch(bytes32,uint256,string,uint256)",ABI Tokens: submitepoch

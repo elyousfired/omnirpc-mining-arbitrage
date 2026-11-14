@@ -27,10 +27,15 @@ from typing import Any
 
 import aiohttp
 
+from game_scanner import refresh_games_registry
 from mining_registry import is_actionable_mining_protocol, load_registry, save_registry, utc_now_iso
 from omnirpc_client import OmniRPC
 import onchain_mining_scanner
-from protocol_profiler import CURATED_MINING_SEEDS, enrich_registry_items_onchain
+from protocol_profiler import (
+    CURATED_MINING_SEEDS,
+    discover_whattomine_gpu_pow_coins,
+    enrich_registry_items_onchain,
+)
 from wallet_simulator import (
     DEFAULT_SANDBOX_EVM_WALLET,
     DEFAULT_SANDBOX_SOL_WALLET,
@@ -41,70 +46,63 @@ from wallet_simulator import (
 ROOT = Path(__file__).resolve().parent
 AGENT_MEMORY_PATH = ROOT / "agent_memory.json"
 
-# Extra adaptive search rotations added every hour beyond base queries (ONLY Web3 Connect-Wallet Mint & On-Chain PoW)
+# Extra adaptive search rotations added every hour beyond base queries (ONLY genuine PoW & ERC-918)
 ADAPTIVE_QUERY_POOL = [
-    ["claimrank", "startmint", "titanx", "glaze", "drillx", "xen mint", "pmint", "fair mint", "mint to earn"],
-    ["orx minter", "mrdn", "pulsechain mint", "base mine", "shogun", "x28", "titanfarms", "burnandmint"],
-    ["dragonx", "volt mint", "hyper mint", "pow token", "epow", "web3 miner", "mine token", "enterauction"],
-    ["ore supply", "coal solana", "claim mint", "batchmint", "challengeNumber", "nonce mint", "epoch mine"],
+    ["0xbtc", "erc918", "challengeNumber", "miningTarget", "getMiningDifficulty", "proof of work"],
+    ["seasonal spring", "seasonal summer", "seasonal autumn", "seasonal winter", "bwork", "pow token"],
+    ["meridian mrdn", "coal drillx", "nonce mint", "epochCount", "pow miner", "blockreward"],
+    ["ore supply grid", "glaze koth", "5x5 mining game", "solanajack", "erc918 mine", "gpu pow"],
 ]
 
 DEFAULT_USER_DIRECTIVES: list[dict[str, Any]] = [
     {
-        "timestamp": "2026-11-13T21:40:00Z",
+        "timestamp": "2026-11-14T19:00:00Z",
         "category": "directive",
-        "text": "عدم تصفير mining_registry.json أبداً؛ الحفاظ على كل البروتوكولات الصالحة القديمة (first_seen_at, seen_scans) وإضافة الجديد كل ساعة مع حذف المواقع الطايحة والعملات الممنوعة.",
-        "active": True,
-    },
-    {
-        "timestamp": "2026-11-13T22:20:00Z",
-        "category": "directive",
-        "text": "التركيز 100% فقط على بروتوكولات Web3 (Connect Wallet -> Mint / Mine -> بيع التوكن فـ DEX وربح) وفحص عقودها On-Chain وتجريبها بالمحفظة التجريبية (Sandbox Wallet) — مع حظر تام لعملات L1/HiveOS بحال Dynex و Firo و Zano و Ergo و ETC.",
+        "text": "نظام المسارين الصارم: (1) رادار PoW الحقيقي (/) فيه فقط عقود PoW حقيقية (ERC-918: challengeNumber/miningTarget بحال 0xBTC و Seasonal و BWORK و COAL و MRDN) + كل عملات GPU L1 PoW الصغيرة والمغمورة من WhatToMine (بدون ألعاب وبدون XEN/TITANX/ORX). (2) صفحة /games مخصصة لألعاب التعدين بحال نظام المربعات 5x5 ديال ORE ومزاد التاج ديال DONUT.",
         "active": True,
     },
     {
         "timestamp": "2026-11-13T21:40:00Z",
         "category": "directive",
-        "text": "تغطية الشبكات الصغيرة والمغمورة والـ L2s (PulseChain, Base, Polygon, Arbitrum, BSC, Solana, TON, Ethereum) بحثاً عن عقود PoW و Mint حقيقية شغالة on-chain.",
+        "text": "عدم تصفير mining_registry.json أبداً؛ الحفاظ على كل البروتوكولات الصالحة القديمة (first_seen_at, seen_scans) وإضافة الجديد كل ساعة مع حذف الألعاب والعقود المزيفة من الرادار الرئيسي.",
         "active": True,
     },
     {
         "timestamp": "2026-11-13T21:40:00Z",
         "category": "directive",
-        "text": "الرفض الصارم لشبكات التجربة (testnets: robinhood, arc, sepolia)، ألعاب النقرات (idle clickers)، عملات L1 PoW التقليدية، مواقع L1/CLI، والمواقع الطايحة DNS.",
+        "text": "تغطية جميع الشبكات (598 EVM + 131 Cosmos + 73 Substrate + 112 Blockscout + Solana + TON) للبحث عن عقود PoW حقيقية وألعاب المربعات بحال ORE.",
         "active": True,
     },
     {
         "timestamp": "2026-11-13T21:52:00Z",
         "category": "directive",
-        "text": "فين ما تلقى شي بروتوكول Connect Wallet -> Mint جديد مجرّب وناجح، صيفطو لينا هنا فوراً عبر notifications_queue.",
+        "text": "فين ما تلقى شي بروتوكول PoW حقيقي أو لعبة مربعات جديدة بحال ORE، صيفطو لينا هنا فوراً عبر notifications_queue.",
         "active": True,
     },
 ]
 
 DEFAULT_PRIORITY_CHAINS: list[str] = [
-    "PulseChain",
+    "Ethereum",
     "Base",
-    "TON",
-    "Solana",
     "Polygon",
+    "PulseChain",
     "Arbitrum",
     "BNB Smart Chain",
-    "Ethereum",
-    "Avalanche",
+    "Solana",
+    "TON",
+    "GPU L1 PoW",
 ]
 
 DEFAULT_WATCHLIST_QUERIES: list[str] = [
-    "claimrank",
-    "startmint",
-    "glaze",
-    "pmint",
-    "titanx",
-    "orx",
-    "shogun",
+    "0xbtc",
+    "erc918",
+    "challengeNumber",
+    "miningTarget",
+    "seasonal",
+    "bwork",
     "mrdn",
-    "ore",
     "coal",
+    "proof of work",
 ]
 
 DEFAULT_REJECTED_PATTERNS: list[str] = [
@@ -114,26 +112,16 @@ DEFAULT_REJECTED_PATTERNS: list[str] = [
     "sepolia",
     "amber",
     "jagent",
-    "ethereumpow.org",
     "tap to earn",
     "idle clicker",
     "mint.club",
     "pump.fun",
-    "dynexcoin.org",
-    "firo.org",
-    "zano.org",
-    "ergoplatform.org",
-    "confluxnetwork.org",
-    "octa.space",
-    "ethereumclassic.org",
-    "clore.ai",
-    "runonflux.io",
-    "aipowergrid.io",
-    "tari.com",
-    "qu.ai",
-    "alephium.org",
-    "0xbitcoin.org",
-    "gramcoin.org",
+    "xen.network",
+    "titanx.win",
+    "x28.win",
+    "ouroboros.foundation",
+    "pmint.win",
+    "mintables.pages.dev",
 ]
 
 
@@ -505,9 +493,11 @@ async def run_agent_cycle(
 
     connector = aiohttp.TCPConnector(limit=32, ssl=False)
     async with aiohttp.ClientSession(connector=connector) as session:
-        bs_hits, refreshed_old = await asyncio.gather(
-            _discover_blockscout_small_chains(session, max_explorers=28, offset=bs_offset),
+        bs_hits, refreshed_old, wtm_gpu_coins, games_reg = await asyncio.gather(
+            _discover_blockscout_small_chains(session, max_explorers=35, offset=bs_offset),
             _refresh_existing_market_prices(session, prev_items),
+            discover_whattomine_gpu_pow_coins(session),
+            refresh_games_registry(session),
         )
         import hourly_mint_scanner as _hms
         orig_queries = list(_hms.SEARCH_QUERIES)
@@ -615,12 +605,16 @@ async def run_agent_cycle(
         pass
 
     def _ready_for_sandbox(it: dict[str, Any]) -> bool:
+        if it.get("kind") == "gpu_l1_pow" or it.get("is_gpu_l1_pow"):
+            return False
         mkt = it.get("market_profile") or {}
         sites = [w for w in (mkt.get("websites") or []) if isinstance(w, str) and w.startswith(("http://", "https://")) and "github.com" not in w.lower()]
         try:
             px = float(mkt.get("price_usd") or 0)
         except Exception:
             px = 0.0
+        if it.get("is_curated_miner") or it.get("onchain_pow_verified"):
+            return not _matches_rejected_patterns(it, rejected_patterns)
         return bool(sites and px > 0 and not _matches_rejected_patterns(it, rejected_patterns))
 
     trial_targets: list[dict[str, Any]] = [it for it in raw_candidates if _ready_for_sandbox(it)]
@@ -659,7 +653,7 @@ async def run_agent_cycle(
             await asyncio.gather(*(_run_trial(it) for it in all_to_test), return_exceptions=True)
 
     verified_this_cycle = [
-        it for it in raw_candidates
+        it for it in (raw_candidates + list(wtm_gpu_coins or []))
         if is_actionable_mining_protocol(it) and not _matches_rejected_patterns(it, rejected_patterns)
     ]
 
@@ -802,22 +796,33 @@ async def run_agent_cycle(
     }
     save_registry(out_reg)
 
+    real_pow_onchain_count = sum(
+        1 for it in merged_items.values()
+        if (it.get("sandbox_test") or {}).get("is_real_pow_onchain") and not (it.get("kind") == "gpu_l1_pow" or it.get("is_gpu_l1_pow"))
+    )
+    gpu_l1_pow_count = sum(
+        1 for it in merged_items.values()
+        if it.get("kind") == "gpu_l1_pow" or it.get("is_gpu_l1_pow")
+    )
+    games_count = int((games_reg or {}).get("total_games") or 0)
+    grid_5x5_count = int((games_reg or {}).get("grid_5x5_count") or 0)
+
     # 6. REPORT & UPDATE AGENT LONG-TERM MEMORY (preserve all directives, notes, chains, watchlist, rejections)
     if new_added_names:
         brief = (
-            f"الدورة #{cycle_num}: دخل الإيجنت l-on-chain ({total_chains} شبكة)، جرّب {len(all_to_test)} داب بالمحفظة التجريبية "
-            f"{sandbox_wallet[:8]}..، زاد +{len(new_added_names)} بروتوكول Connect Wallet -> Mint ({', '.join(new_added_names[:3])}) "
-            f"والمجموع الصافي دابا {len(merged_items)} بروتوكول."
+            f"الدورة #{cycle_num}: مسح {total_chains} شبكة + Blockscout + WhatToMine؛ "
+            f"النتيجة: {real_pow_onchain_count} عقد PoW حقيقي + {gpu_l1_pow_count} عملة GPU L1 صغيرة + "
+            f"{games_count} لعبة تعدين ({grid_5x5_count} بنظام المربعات 5x5) فصفحة /games؛ جديد: +{len(new_added_names)} ({', '.join(new_added_names[:3])})."
         )
     else:
         brief = (
-            f"الدورة #{cycle_num}: دخل الإيجنت l-on-chain ({total_chains} شبكة)، جرّب {len(all_to_test)} داب بالمحفظة التجريبية "
-            f"{sandbox_wallet[:8]}..، وصفّى اللستة غير لبروتوكولات Connect Wallet -> Mint الصالحة ({len(merged_items)} بروتوكول، "
-            f"{sim_open_count} مجرّب On-Chain)."
+            f"الدورة #{cycle_num}: مسح {total_chains} شبكة + Blockscout + WhatToMine؛ "
+            f"المجموع الصافي: {real_pow_onchain_count} عقد PoW حقيقي + {gpu_l1_pow_count} عملة GPU L1 صغيرة + "
+            f"{games_count} لعبة تعدين ({grid_5x5_count} بنظام المربعات 5x5 فـ /games)."
         )
 
     mem["agent_name"] = "OmniRPC Autonomous Mining Agent"
-    mem["version"] = "2.0"
+    mem["version"] = "3.0"
     mem["sandbox_wallet"] = sandbox_wallet
     mem["sandbox_trials_last_cycle"] = {
         "tested": len(all_to_test),
@@ -826,11 +831,15 @@ async def run_agent_cycle(
         "onchain_pow_promoted": onchain_pow_promoted,
     }
     mem["total_cycles"] = cycle_num
-    mem["cursor_evm_offset"] = (evm_offset + 90) % evm_pool_size
-    mem["cursor_bs_offset"] = (bs_offset + 14) % 90
+    mem["cursor_evm_offset"] = (evm_offset + 150) % evm_pool_size
+    mem["cursor_bs_offset"] = (bs_offset + 35) % 112
     mem["cursor_query_batch"] = (q_idx + 1) % len(ADAPTIVE_QUERY_POOL)
     mem["last_cycle_at"] = now_iso
     mem["known_protocols_count"] = len(merged_items)
+    mem["real_pow_onchain_count"] = real_pow_onchain_count
+    mem["gpu_l1_pow_count"] = gpu_l1_pow_count
+    mem["games_count"] = games_count
+    mem["grid_5x5_count"] = grid_5x5_count
     mem["newly_added_last_cycle"] = len(new_added_names)
     mem["ai_llm_enabled"] = bool(os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))
     mem["last_agent_brief_ar"] = brief
@@ -856,7 +865,7 @@ async def run_agent_cycle(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="OmniRPC Autonomous 1h IA Mining Discovery Agent")
-    parser.add_argument("--max-evm", type=int, default=180)
+    parser.add_argument("--max-evm", type=int, default=300)
     parser.add_argument("--blocks", type=int, default=10)
     parser.add_argument("--no-blocks", action="store_true")
     parser.add_argument("--loop", action="store_true", help="Run continuously every 3600s")

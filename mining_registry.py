@@ -44,23 +44,21 @@ NON_MINING_ADDRESSES = {
     "0x3ae2dfc3b795267e284cbab7eff9a0cefdab401d",  # Apertum Virtual Miner (no DexScreener token)
     "6ef8rrecthr5dkzon8nwu78hrvfckubj14m5ubewf6p",  # Pump.fun bonding-curve launchpad
     "6vo3245eszab5wuqemw8mgdbfrudkbhhdhp5lcagutab", # Pump app launchpad router
-    # Traditional L1 / HiveOS GPU Pool Coins (NO Web3 Connect-Wallet Mint UI)
-    "0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b",   # Conflux wrapped
-    "0x3d6545b08693dae087e957cb1180ee38b9e3c25e",   # ETC bridged
-    "0xdb85f6685950e285b1e611037bebe5b34e2b7d78",   # WZANO
-    "04b95368393c821f180deee8229fbd941baaf9bd748ebcdbf7adbb147273455247",  # rsERG Cardano
-    "0xe0e8a04242f35b95dc64b07e0eae23a8e43a78e4",   # rsERG BSC
-    "0xe60201989b8628f43dc0605f585a72bcf1f1e977",   # CLORE
-    "0x9928a8600d14ac22c0be1e8d58909834d7ceaf13",   # 0xDNX (Dynex)
-    "0xd5d0322b6bab6a762c79f8c81a0b674778e13aed",   # FIRO
-    "0xfa704148d516b209d52c2d75f239274c8f8eaf1a",   # OCTA
-    "0xaff9084f2374585879e8b434c399e29e80cce635",   # FLUX
-    "0xa1c0decafe3e9bf06a5f29b7015cd373a9854608",   # AIPG
-    "0xfd36fa88bb3fea8d1264fc89d70723b6a2b56958",   # Tari wXTM
-    "0x5c97d726bf5130ae15408ce32bc764e458320d2f",   # Quai wrapped
-    "0x590f820444fa3638e022776752c5eef34e2f89a6",   # Alephium wrapped
-    "0xb6ed7644c69416d67b522e20bc294a9a9b405b31",   # 0xBTC CLI miner (no Web3 Mint UI)
-    "0x71b821aa52a49f32eed535fca6eb5aa130085978",   # 0xBTC Polygon CLI miner
+    # Games & Non-PoW Time-Lock / Paid-Burn Contracts (Strictly purged from Real PoW Radar)
+    "orev3eg1i9begiaj8b177z2s2rmarzak4nmv1kulvwv",   # ORE 5x5 Grid Game -> lives ONLY on /games
+    "oreou2p8bn6jkk3jbaivyng1dcxcyxwhwyk9jsybcp",   # ORE token
+    "0xae4a37d554c6d6f3e398546d8566b25052e0169c",   # DONUT / Glaze KOTH Auction -> lives ONLY on /games
+    "0xf19308f923582a6f7c465e5ce7a9dc1bec6665b1",   # TitanX (time-lock paid burn)
+    "0x06450dee7fd2fb8e39061434babcfc05599a6fb8",   # XEN (time-lock)
+    "0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",   # bXEN / mXEN (time-lock)
+    "0xffcbf84650ce02dafe96926b37a0ac5e34932fa5",   # cbXEN (time-lock)
+    "0xef4b763385838fffc708000f884026b8c0434275",   # fmXEN (time-lock)
+    "0xc0c5aa69dbe4d6dddfbc89c0957686ec60f24389",   # aXEN (time-lock)
+    "0xff640cbd35a618df1348d861b5e47f7eab05b422",   # pMINT (non-PoW)
+    "0x037645963aece8c5beb947da5621362c9f7db5a6",   # Mintables (non-PoW)
+    "0xd536e7a9543cf9867a580b45cec7f748a1fe11ec",   # ORX (deposit/vesting vault)
+    "0x5c47902c8c80779cb99235e42c354e53f38c3b0d",   # X28 (transform/paid burn)
+    "0xfcd7ccee4071aa4ecfac1683b7cc0afecaf42a36",   # Titan Blaze (non-PoW)
 }
 
 NON_MINING_KEYWORDS = (
@@ -76,9 +74,8 @@ NON_MINING_KEYWORDS = (
     "dragon coin", "zendawg", "never give up", "antminer", "minted hub",
     "staking / yield", "سيولة defi", "سكّ nft", "توكن عادي", "لعبة ويب 3",
     "مطالبة ومكافآت", "ستيكينغ",
-    "dynex", "firo", "zano", "ergo", "conflux", "octaspace", "ethereum classic",
-    "clore.ai", "runonflux", "ai power grid", "alephium", "tari (", "quai network",
-    "0xbitcoin", "fodinamine", "gram (grm)",
+    "ore protocol", "donut protocol", "glaze", "solanajack",
+    "xen crypto", "titanx", "titan blaze", "ouroboros", "orx minter", "x28", "pmint", "mintables", "hydra", "hyper",
 )
 
 ADMIN_NOISE_PREFIXES = (
@@ -118,52 +115,35 @@ def is_actionable_mining_protocol(item: dict[str, Any]) -> bool:
     cat_l = str(item.get("category") or "").lower()
     vname = str(mkt.get("verified_contract_name") or "").lower()
     blob = f"{pname} {ptype} {cat_l} {vname}"
-    if item.get("wtm_name") or "gpu proof-of-work" in blob or "gpu_pow(" in " ".join(item.get("decoded_functions") or []).lower():
-        return False
     if any(bad in blob for bad in NON_MINING_KEYWORDS):
         return False
     if "amber" in blob or "jagent" in blob:
         return False
 
-    # Strictly require passing live Sandbox Wallet & Web3 Connect-Wallet Mint UI verification
+    # Exclude gamified 5x5 grid / KOTH auction games (those live strictly on /games)
+    if item.get("is_gamified_mining") or item.get("game_type"):
+        return False
+
+    # Track B: Live GPU L1 PoW coins (small/obscure chains from WhatToMine)
+    if item.get("kind") == "gpu_l1_pow" or item.get("is_gpu_l1_pow"):
+        wtm = item.get("wtm_data") or {}
+        try:
+            px = float(mkt.get("price_usd") or 0)
+            rev = float(wtm.get("btc_revenue") or 0)
+        except Exception:
+            px, rev = 0.0, 0.0
+        return px > 0 or rev > 0
+
+    # Track A: Strict On-Chain Smart-Contract PoW (ERC-918 / DrillX / TON Giver)
     sb = item.get("sandbox_test")
-    if not (
-        isinstance(sb, dict)
-        and sb.get("tested")
-        and sb.get("site_live")
-        and sb.get("is_actionable_web3_mint")
-        and not sb.get("paused")
-    ):
+    if not isinstance(sb, dict) or not sb.get("tested"):
+        return False
+    if sb.get("paused"):
+        return False
+    if not sb.get("is_real_pow_onchain"):
         return False
 
-    # 1. Must have a real non-GitHub Mint / Mine interface website
-    websites = [
-        w for w in (mkt.get("websites") or [])
-        if isinstance(w, str) and w.startswith(("http://", "https://"))
-    ]
-    ui_sites = [w for w in websites if "github.com" not in w.lower() and "mint.club" not in w.lower()]
-    if not ui_sites:
-        return False
-
-    # 2. Must have a live token listed & priced on DexScreener
-    dex_url = str(mkt.get("dex_url") or "").lower()
-    try:
-        px = float(mkt.get("price_usd") or 0)
-    except Exception:
-        px = 0.0
-    if "dexscreener.com" not in dex_url or px <= 0:
-        return False
-
-    fns = " ".join(item.get("decoded_functions") or []).lower()
-    has_mining_signal = bool(item.get("is_curated_miner")) or any(
-        k in f"{ptype} {fns}"
-        for k in (
-            "pow", "mine", "drill", "nonce", "difficulty", "glaze",
-            "claimmintreward", "claimrank", "startmint", "claimmint", "transform",
-            "mintx28", "mintreward", "blockreward", "fair-mint",
-        )
-    )
-    return has_mining_signal
+    return True
 
 
 def utc_now_iso() -> str:

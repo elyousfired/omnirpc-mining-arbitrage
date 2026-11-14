@@ -613,6 +613,9 @@ async def _raw_evm_rpc(
                             "method not found",
                             "not supported",
                             "block not found",
+                            "specify an address",
+                            "smaller block range",
+                            "query returned more than",
                         )
                     ) and url != urls[-1]:
                         last_err = full_err
@@ -802,6 +805,13 @@ async def simulate_sandbox_wallet_mint(
     ui_ok = bool(ui.get("site_live") and not ui.get("is_l1_cli_miner") and (ui.get("is_web3_mint_dapp") or ton_ok))
     trial["is_actionable_web3_mint"] = bool(good_status and ui_ok and not trial["paused"])
 
+    # Strict mechanics classification: separate REAL PoW from Gamified Grid/KOTH Games & Time-Locks
+    has_real_evm_pow = bool(trial["pow_functions"] or trial["onchain_pow_state"])
+    is_drillx_or_ton_pow = bool(
+        chain_type == "SOLANA" and any("solana_program_live" in str(x) for x in (trial.get("pow_functions") or []))
+    ) or bool(chain_type == "TON" and trial["onchain_verified"])
+    trial["is_real_pow_onchain"] = bool((has_real_evm_pow or is_drillx_or_ton_pow) and not trial["paused"])
+
     if not ui.get("site_live"):
         trial["trial_verdict_ar"] = f"مرفوض — الموقع ما خدامش ({ui.get('error', 'down')})"
     elif ui.get("is_l1_cli_miner"):
@@ -824,3 +834,90 @@ async def simulate_sandbox_wallet_mint(
         trial["trial_verdict_ar"] = trial["ui_summary"] or "ما استوفاش شروط Connect Wallet -> Mint"
 
     return trial
+
+
+GAMIFIED_GRID_SIGNALS = (
+    "5x5",
+    "grid",
+    "motherlode",
+    "winning tile",
+    "winning square",
+    "25 squares",
+    "unrefined",
+    "deploy sol",
+    "claim sol",
+    "tiles",
+    "round timer",
+    "minechain",
+    "crafting",
+    "ore.supply",
+)
+
+KOTH_AUCTION_SIGNALS = (
+    "king glazer",
+    "king of the hill",
+    "glaze",
+    "outbid",
+    "dutch auction",
+    "steal the crown",
+    "glaze.click",
+)
+
+
+async def verify_gamified_grid_ui(session: aiohttp.ClientSession, url: str) -> dict[str, Any]:
+    """
+    Enter a Gamified Mining site + JS bundles and detect ORE-style Grid/Square games
+    ("نظام المربعات") or King-of-the-Hill (KOTH) auction games (like DONUT).
+    """
+    res: dict[str, Any] = {
+        "url": url,
+        "site_live": False,
+        "http_status": 0,
+        "has_connect_wallet": False,
+        "game_type": "",
+        "game_type_ar": "",
+        "matched_game_signals": [],
+        "is_gamified_mining": False,
+        "error": "",
+    }
+    if not _is_good_dapp_url(url):
+        res["error"] = "invalid_url"
+        return res
+
+    html, status, final_url, err = await _fetch_text(session, url, timeout=8, max_bytes=400_000)
+    res["http_status"] = status
+    if status < 200 or status >= 400 or not html:
+        res["error"] = err or f"http_{status}"
+        return res
+    res["site_live"] = True
+
+    corpus = html.lower()
+    script_urls = re.findall(r'<script[^>]+src=["\']([^"\']+)["\']', html, re.I)
+    js_candidates = [urljoin(final_url, s) for s in script_urls if not s.startswith("data:")][:10]
+    if js_candidates:
+        chunks = await asyncio.gather(*[_fetch_text(session, u, timeout=6, max_bytes=850_000) for u in js_candidates], return_exceptions=True)
+        for ch in chunks:
+            if isinstance(ch, tuple) and ch[0]:
+                corpus += "\n" + ch[0].lower()
+
+    res["has_connect_wallet"] = any(sig in corpus for sig in WALLET_CONNECT_SIGNALS)
+    grid_hits = [s for s in GAMIFIED_GRID_SIGNALS if s in corpus]
+    koth_hits = [s for s in KOTH_AUCTION_SIGNALS if s in corpus]
+
+    if len(grid_hits) >= 2 or ("motherlode" in grid_hits) or ("5x5" in grid_hits and "tile" in corpus):
+        res["game_type"] = "GRID_5X5_BETTING"
+        res["game_type_ar"] = "نظام المربعات 5x5 (Grid Betting بحال ORE)"
+        res["matched_game_signals"] = grid_hits[:8]
+        res["is_gamified_mining"] = True
+    elif len(koth_hits) >= 2 or "king glazer" in koth_hits:
+        res["game_type"] = "KOTH_AUCTION"
+        res["game_type_ar"] = "مزاد التاج (King of the Hill بحال DONUT)"
+        res["matched_game_signals"] = koth_hits[:8]
+        res["is_gamified_mining"] = True
+    elif "minechain" in corpus or ("crafting" in corpus and "drillx" in corpus):
+        res["game_type"] = "IDLE_CRAFTING_MINER"
+        res["game_type_ar"] = "تعدين مع كرافتينغ وGrid (بحال Minechain)"
+        res["matched_game_signals"] = (grid_hits + ["crafting", "drillx"])[:8]
+        res["is_gamified_mining"] = True
+
+    return res

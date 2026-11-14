@@ -95,11 +95,9 @@ ALT_DEX_CHAIN_MAP: dict[str, tuple[str, str, str, str]] = {
 }
 
 SEARCH_QUERIES = [
-    "claimrank", "startmint", "titanx", "xen mint", "fair mint",
-    "mint to earn", "web3 miner", "mine token", "pulsechain mint", "glaze",
-    "transform", "dragonx", "volt", "hyper", "pmint", "mrdn",
-    "ore", "drillx", "epow", "pow token", "proof of work", "nonce",
-    "burnandmint", "blockreward",
+    "0xbtc", "erc918", "proof of work", "pow token", "seasonal",
+    "bwork", "meridian", "coal", "challengeNumber", "miningTarget",
+    "mine token", "web3 miner", "mrdn", "nonce", "blockreward",
 ]
 
 # Unambiguous Web3 Connect-Wallet Mint phrases (delegated to JS-bundle inspector in wallet_simulator.py)
@@ -217,10 +215,10 @@ async def _fetch_wtm_and_woolypooly(session: aiohttp.ClientSession) -> dict[str,
 
 async def _discover_blockscout_small_chains(
     session: aiohttp.ClientSession,
-    max_explorers: int = 24,
+    max_explorers: int = 35,
     offset: int = 0,
 ) -> list[dict[str, Any]]:
-    """Query small non-testnet Blockscout v2 explorers for PoW/Mine/Mint tokens."""
+    """Query small non-testnet Blockscout v2 explorers for genuine PoW / ERC-918 smart contracts."""
     if not BS_CACHE_PATH.exists():
         return []
     try:
@@ -278,16 +276,17 @@ async def _discover_blockscout_small_chains(
                             addr = str(addr_obj.get("hash") or sc.get("address_hash") or "").strip()
                             sc_name = str(sc.get("name") or addr_obj.get("name") or "").strip()
                             txc = int(sc.get("transactions_count") or 0)
-                            if not addr.startswith("0x") or len(addr) != 42 or txc < 10:
+                            if not addr.startswith("0x") or len(addr) != 42 or txc < 5:
                                 continue
-                            if any(k in sc_name.lower() for k in ("mine", "mint", "pow", "xen", "titan", "glaze", "claim")):
+                            if any(k in sc_name.lower() for k in ("pow", "mine", "miner", "erc918", "seasonal", "bwork", "0xbtc", "challenge", "target")):
                                 found.append({"cid": cid, "address": addr, "symbol": sc_name[:12], "name": sc_name, "holders": txc})
             except Exception:
                 pass
 
+    pow_queries = ("challengeNumber", "miningTarget", "getMiningDifficulty", "ERC918", "ProofOfWork", "pow")
     tasks = []
     for idx, (cid, base_url) in enumerate(rotated):
-        q = ("mine", "mint", "pow", "xen")[idx % 4]
+        q = pow_queries[idx % len(pow_queries)]
         tasks.append(probe_one(cid, base_url, q))
     await asyncio.gather(*tasks)
     return found
@@ -423,7 +422,7 @@ async def _discover_dexscreener_candidates(
 
 
 async def run_hourly_mint_scan(
-    max_evm_chains: int = 180,
+    max_evm_chains: int = 300,
     blocks_back: int = 10,
     no_blocks: bool = False,
 ) -> dict[str, Any]:
@@ -440,7 +439,7 @@ async def run_hourly_mint_scan(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="OmniRPC Hourly All-Chains PoW & GPU-Mint Scanner (AI Agent)")
-    parser.add_argument("--max-evm", type=int, default=180, help="Max EVM chains per rotating scan window")
+    parser.add_argument("--max-evm", type=int, default=300, help="Max EVM chains per rotating scan window")
     parser.add_argument("--blocks", type=int, default=10, help="Recent blocks back per EVM RPC")
     parser.add_argument("--no-blocks", action="store_true", help="Skip live block loop and run API/DEX/Blockscout scan")
     args = parser.parse_args()

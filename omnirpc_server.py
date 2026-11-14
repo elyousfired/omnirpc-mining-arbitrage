@@ -14,6 +14,7 @@ import aiohttp
 from aiohttp import web
 
 from arbitrage_engine import compute_arbitrage_snapshot
+from game_scanner import GAMES_REGISTRY_JSON, load_games_registry
 from mining_registry import REGISTRY_CSV, REGISTRY_JSON, load_registry
 from omnirpc_client import OmniRPC, POOL_PATH
 from protocol_profiler import check_all_apis_health
@@ -22,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DASHBOARD_HTML = BASE_DIR / "dashboard" / "index.html"
 MINING_HTML = BASE_DIR / "dashboard" / "mining.html"
 ARBITRAGE_HTML = BASE_DIR / "dashboard" / "arbitrage.html"
+GAMES_HTML = BASE_DIR / "dashboard" / "games.html"
 AUTO_SCAN_INTERVAL = 3600  # 1 hour
 MINING_REPORT_PATH = BASE_DIR / "onchain_mining_scan_report.json"
 MINING_CSV_PATH = BASE_DIR / "onchain_mining_candidates.csv"
@@ -256,6 +258,14 @@ def create_app(pool_path: Path = POOL_PATH) -> web.Application:
         if not ARBITRAGE_HTML.exists():
             return web.Response(text="Arbitrage UI file missing.", status=404)
         return web.Response(text=ARBITRAGE_HTML.read_text(encoding="utf-8"), content_type="text/html", charset="utf-8")
+
+    async def handle_games_page(_request: web.Request) -> web.Response:
+        if not GAMES_HTML.exists():
+            return web.Response(text="Games UI file missing.", status=404)
+        return web.Response(text=GAMES_HTML.read_text(encoding="utf-8"), content_type="text/html", charset="utf-8")
+
+    async def handle_api_games(_request: web.Request) -> web.Response:
+        return web.json_response(load_games_registry())
 
     async def handle_api_arbitrage(request: web.Request) -> web.Response:
         q = request.rel_url.query
@@ -516,6 +526,8 @@ def create_app(pool_path: Path = POOL_PATH) -> web.Application:
     app.router.add_get("/", handle_dashboard)
     app.router.add_get("/mining", handle_mining_page)
     app.router.add_get("/arbitrage", handle_arbitrage_page)
+    app.router.add_get("/games", handle_games_page)
+    app.router.add_get("/api/games", handle_api_games)
     app.router.add_get("/api/arbitrage", handle_api_arbitrage)
     app.router.add_get("/api/agent", handle_api_agent)
     app.router.add_get("/api/registry", handle_api_registry)

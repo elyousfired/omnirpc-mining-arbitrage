@@ -10,6 +10,7 @@
     { "source": "/", "destination": "/api/index?__path=/" },
     { "source": "/mining", "destination": "/api/index?__path=/mining" },
     { "source": "/arbitrage", "destination": "/api/index?__path=/arbitrage" },
+    { "source": "/games", "destination": "/api/index?__path=/games" },
     { "source": "/api/:path*", "destination": "/api/index?__path=/api/:path*" },
     { "source": "/evm/:path*", "destination": "/api/index?__path=/evm/:path*" },
     { "source": "/cosmos/:path*", "destination": "/api/index?__path=/cosmos/:path*" },
