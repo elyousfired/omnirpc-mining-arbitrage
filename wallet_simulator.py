@@ -836,21 +836,29 @@ async def simulate_sandbox_wallet_mint(
     return trial
 
 
-GAMIFIED_GRID_SIGNALS = (
+STRICT_5X5_LAYOUT_SIGNALS = (
     "5x5",
-    "grid",
-    "motherlode",
+    "25 squares",
+    "25 blocks",
+    "25 tiles",
     "winning tile",
     "winning square",
-    "25 squares",
-    "unrefined",
-    "deploy sol",
-    "claim sol",
-    "tiles",
-    "round timer",
-    "minechain",
-    "crafting",
+    "winning block",
+    "motherlode",
+    "beanpot",
     "ore.supply",
+    "minebean",
+    "binarium",
+)
+
+GRID_ACTION_SIGNALS = (
+    "deploy",
+    "claim",
+    "round",
+    "tile",
+    "square",
+    "block",
+    "unrefined",
 )
 
 KOTH_AUCTION_SIGNALS = (
@@ -866,8 +874,9 @@ KOTH_AUCTION_SIGNALS = (
 
 async def verify_gamified_grid_ui(session: aiohttp.ClientSession, url: str) -> dict[str, Any]:
     """
-    Enter a Gamified Mining site + JS bundles and detect ORE-style Grid/Square games
+    Enter a Gamified Mining site + JS bundles and detect true ORE-style 5x5 Grid/Square games
     ("نظام المربعات") or King-of-the-Hill (KOTH) auction games (like DONUT).
+    Requires strict 5x5 / 25-tile / motherlode / beanpot evidence to reject generic CSS "grid" meme pages.
     """
     res: dict[str, Any] = {
         "url": url,
@@ -884,40 +893,52 @@ async def verify_gamified_grid_ui(session: aiohttp.ClientSession, url: str) -> d
         res["error"] = "invalid_url"
         return res
 
-    html, status, final_url, err = await _fetch_text(session, url, timeout=8, max_bytes=400_000)
+    status, html, final_url = await _fetch_text_limited(session, url, max_bytes=400_000, timeout=8)
     res["http_status"] = status
     if status < 200 or status >= 400 or not html:
-        res["error"] = err or f"http_{status}"
+        res["error"] = (html if status == 0 else "") or f"http_{status}"
         return res
     res["site_live"] = True
 
     corpus = html.lower()
     script_urls = re.findall(r'<script[^>]+src=["\']([^"\']+)["\']', html, re.I)
-    js_candidates = [urljoin(final_url, s) for s in script_urls if not s.startswith("data:")][:10]
-    if js_candidates:
-        chunks = await asyncio.gather(*[_fetch_text(session, u, timeout=6, max_bytes=850_000) for u in js_candidates], return_exceptions=True)
+    # Prioritize app / Next.js / Vite chunks and skip third-party analytics
+    raw_js = [
+        urljoin(final_url, s)
+        for s in script_urls
+        if not s.startswith("data:") and not any(x in s.lower() for x in ("googletagmanager", "google-analytics", "plausible", "clarity.ms", "cloudflareinsights"))
+    ]
+    prioritized_js = sorted(
+        raw_js,
+        key=lambda u: (0 if any(k in u.lower() for k in ("_next/static/chunks", "assets/", "app", "main", "index", "page")) else 1),
+    )[:8]
+    if prioritized_js:
+        chunks = await asyncio.gather(*[_fetch_text_limited(session, u, max_bytes=500_000, timeout=6) for u in prioritized_js], return_exceptions=True)
         for ch in chunks:
-            if isinstance(ch, tuple) and ch[0]:
-                corpus += "\n" + ch[0].lower()
+            if isinstance(ch, tuple) and len(ch) >= 2 and ch[0] == 200 and ch[1]:
+                corpus += "\n" + ch[1].lower()
 
     res["has_connect_wallet"] = any(sig in corpus for sig in WALLET_CONNECT_SIGNALS)
-    grid_hits = [s for s in GAMIFIED_GRID_SIGNALS if s in corpus]
+    layout_hits = [s for s in STRICT_5X5_LAYOUT_SIGNALS if s in corpus]
+    action_hits = [s for s in GRID_ACTION_SIGNALS if s in corpus]
     koth_hits = [s for s in KOTH_AUCTION_SIGNALS if s in corpus]
 
-    if len(grid_hits) >= 2 or ("motherlode" in grid_hits) or ("5x5" in grid_hits and "tile" in corpus):
+    has_web3_stack = res["has_connect_wallet"] or any(w in corpus for w in ("wagmi", "viem", "@solana/web3", "ethers", "rainbowkit", "privy", "wallet"))
+
+    if layout_hits and len(action_hits) >= 2 and has_web3_stack:
         res["game_type"] = "GRID_5X5_BETTING"
         res["game_type_ar"] = "نظام المربعات 5x5 (Grid Betting بحال ORE)"
-        res["matched_game_signals"] = grid_hits[:8]
+        res["matched_game_signals"] = (layout_hits + action_hits)[:8]
         res["is_gamified_mining"] = True
-    elif len(koth_hits) >= 2 or "king glazer" in koth_hits:
+    elif (len(koth_hits) >= 2 or "king glazer" in koth_hits) and has_web3_stack:
         res["game_type"] = "KOTH_AUCTION"
         res["game_type_ar"] = "مزاد التاج (King of the Hill بحال DONUT)"
         res["matched_game_signals"] = koth_hits[:8]
         res["is_gamified_mining"] = True
-    elif "minechain" in corpus or ("crafting" in corpus and "drillx" in corpus):
+    elif ("minechain" in corpus or ("crafting" in corpus and "drillx" in corpus)) and has_web3_stack:
         res["game_type"] = "IDLE_CRAFTING_MINER"
         res["game_type_ar"] = "تعدين مع كرافتينغ وGrid (بحال Minechain)"
-        res["matched_game_signals"] = (grid_hits + ["crafting", "drillx"])[:8]
+        res["matched_game_signals"] = (layout_hits + ["crafting", "drillx"])[:8]
         res["is_gamified_mining"] = True
 
     return res

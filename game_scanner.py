@@ -25,19 +25,15 @@ GAMIFIED_SEARCH_QUERIES = [
     "ore",
     "motherlode",
     "minebean",
-    "minecat",
-    "idlemine",
-    "antminer",
-    "aidiglet",
-    "blitzmine",
+    "beanpot",
+    "binarium",
+    "godl",
+    "5x5",
+    "25 blocks",
+    "25 squares",
     "grid mining",
-    "5x5 mine",
-    "tile mine",
     "glaze",
     "minechain",
-    "virtual mining",
-    "dig mine",
-    "bitz mine",
 ]
 
 TESTNET_GAME_SLUGS = {"robinhood", "arc", "sepolia", "goerli", "holesky", "amoy", "devnet", "mumbai", "fuji"}
@@ -76,80 +72,44 @@ CURATED_GAMIFIED_MINING_GAMES: list[dict[str, Any]] = [
         "round_duration_sec": 60,
         "entry_currency": "ETH (Base)",
         "house_cut_pct": 10.0,
-        "mechanic_ar": "نسخة نظام المربعات على شبكة Base: كتدخل بـ ETH فـ مربعات الشبكة وكل جولة كيربح مربع وكيوزع BEAN + جاكبوت.",
+        "mechanic_ar": "نسخة نظام المربعات 5x5 على شبكة Base: كتدخل بـ ETH فـ مربعات الشبكة وكل جولة كيربح مربع وكيوزع BEAN + جاكبوت Beanpot.",
         "risk_note_ar": "لعبة مربعات على Base L2 — راقب السيولة ورسوم الغاز.",
     },
     {
-        "uid": "game:solana:minecat",
-        "name": "MINECAT Mining Control (Grid Game)",
-        "symbol": "MINECAT",
+        "uid": "game:bsc:binarium",
+        "name": "Binarium ($BNR — BSC Grid Mining)",
+        "symbol": "BNR",
+        "chain_name": "BNB Smart Chain",
+        "chain_id": "bsc",
+        "contract": "0xc3Fc2156e53Ab760574EAd452627e6B8CD675B32",
+        "token_address": "0xc3Fc2156e53Ab760574EAd452627e6B8CD675B32",
+        "site_url": "https://binarium.supply",
+        "game_type": "GRID_5X5_BETTING",
+        "game_type_ar": "نظام المربعات على BSC (شبيه ORE)",
+        "grid_layout": "Grid Squares (60s)",
+        "round_duration_sec": 60,
+        "entry_currency": "BNB (BSC)",
+        "house_cut_pct": 10.0,
+        "mechanic_ar": "نظام المربعات بحال ORE على شبكة BSC: كتدخل بـ BNB فـ مربعات الشبكة كل 60 ثانية، والرابحين كيقسمو 90% من الـ BNB + توكن BNR + جاكبوت Motherlode.",
+        "risk_note_ar": "لعبة مربعات ورهان بـ BNB على شبكة BSC.",
+    },
+    {
+        "uid": "game:solana:godl",
+        "name": "GODL Supply (Solana 5x5 Grid Mining)",
+        "symbol": "GODL",
         "chain_name": "Solana Mainnet",
         "chain_id": "solana",
-        "contract": "4ZnJ72JoEVazMe7nvbek7CfSKh7eTtR3nikyAua6EkiE",
-        "token_address": "4ZnJ72JoEVazMe7nvbek7CfSKh7eTtR3nikyAua6EkiE",
-        "site_url": "https://minecatore.com/",
+        "contract": "GodL6KZ9uuUoQwELggtVzQkKmU1LfqmDokPibPeDKkhF",
+        "token_address": "GodL6KZ9uuUoQwELggtVzQkKmU1LfqmDokPibPeDKkhF",
+        "site_url": "https://godl.supply",
         "game_type": "GRID_5X5_BETTING",
-        "game_type_ar": "نظام المربعات على Solana (ORE Fork)",
-        "grid_layout": "Grid Squares",
+        "game_type_ar": "نظام المربعات 5x5 على Solana (شبيه ORE)",
+        "grid_layout": "5x5 (25 مربع)",
         "round_duration_sec": 60,
         "entry_currency": "SOL",
         "house_cut_pct": 10.0,
-        "mechanic_ar": "لعبة تعدين بالمربعات مستوحاة من ORE على Solana (MineCat ORE) فيها جولات ومربعات ومكافآت.",
-        "risk_note_ar": "لعبة مربعات على Solana — تأكد من السيولة قبل الدخول.",
-    },
-    {
-        "uid": "game:solana:idlemine",
-        "name": "IdleMine ($IDLE — Grid & Tiles Miner)",
-        "symbol": "IDLE",
-        "chain_name": "Solana Mainnet",
-        "chain_id": "solana",
-        "contract": "BjcRmwm8e25RgjkyaFE56fc7bxRgGPw96JUkXRJFEroT",
-        "token_address": "BjcRmwm8e25RgjkyaFE56fc7bxRgGPw96JUkXRJFEroT",
-        "site_url": "https://idlemine.io",
-        "game_type": "GRID_5X5_BETTING",
-        "game_type_ar": "نظام المربعات والبلاطات (Grid & Tiles)",
-        "grid_layout": "Tile Grid",
-        "round_duration_sec": 60,
-        "entry_currency": "SOL / IDLE",
-        "house_cut_pct": 5.0,
-        "mechanic_ar": "لعبة تعدين تفاعلية بالـ Grid و Tiles على Solana مع اقتصاد توكن IDLE وسيولة عالية.",
-        "risk_note_ar": "لعبة Web3 تفاعلية (ماشي تعدين GPU).",
-    },
-    {
-        "uid": "game:solana:antminer",
-        "name": "ANT MINER ($ANT — Colony Grid)",
-        "symbol": "ANT",
-        "chain_name": "Solana Mainnet",
-        "chain_id": "solana",
-        "contract": "7ypCq2CJ4fnbtS3z2B1W1UT2he5E3u7Md6Gy1ri7uGrQ",
-        "token_address": "7ypCq2CJ4fnbtS3z2B1W1UT2he5E3u7Md6Gy1ri7uGrQ",
-        "site_url": "https://theantminer.xyz/",
-        "game_type": "GRID_5X5_BETTING",
-        "game_type_ar": "لعبة تعدين بالمربعات والجولات (Solana)",
-        "grid_layout": "Colony Grid",
-        "round_duration_sec": 60,
-        "entry_currency": "SOL",
-        "house_cut_pct": 10.0,
-        "mechanic_ar": "لعبة تعدين جولات ومربعات على Solana (The ants mine. The colony eats).",
-        "risk_note_ar": "لعبة احتمالات وجولات على Solana.",
-    },
-    {
-        "uid": "game:solana:aidiglet",
-        "name": "AiDiglet ($DIGS — Tap & Grid Miner)",
-        "symbol": "DIGS",
-        "chain_name": "Solana Mainnet",
-        "chain_id": "solana",
-        "contract": "9QT8K685Hrae4k11dhGXirdtpfAaimExtyfwt8cPpump",
-        "token_address": "9QT8K685Hrae4k11dhGXirdtpfAaimExtyfwt8cPpump",
-        "site_url": "https://aidiglet.me",
-        "game_type": "IDLE_CRAFTING_MINER",
-        "game_type_ar": "لعبة Tap-to-Mine & Grid",
-        "grid_layout": "Tap / Grid",
-        "round_duration_sec": 60,
-        "entry_currency": "SOL / TG",
-        "house_cut_pct": 5.0,
-        "mechanic_ar": "لعبة تعدين تفاعلية (Telegram + Solana) بنظام الجولات والمكافآت.",
-        "risk_note_ar": "لعبة تعدين اجتماعية — راقب التقلبات.",
+        "mechanic_ar": "نسخة 5x5 بحال ORE على Solana: كتختار مربعات فـ الشبكة وتدخل بـ SOL كل جولة، والرابح كياخد توزيع SOL + توكن GODL + جاكبوت Motherlode.",
+        "risk_note_ar": "لعبة مربعات ورهان بـ SOL على Solana.",
     },
     {
         "uid": "game:base:donut_glaze",
@@ -262,6 +222,9 @@ async def _discover_new_grid_games(session: aiohttp.ClientSession, known_tokens:
             websites = [w.get("url") for w in ((p.get("info") or {}).get("websites") or []) if isinstance(w, dict) and w.get("url")]
             if not websites:
                 continue
+            site_low = str(websites[0]).lower()
+            if any(lp in site_low for lp in ("stonkfun.xyz", "pump.fun", "four.meme", "clanker.world", "moonshot", "raydium.io", "uniswap.org", "jup.ag", "gmgn.ai", "zora.co", "bonk.fun", "believe.app")):
+                continue
             seen_tok.add(taddr.lower())
             to_verify.append((p, websites[0]))
 
@@ -314,11 +277,9 @@ async def refresh_games_registry(session: aiohttp.ClientSession | None = None) -
     if own_session:
         session = aiohttp.ClientSession()
     try:
-        prev = load_games_registry()
-        by_uid: dict[str, dict[str, Any]] = {
-            str(x.get("uid")): dict(x) for x in (prev.get("items") or []) if isinstance(x, dict) and x.get("uid")
-        }
-        known_toks = {str(x.get("token_address") or "").lower() for x in by_uid.values() if x.get("token_address")}
+        # Rebuild fresh from curated + strictly verified discoveries so stale meme-coin false positives never linger
+        by_uid: dict[str, dict[str, Any]] = {}
+        known_toks: set[str] = set()
 
         async def _check_curated(g: dict[str, Any]) -> dict[str, Any]:
             rec = dict(g)
