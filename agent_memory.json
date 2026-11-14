@@ -1,16 +1,29 @@
 {
   "agent_name": "OmniRPC Autonomous Mining Agent",
-  "version": "1.0",
-  "total_cycles": 20,
-  "cursor_evm_offset": 180,
-  "cursor_bs_offset": 28,
-  "cursor_query_batch": 2,
-  "last_cycle_at": "2026-11-13T21:29:05Z",
-  "known_protocols_count": 34,
-  "newly_added_last_cycle": 2,
+  "version": "1.1",
+  "total_cycles": 21,
+  "cursor_evm_offset": 270,
+  "cursor_bs_offset": 42,
+  "cursor_query_batch": 3,
+  "last_cycle_at": "2026-11-14T00:39:29Z",
+  "known_protocols_count": 35,
+  "newly_added_last_cycle": 1,
   "ai_llm_enabled": false,
-  "last_agent_brief_ar": "الدورة #20: فحص الإيجنت 392 شبكة وحدّث الأسعار، وبقى محافظ على كل البروتوكولات القديمة (32 بروتوكول جاهز للتعدين).",
+  "last_agent_brief_ar": "الدورة #21: فحص الإيجنت 392 شبكة، زاد +1 بروتوكولات جديدة (A Network (ANET)) فوق القديم، المجموع المخزن دابا 35 بروتوكول.",
   "cycle_logs": [
+    {
+      "scan_id": 21,
+      "timestamp": "2026-11-14T00:39:29Z",
+      "duration_s": 40.3,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 33,
+      "newly_registered": 1,
+      "new_names": [
+        "A Network (ANET)"
+      ],
+      "total_registry_size": 35
+    },
     {
       "scan_id": 20,
       "timestamp": "2026-11-13T21:29:05Z",
@@ -115,5 +128,22 @@
     "mint.club",
     "pump.fun"
   ],
-  "notifications_queue": []
+  "notifications_queue": [
+    {
+      "id": "alert-21-56:0x791055a7d52aa392eae8de04250497f33807e46a",
+      "discovered_at": "2026-11-14T00:39:29Z",
+      "cycle_id": 21,
+      "uid": "56:0x791055a7d52aa392eae8de04250497f33807e46a",
+      "protocol_name": "A Network (ANET)",
+      "token_symbol": "BNB",
+      "chain_name": "BNB Chain",
+      "kind": "mint_tx",
+      "price_usd": "8.94",
+      "liquidity_usd": 27530.34,
+      "website": "https://a-network.net",
+      "dex_url": "https://dexscreener.com/bsc/0xb90071e377a31a6ea2cfdebe19a4d5226c420b6b",
+      "explorer_url": "https://bscscan.com/address/0x791055A7d52AA392eaE8De04250497f33807E46A",
+      "reported_to_chat": false
+    }
+  ]
 }
