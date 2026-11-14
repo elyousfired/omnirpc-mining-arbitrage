@@ -1,3 +1,3 @@
 ﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
-250,Fantom Opera,FTM,0xef4b763385838fffc708000f884026b8c0434275,3,3,3,0.0,6,"claimMintRewardAndShare(address,uint256)",ABI Tokens: claimmintrewardandshare
-1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,4,1,4,0.0,2,mine(uint256),ABI Tokens: mine
+1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,2,1,2,0.0,2,mine(uint256),ABI Tokens: mine
+15,Diode Prenet,DIODE,0x5000000000000000000000000000000000000000,10,4,10,0.0,1,"blockReward(uint256,uint256)",ABI Tokens: blockreward
