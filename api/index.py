@@ -95,7 +95,7 @@ class handler(BaseHTTPRequestHandler):
             if path in ("/", "/index.html", "/dashboard/index.html", "/arbitrage", "/arbitrage.html", "/dashboard/arbitrage.html"):
                 return self._send_text(ARBITRAGE_HTML.read_text(encoding="utf-8"))
             if path in ("/games", "/games.html", "/dashboard/games.html"):
-                games_html = BASE_DIR / "dashboard" / "games.html"
+                games_html = ARBITRAGE_HTML.parent / "games.html"
                 if not games_html.exists():
                     return self._send_text("Games UI missing", content_type="text/plain", status=404)
                 return self._send_text(games_html.read_text(encoding="utf-8"))
