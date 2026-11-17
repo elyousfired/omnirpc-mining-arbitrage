@@ -1,2 +1,3 @@
 ﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
-314,Filecoin - Mainnet,FIL,0xbadd0b92c1c71d02e7d520f64c0876538fa2557f,12,7,4,0.0,0,"addPieces(uint256,address,(bytes)[],bytes), provePossession(uint256,(bytes32,bytes32[])[]), nextProvingPeriod(uint256,uint256,bytes)","ABI Tokens: prove, provepossession"
+1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,1,1,1,0.0,1,mine(uint256),ABI Tokens: mine
+204,opBNB Mainnet,BNB,0xa596e82b0e7d9f5c3e7841cf3f53f66b34d2c1d2,2,2,1,0.0,0,"submitEpoch(bytes32,uint256,string,uint256)",ABI Tokens: submitepoch
