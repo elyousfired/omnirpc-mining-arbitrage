@@ -1,16 +1,27 @@
 {
   "agent_name": "OmniRPC Autonomous Mining Agent",
   "version": "3.0",
-  "total_cycles": 38,
-  "cursor_evm_offset": 188,
-  "cursor_bs_offset": 37,
-  "cursor_query_batch": 0,
-  "last_cycle_at": "2026-11-17T23:44:09Z",
+  "total_cycles": 39,
+  "cursor_evm_offset": 338,
+  "cursor_bs_offset": 72,
+  "cursor_query_batch": 1,
+  "last_cycle_at": "2026-11-18T05:40:55Z",
   "known_protocols_count": 53,
   "newly_added_last_cycle": 0,
   "ai_llm_enabled": false,
-  "last_agent_brief_ar": "الدورة #38: مسح 392 شبكة + Blockscout + WhatToMine؛ المجموع الصافي: 12 عقد PoW حقيقي + 41 عملة GPU L1 صغيرة + 6 لعبة تعدين (4 بنظام المربعات 5x5 فـ /games).",
+  "last_agent_brief_ar": "الدورة #39: مسح 392 شبكة + Blockscout + WhatToMine؛ المجموع الصافي: 12 عقد PoW حقيقي + 41 عملة GPU L1 صغيرة + 6 لعبة تعدين (4 بنظام المربعات 5x5 فـ /games).",
   "cycle_logs": [
+    {
+      "scan_id": 39,
+      "timestamp": "2026-11-18T05:40:55Z",
+      "duration_s": 37.8,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 52,
+      "newly_registered": 0,
+      "new_names": [],
+      "total_registry_size": 53
+    },
     {
       "scan_id": 38,
       "timestamp": "2026-11-17T23:44:09Z",
