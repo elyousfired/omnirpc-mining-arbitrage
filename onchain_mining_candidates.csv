@@ -1,3 +1,2 @@
 ﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
-15,Diode Prenet,DIODE,0x5000000000000000000000000000000000000000,10,5,10,0.0,1,"blockReward(uint256,uint256)",ABI Tokens: blockreward
-100,Gnosis,XDAI,0x8c9a555402a8f14c20810ea1b8c6b27479f96669,13,7,3,0.0,0,"createChallenge(), submitProof(bytes,bytes32[])",ABI Tokens: challenge
+42424242,GenLayer Mainnet,GEN,0x14f2982d601c9458f93bd70b218933a6f8165e7b,2,1,2,0.0,0,"createProxyWithNonce(address,bytes,uint256)",ABI Tokens: nonce
