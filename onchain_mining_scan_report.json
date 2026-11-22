@@ -2,137 +2,161 @@
   "total_chains_scanned": 392,
   "evm_chains_scanned": 180,
   "evm_chains_ok": 172,
-  "evm_chains_with_txs": 108,
-  "total_raw_blocks_scanned": 1912,
-  "total_raw_txs_scanned": 12465,
+  "evm_chains_with_txs": 89,
+  "total_raw_blocks_scanned": 1901,
+  "total_raw_txs_scanned": 13890,
   "onchain_mining_candidates_found": 1,
   "onchain_mining_candidates": [
     {
-      "chain_id": 204,
-      "chain_name": "opBNB Mainnet",
-      "symbol": "BNB",
-      "address": "0xa596e82b0e7d9f5c3e7841cf3f53f66b34d2c1d2",
-      "tx_count": 8,
-      "unique_callers": 8,
-      "blocks_active": 5,
+      "chain_id": 250,
+      "chain_name": "Fantom Opera",
+      "symbol": "FTM",
+      "address": "0xef4b763385838fffc708000f884026b8c0434275",
+      "tx_count": 3,
+      "unique_callers": 3,
+      "blocks_active": 3,
       "total_value_native": 0.0,
-      "mint_events_in_window": 0,
+      "mint_events_in_window": 6,
       "top_selectors": [
-        "0xc6066fcf",
-        "0x7e3bbabc"
+        "0x1c560305"
       ],
       "decoded_functions": [
-        "0xc6066fcf",
-        "submitEpoch(bytes32,uint256,string,uint256)"
+        "claimMintRewardAndShare(address,uint256)"
       ],
       "category": "PoW / Hash & Epoch Mining",
-      "detection_reason": "ABI Tokens: submitepoch"
+      "detection_reason": "ABI Tokens: claimmintrewardandshare"
     }
   ],
   "solana_direct_scan": {
     "ok": true,
     "slots_scanned": 8,
-    "txs_scanned": 2616,
+    "txs_scanned": 3949,
     "top_active_programs": [
       {
         "program_id": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
-        "calls": 1936,
-        "unique_signers": 9,
-        "mint_or_mine_logs": 0,
-        "matched_signals": []
-      },
-      {
-        "program_id": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
-        "calls": 849,
-        "unique_signers": 39,
-        "mint_or_mine_logs": 2,
-        "matched_signals": [
-          "mintto"
-        ]
-      },
-      {
-        "program_id": "EtrnLzgbS7nMMy5fbD42kXiUzGg8XQzJ972Xtk1cjWih",
-        "calls": 185,
-        "unique_signers": 12,
-        "mint_or_mine_logs": 0,
-        "matched_signals": []
-      },
-      {
-        "program_id": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
-        "calls": 167,
-        "unique_signers": 137,
-        "mint_or_mine_logs": 0,
-        "matched_signals": []
-      },
-      {
-        "program_id": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
-        "calls": 156,
-        "unique_signers": 124,
-        "mint_or_mine_logs": 1,
-        "matched_signals": [
-          "mintto"
-        ]
-      },
-      {
-        "program_id": "Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy",
-        "calls": 133,
-        "unique_signers": 6,
-        "mint_or_mine_logs": 0,
-        "matched_signals": []
-      },
-      {
-        "program_id": "W1LDCARDa67SPBG7TFpQivHnEZXRtxCFP13ysEd1bWR",
-        "calls": 65,
-        "unique_signers": 15,
-        "mint_or_mine_logs": 0,
-        "matched_signals": []
-      },
-      {
-        "program_id": "DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z",
-        "calls": 42,
-        "unique_signers": 5,
-        "mint_or_mine_logs": 0,
-        "matched_signals": []
-      },
-      {
-        "program_id": "DhpyNWkdxFh3DRPsBrwRwrK3TYC5t7Q4arnSvf3t84HY",
-        "calls": 40,
-        "unique_signers": 4,
-        "mint_or_mine_logs": 0,
-        "matched_signals": []
-      },
-      {
-        "program_id": "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9",
-        "calls": 38,
-        "unique_signers": 19,
-        "mint_or_mine_logs": 0,
-        "matched_signals": []
-      },
-      {
-        "program_id": "BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi",
-        "calls": 35,
-        "unique_signers": 2,
+        "calls": 989,
+        "unique_signers": 8,
         "mint_or_mine_logs": 0,
         "matched_signals": []
       },
       {
         "program_id": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
-        "calls": 33,
-        "unique_signers": 28,
+        "calls": 369,
+        "unique_signers": 67,
         "mint_or_mine_logs": 0,
         "matched_signals": []
       },
       {
-        "program_id": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
-        "calls": 30,
-        "unique_signers": 17,
+        "program_id": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+        "calls": 350,
+        "unique_signers": 22,
         "mint_or_mine_logs": 0,
         "matched_signals": []
       },
       {
-        "program_id": "SAGE2HAwep459SNq61LHvjxPk4pLPEJLoMETef7f7EE",
-        "calls": 25,
-        "unique_signers": 14,
+        "program_id": "EtrnLzgbS7nMMy5fbD42kXiUzGg8XQzJ972Xtk1cjWih",
+        "calls": 265,
+        "unique_signers": 19,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+        "calls": 253,
+        "unique_signers": 177,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+        "calls": 179,
+        "unique_signers": 153,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "Prism8hsRo6Ww5jiN5Zeh3YDPLZHqHduCPSAV7JF7qv",
+        "calls": 149,
+        "unique_signers": 3,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z",
+        "calls": 144,
+        "unique_signers": 13,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy",
+        "calls": 138,
+        "unique_signers": 12,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "W1LDCARDa67SPBG7TFpQivHnEZXRtxCFP13ysEd1bWR",
+        "calls": 125,
+        "unique_signers": 15,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9",
+        "calls": 81,
+        "unique_signers": 18,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "hydHwdP54fiTbJ5QXuKDLZFLY5m8pqx15RSmWcL1yAJ",
+        "calls": 79,
+        "unique_signers": 2,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi",
+        "calls": 69,
+        "unique_signers": 2,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+        "calls": 69,
+        "unique_signers": 10,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+        "calls": 49,
+        "unique_signers": 20,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "calls": 46,
+        "unique_signers": 11,
+        "mint_or_mine_logs": 3,
+        "matched_signals": [
+          "mintto"
+        ]
+      },
+      {
+        "program_id": "4Qv3mbzcq1bKmrhGG4voS3EemfPd7f838FLUU7wBHSyi",
+        "calls": 45,
+        "unique_signers": 4,
+        "mint_or_mine_logs": 0,
+        "matched_signals": []
+      },
+      {
+        "program_id": "CcmRKTuZCGJBWQwMHvDYApBRvSZNHqGJXkznqpDTSQUr",
+        "calls": 40,
+        "unique_signers": 3,
         "mint_or_mine_logs": 0,
         "matched_signals": []
       }
@@ -148,28 +172,38 @@
     "txs_scanned": 80,
     "top_move_calls": [
       {
-        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::admin_apis::update_mark_for_composite_chainlink",
+        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_entry::place_order_to_subaccount",
+        "count": 15,
+        "unique_senders": 4
+      },
+      {
+        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_entry::place_bulk_orders_to_subaccount_with_repricing",
         "count": 15,
         "unique_senders": 1
       },
       {
-        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_entry::place_bulk_orders_to_subaccount_with_repricing",
-        "count": 9,
+        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::admin_apis::update_mark_for_composite_chainlink",
+        "count": 10,
         "unique_senders": 1
       },
       {
         "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::admin_apis::update_mark_with_blended_chainlink_feeds",
-        "count": 9,
+        "count": 5,
+        "unique_senders": 1
+      },
+      {
+        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_entry::cancel_client_order_to_subaccount",
+        "count": 5,
+        "unique_senders": 1
+      },
+      {
+        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_spot_entry::place_spot_bulk_order_to_subaccount",
+        "count": 4,
         "unique_senders": 1
       },
       {
         "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::public_apis::process_perp_market_pending_requests",
-        "count": 3,
-        "unique_senders": 1
-      },
-      {
-        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::public_apis::process_perp_collateral_withdrawals",
-        "count": 1,
+        "count": 2,
         "unique_senders": 1
       },
       {
@@ -178,27 +212,22 @@
         "unique_senders": 1
       },
       {
-        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_entry::place_bulk_orders_to_subaccount",
+        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_spot_entry::process_spot_pending_requests",
         "count": 1,
         "unique_senders": 1
       },
       {
-        "target": "0x92e95ed77b5ac815d3fbc2227e76db238339e9ca43ace45031ec2589bea5b8c::tiered_oracle::update_price_fa",
+        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::public_apis::process_perp_collateral_withdrawals",
         "count": 1,
         "unique_senders": 1
       },
       {
-        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_entry::place_order_to_subaccount",
+        "target": "0x8b4a2c4bb53857c718a04c020b98f8c2e1f99a68b0f57389a8bf5434cd22e05c::router_v3::exact_input_swap_entry",
         "count": 1,
         "unique_senders": 1
       },
       {
-        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::vault_api::process_pending_requests",
-        "count": 1,
-        "unique_senders": 1
-      },
-      {
-        "target": "0x50ead22afd6ffd9769e3b3d6e0e64a2a350d68e8b102c4e72e33d0b8cfdfdb06::dex_accounts_entry::cancel_client_order_to_subaccount",
+        "target": "0xc46110bdfc846201597719951ce562344b6560f00463f6d1ef84ead4d17c54ab::arb::run_fa_own_g",
         "count": 1,
         "unique_senders": 1
       }
@@ -207,48 +236,48 @@
   "near_direct_scan": {
     "ok": true,
     "chunks_scanned": 6,
-    "txs_scanned": 1,
+    "txs_scanned": 2,
     "top_contract_calls": [
       {
-        "receiver": "world.pumpopoly.near",
-        "method": "move_player",
-        "count": 1,
-        "unique_signers": 1
+        "receiver": "wrap.near",
+        "method": "ft_transfer_call",
+        "count": 2,
+        "unique_signers": 2
       }
     ]
   },
   "ton_direct_scan": {
     "ok": true,
-    "masterchain_seqno": 107119227,
-    "txs_scanned": 32,
+    "masterchain_seqno": 107168228,
+    "txs_scanned": 13,
     "candidates": []
   },
   "cosmos_candidates": [],
   "cosmos_summary": {
     "cosmos_scanned": 131,
     "cosmos_ok": 129,
-    "cosmos_txs": 81
+    "cosmos_txs": 84
   },
   "substrate_summary": {
     "substrate_scanned": 73,
-    "substrate_ok": 71,
-    "substrate_extrinsics": 298
+    "substrate_ok": 70,
+    "substrate_extrinsics": 286
   },
   "pow_l1_summary": {
     "pow_l1_ok": 3,
     "chains": [
       {
         "chain": "Bitcoin",
-        "height": 977082,
-        "txs": 7020
+        "height": 977116,
+        "txs": 2885
       },
       {
         "chain": "Kaspa",
-        "daa_score": "599484016"
+        "daa_score": "599684494"
       },
       {
         "chain": "Ergo",
-        "height": 1922443
+        "height": 1922619
       }
     ]
   },
@@ -256,757 +285,624 @@
     {
       "chain_id": 167000,
       "name": "Taiko",
-      "block": 14362391,
+      "block": 14372407,
       "txs": 10,
       "mint_tokens": 0
     },
     {
       "chain_id": 8453,
       "name": "Base",
-      "block": 60892425,
-      "txs": 251,
-      "mint_tokens": 4
+      "block": 60992598,
+      "txs": 436,
+      "mint_tokens": 5
     },
     {
       "chain_id": 43114,
       "name": "Avalanche C-Chain",
-      "block": 101090078,
-      "txs": 29,
+      "block": 101110022,
+      "txs": 38,
       "mint_tokens": 1
     },
     {
       "chain_id": 42220,
       "name": "Celo Mainnet",
-      "block": 83468104,
-      "txs": 47,
+      "block": 83488136,
+      "txs": 57,
       "mint_tokens": 2
     },
     {
       "chain_id": 137,
       "name": "Polygon Mainnet",
-      "block": 97775593,
-      "txs": 739,
-      "mint_tokens": 7
+      "block": 97788950,
+      "txs": 675,
+      "mint_tokens": 5
     },
     {
       "chain_id": 80094,
       "name": "Berachain",
-      "block": 29177072,
-      "txs": 12,
+      "block": 29187088,
+      "txs": 14,
       "mint_tokens": 1
     },
     {
       "chain_id": 59144,
       "name": "Linea",
-      "block": 32682924,
-      "txs": 10,
-      "mint_tokens": 0
+      "block": 32684765,
+      "txs": 18,
+      "mint_tokens": 1
     },
     {
       "chain_id": 1,
       "name": "Ethereum Mainnet",
-      "block": 26472180,
-      "txs": 2622,
-      "mint_tokens": 30
+      "block": 26473846,
+      "txs": 2192,
+      "mint_tokens": 33
     },
     {
       "chain_id": 42161,
       "name": "Arbitrum One",
-      "block": 526576553,
-      "txs": 32,
+      "block": 526639814,
+      "txs": 86,
       "mint_tokens": 1
     },
     {
       "chain_id": 56,
       "name": "BNB Smart Chain Mainnet",
-      "block": 135119885,
-      "txs": 795,
-      "mint_tokens": 14
+      "block": 135164396,
+      "txs": 727,
+      "mint_tokens": 0
     },
     {
       "chain_id": 57073,
       "name": "Ink",
-      "block": 61870451,
-      "txs": 79,
-      "mint_tokens": 3
+      "block": 61890483,
+      "txs": 128,
+      "mint_tokens": 0
     },
     {
       "chain_id": 5000,
       "name": "Mantle",
-      "block": 103619274,
-      "txs": 11,
+      "block": 103629290,
+      "txs": 10,
       "mint_tokens": 0
     },
     {
       "chain_id": 534352,
       "name": "Scroll",
-      "block": 35821403,
+      "block": 35823070,
       "txs": 10,
       "mint_tokens": 0
     },
     {
       "chain_id": 143,
       "name": "Monad",
-      "block": 124494785,
-      "txs": 209,
-      "mint_tokens": 3
+      "block": 124560778,
+      "txs": 488,
+      "mint_tokens": 2
     },
     {
       "chain_id": 146,
       "name": "Sonic Mainnet",
-      "block": 82973810,
-      "txs": 11,
+      "block": 82984268,
+      "txs": 10,
       "mint_tokens": 0
     },
     {
       "chain_id": 61,
       "name": "Ethereum Classic",
-      "block": 25785027,
+      "block": 25786644,
       "txs": 3,
       "mint_tokens": 0
     },
     {
       "chain_id": 130,
       "name": "Unichain",
-      "block": 64620503,
-      "txs": 25,
+      "block": 64640535,
+      "txs": 90,
       "mint_tokens": 0
     },
     {
       "chain_id": 252,
       "name": "Fraxtal",
-      "block": 44279075,
-      "txs": 10,
+      "block": 44289091,
+      "txs": 11,
       "mint_tokens": 0
     },
     {
       "chain_id": 999,
       "name": "HyperEVM Mainnet",
-      "block": 51963711,
-      "txs": 40,
-      "mint_tokens": 3
+      "block": 51984077,
+      "txs": 51,
+      "mint_tokens": 2
     },
     {
       "chain_id": 1116,
       "name": "Core Blockchain Mainnet",
-      "block": 40684908,
-      "txs": 13,
+      "block": 40691584,
+      "txs": 14,
       "mint_tokens": 0
     },
     {
       "chain_id": 10,
       "name": "OP Mainnet",
-      "block": 159885042,
-      "txs": 389,
-      "mint_tokens": 2
+      "block": 159895058,
+      "txs": 553,
+      "mint_tokens": 4
     },
     {
       "chain_id": 1088,
       "name": "Metis Andromeda Mainnet",
-      "block": 23450438,
-      "txs": 24,
-      "mint_tokens": 3
+      "block": 23451774,
+      "txs": 11,
+      "mint_tokens": 1
     },
     {
       "chain_id": 14,
       "name": "Flare Mainnet",
-      "block": 75142660,
-      "txs": 115,
+      "block": 75160597,
+      "txs": 20,
       "mint_tokens": 0
     },
     {
       "chain_id": 369,
       "name": "PulseChain",
-      "block": 28124339,
-      "txs": 579,
+      "block": 28126263,
+      "txs": 796,
       "mint_tokens": 0
     },
     {
       "chain_id": 100,
       "name": "Gnosis",
-      "block": 49414291,
-      "txs": 215,
-      "mint_tokens": 4
+      "block": 49418230,
+      "txs": 603,
+      "mint_tokens": 6
     },
     {
       "chain_id": 2741,
       "name": "Abstract",
-      "block": 89591898,
+      "block": 89604042,
       "txs": 11,
       "mint_tokens": 1
     },
     {
       "chain_id": 360,
       "name": "Shape",
-      "block": 36812196,
+      "block": 36822212,
       "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 1030,
+      "name": "Conflux eSpace",
+      "block": 161716879,
+      "txs": 1,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 25,
+      "name": "Cronos Mainnet",
+      "block": 107468070,
+      "txs": 4,
       "mint_tokens": 0
     },
     {
       "chain_id": 19,
       "name": "Songbird Canary-Network",
-      "block": 138549211,
+      "block": 138568273,
       "txs": 7,
       "mint_tokens": 0
     },
     {
       "chain_id": 30,
       "name": "Rootstock Mainnet",
-      "block": 9434257,
-      "txs": 20,
+      "block": 9434910,
+      "txs": 26,
       "mint_tokens": 0
     },
     {
-      "chain_id": 5511,
-      "name": "PointPay Mainnet",
-      "block": 15997115,
-      "txs": 3,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 5333,
-      "name": "Netsbo",
-      "block": 11647018,
-      "txs": 5,
-      "mint_tokens": 2
-    },
-    {
-      "chain_id": 42170,
-      "name": "Arbitrum Nova",
-      "block": 85294100,
-      "txs": 20,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 13371,
-      "name": "Immutable zkEVM",
-      "block": 46542757,
-      "txs": 12,
-      "mint_tokens": 1
-    },
-    {
-      "chain_id": 3501,
-      "name": "JFIN Chain",
-      "block": 20748904,
-      "txs": 11,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 39815,
-      "name": "OHO Mainnet",
-      "block": 11529588,
-      "txs": 3,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 2046399126,
-      "name": "SKALE Europa Hub",
-      "block": 28566857,
-      "txs": 9,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 5371,
-      "name": "Settlus",
-      "block": 55197289,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 39797,
-      "name": "Energi Mainnet",
-      "block": 3523596,
-      "txs": 421,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 4488,
-      "name": "Hydra Chain",
-      "block": 102766001,
-      "txs": 4,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 4217,
-      "name": "Tempo Mainnet Presto",
-      "block": 50302448,
-      "txs": 6,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 196,
-      "name": "X Layer Mainnet",
-      "block": 76599827,
-      "txs": 123,
-      "mint_tokens": 1
-    },
-    {
-      "chain_id": 7560,
-      "name": "Cyber Mainnet",
-      "block": 40970148,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 193939,
-      "name": "R0AR Chain",
-      "block": 33541621,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 42420,
-      "name": "Asset Chain Mainnet",
-      "block": 2112654,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 88008,
-      "name": "OmniCoin",
-      "block": 3281738,
-      "txs": 14,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 2222,
-      "name": "Kava",
-      "block": 23614076,
-      "txs": 1,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 100009,
-      "name": "VeChain",
-      "block": 26483616,
-      "txs": 13,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 151,
-      "name": "Redbelly Network Mainnet",
-      "block": 3276113,
-      "txs": 11,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 24101,
-      "name": "Incentiv Mainnet",
-      "block": 6961063,
-      "txs": 1,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 97477,
-      "name": "Doma",
-      "block": 18700057,
-      "txs": 39,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 747474,
-      "name": "katana",
-      "block": 48626054,
-      "txs": 11,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 5424,
-      "name": "edeXa Mainnet",
-      "block": 10516946,
-      "txs": 35,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 737373,
-      "name": "bokuto",
-      "block": 46957693,
-      "txs": 16,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 1829,
-      "name": "PlayBlock",
-      "block": 277933378,
-      "txs": 20,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 4337,
-      "name": "Beam",
-      "block": 9919534,
-      "txs": 11,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 3011,
-      "name": "PLAYA3ULL GAMES",
-      "block": 3488367,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 36900,
-      "name": "ADI Chain",
-      "block": 2044547,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 81008,
-      "name": "Zorin Chain",
-      "block": 5835895,
-      "txs": 31,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 4689,
-      "name": "IoTeX Network Mainnet",
-      "block": 54716633,
-      "txs": 17,
-      "mint_tokens": 1
-    },
-    {
-      "chain_id": 9898,
-      "name": "Larissa Chain",
-      "block": 6981523,
-      "txs": 1,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 181,
-      "name": "Waterfall Network",
-      "block": 16705301,
-      "txs": 22,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 420420418,
-      "name": "Kusama",
-      "block": 24142179,
-      "txs": 1,
-      "mint_tokens": 1
-    },
-    {
-      "chain_id": 8217,
-      "name": "Kaia Mainnet",
-      "block": 233164486,
-      "txs": 6,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 7667,
-      "name": "CarrChain Mainnet",
-      "block": 378089,
-      "txs": 20,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 204,
-      "name": "opBNB Mainnet",
-      "block": 209007742,
-      "txs": 32,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 50,
-      "name": "XDC Network",
-      "block": 109636789,
-      "txs": 413,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 1658000,
-      "name": "Bana Mainnet",
-      "block": 2202902,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 3282,
-      "name": "Irys Mainnet Beta",
-      "block": 2930903,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 5464,
-      "name": "SagaEVM",
-      "block": 11021149,
-      "txs": 1,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 5031,
-      "name": "Somnia Mainnet",
-      "block": 472141013,
-      "txs": 6,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 7000700,
-      "name": "JMDT Mainnet",
-      "block": 21247,
-      "txs": 20,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 9745,
-      "name": "Plasma Mainnet",
-      "block": 38423818,
-      "txs": 99,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 33111,
-      "name": "Curtis",
-      "block": 37440508,
-      "txs": 20,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 988,
-      "name": "Stable Mainnet",
-      "block": 47848070,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 38833,
-      "name": "Igra Network",
-      "block": 22414052,
-      "txs": 1,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 274663,
-      "name": "BrainChain",
-      "block": 4612,
-      "txs": 20,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 3338,
-      "name": "peaq",
-      "block": 12484095,
-      "txs": 32,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 232,
-      "name": "Lens",
-      "block": 6522366,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 1440000,
-      "name": "XRPL EVM Sidechain",
-      "block": 8726724,
-      "txs": 1,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 239,
-      "name": "TAC Mainnet",
-      "block": 29141883,
-      "txs": 1,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 7000,
-      "name": "ZetaChain Mainnet",
-      "block": 20364994,
-      "txs": 16,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 432204,
-      "name": "Dexalot Subnet",
-      "block": 79562469,
-      "txs": 52,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 286623,
-      "name": "ValueChain",
-      "block": 17251349,
-      "txs": 9,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 388,
-      "name": "Cronos zkEVM Mainnet",
-      "block": 2694086,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 98866,
-      "name": "Plume Mainnet",
-      "block": 107494157,
-      "txs": 20,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 88,
-      "name": "Viction",
-      "block": 116562949,
-      "txs": 140,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 1329,
-      "name": "Sei Network",
-      "block": 244780140,
-      "txs": 2,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 56789,
-      "name": "VELO Labs Mainnet",
-      "block": 1143947,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 1564830818,
-      "name": "SKALE Calypso Hub",
-      "block": 55015396,
-      "txs": 1,
-      "mint_tokens": 1
-    },
-    {
-      "chain_id": 248,
-      "name": "Oasys Mainnet",
-      "block": 15538651,
-      "txs": 11,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 5291,
-      "name": "SRC Chain",
-      "block": 1328227,
+      "chain_id": 122,
+      "name": "Fuse Mainnet",
+      "block": 45263940,
       "txs": 7,
       "mint_tokens": 0
     },
     {
-      "chain_id": 295,
-      "name": "Hedera Mainnet",
-      "block": 102651204,
-      "txs": 1,
+      "chain_id": 728126428,
+      "name": "Tron Mainnet",
+      "block": 88238248,
+      "txs": 1845,
       "mint_tokens": 0
     },
     {
-      "chain_id": 42,
-      "name": "LUKSO Mainnet",
-      "block": 8836864,
-      "txs": 14,
+      "chain_id": 660279,
+      "name": "Xai Mainnet",
+      "block": 138897083,
+      "txs": 26,
       "mint_tokens": 0
     },
     {
-      "chain_id": 7777777,
-      "name": "Zora",
-      "block": 54337514,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 7773777,
-      "name": "VALYGO NFT",
-      "block": 141,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 1135,
-      "name": "Lisk",
-      "block": 40298351,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 33139,
-      "name": "ApeChain",
-      "block": 55596148,
+      "chain_id": 221978,
+      "name": "MANORA",
+      "block": 400,
       "txs": 20,
       "mint_tokens": 0
     },
     {
-      "chain_id": 4153,
-      "name": "RISE",
-      "block": 27763111,
-      "txs": 970,
+      "chain_id": 127001,
+      "name": "Gravity",
+      "block": 69817758,
+      "txs": 10,
       "mint_tokens": 0
     },
     {
-      "chain_id": 43419,
-      "name": "GUNZ",
-      "block": 26908738,
-      "txs": 237,
-      "mint_tokens": 1
-    },
-    {
-      "chain_id": 263,
-      "name": "ENI Network",
-      "block": 3697588,
-      "txs": 1,
+      "chain_id": 10791,
+      "name": "TrustBitcoin Mainnet",
+      "block": 6959759,
+      "txs": 3,
       "mint_tokens": 0
     },
     {
-      "chain_id": 6292,
-      "name": "MAYA CHAIN",
-      "block": 146,
-      "txs": 29,
-      "mint_tokens": 8
+      "chain_id": 2121217,
+      "name": "GGCHAIN Mainnet",
+      "block": 1066176,
+      "txs": 26,
+      "mint_tokens": 0
     },
     {
-      "chain_id": 190415,
-      "name": "HPP Mainnet",
-      "block": 1898684,
+      "chain_id": 7741,
+      "name": "RWA Chain",
+      "block": 5118275,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 955305,
+      "name": "Eluvio Content Fabric",
+      "block": 48184913,
+      "txs": 17,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 8192,
+      "name": "Torus Mainnet",
+      "block": 997225,
+      "txs": 2,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 8911,
+      "name": "Algen",
+      "block": 26739439,
+      "txs": 132,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 223,
+      "name": "B2 Mainnet",
+      "block": 41112554,
+      "txs": 11,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 177,
+      "name": "HSKChain",
+      "block": 30520881,
+      "txs": 12,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 50000,
+      "name": "Citronus",
+      "block": 18504,
       "txs": 20,
       "mint_tokens": 0
     },
     {
-      "chain_id": 7373,
-      "name": "CRYMAD Chain L2",
-      "block": 21363192,
-      "txs": 10,
-      "mint_tokens": 0
-    },
-    {
-      "chain_id": 10507,
-      "name": "Numbers Mainnet",
-      "block": 1630601,
-      "txs": 10,
+      "chain_id": 8668,
+      "name": "Hela Official Runtime Mainnet",
+      "block": 1010449,
+      "txs": 8,
       "mint_tokens": 1
     },
     {
-      "chain_id": 70007,
-      "name": "Seven Chain",
-      "block": 588812,
+      "chain_id": 3344,
+      "name": "Pentagon Chain",
+      "block": 5343174,
+      "txs": 1,
+      "mint_tokens": 1
+    },
+    {
+      "chain_id": 33979,
+      "name": "Funki",
+      "block": 37088901,
       "txs": 10,
       "mint_tokens": 0
     },
     {
-      "chain_id": 102030,
-      "name": "Creditcoin",
-      "block": 4692443,
-      "txs": 4,
+      "chain_id": 381931,
+      "name": "Metal C-Chain",
+      "block": 72454,
+      "txs": 6,
       "mint_tokens": 0
     },
     {
-      "chain_id": 3223,
-      "name": "XO Market",
-      "block": 14654924,
-      "txs": 41,
+      "chain_id": 97453,
+      "name": "Sidra Chain",
+      "block": 37853157,
+      "txs": 2,
       "mint_tokens": 0
     },
     {
-      "chain_id": 2020,
-      "name": "Ronin Mainnet",
-      "block": 63950040,
+      "chain_id": 973164827,
+      "name": "MobileNode Chain",
+      "block": 1271343,
+      "txs": 1,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 20250,
+      "name": "CHEESE Blockchain Mainnet",
+      "block": 85789,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 3377,
+      "name": "Tajir Chain",
+      "block": 4426958,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 3045,
+      "name": "VYRE",
+      "block": 93,
       "txs": 19,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 1394,
+      "name": "Midpoint Cross",
+      "block": 25396,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 20010,
+      "name": "Mandala Chain",
+      "block": 17852,
+      "txs": 20,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 97741,
+      "name": "Pepe Unchained V2",
+      "block": 10570244,
+      "txs": 20,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 96369,
+      "name": "Lux Mainnet",
+      "block": 1082780,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 57,
+      "name": "Syscoin Mainnet",
+      "block": 1030032,
+      "txs": 1,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 8921,
+      "name": "Algen Layer2",
+      "block": 40206917,
+      "txs": 15,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 2786,
+      "name": "Apertum",
+      "block": 16475238,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 250,
+      "name": "Fantom Opera",
+      "block": 124168243,
+      "txs": 10,
+      "mint_tokens": 1
+    },
+    {
+      "chain_id": 224433,
+      "name": "CONET Cancun",
+      "block": 2275705,
+      "txs": 6,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 3030,
+      "name": "BC Hyper Chain Mainnet",
+      "block": 764499,
+      "txs": 1,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 698,
+      "name": "Matchain",
+      "block": 179086411,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 224400,
+      "name": "CONET Mainnet",
+      "block": 2275705,
+      "txs": 6,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 81224,
+      "name": "Codex",
+      "block": 33245417,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 963369,
+      "name": "AVI Coin",
+      "block": 27155,
+      "txs": 9,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 1750,
+      "name": "Metal L2",
+      "block": 41912693,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 254,
+      "name": "Swan Chain Mainnet",
+      "block": 15349737,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 69000,
+      "name": "Animechain Mainnet",
+      "block": 804487,
+      "txs": 20,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 463,
+      "name": "Areum Network Mainnet",
+      "block": 26746108,
+      "txs": 11,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 6122,
+      "name": "Tea Mainnet",
+      "block": 7811789,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 3343,
+      "name": "Edge",
+      "block": 869275,
+      "txs": 20,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 109,
+      "name": "Shibarium",
+      "block": 19984360,
+      "txs": 1,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 1231,
+      "name": "Ultron Mainnet",
+      "block": 56418247,
+      "txs": 11,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 1625,
+      "name": "Gravity Alpha Mainnet",
+      "block": 130833877,
+      "txs": 20,
+      "mint_tokens": 3
+    },
+    {
+      "chain_id": 26514,
+      "name": "Horizen Mainnet",
+      "block": 34573362,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 7979,
+      "name": "DOS Chain",
+      "block": 162,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 62606,
+      "name": "Apollo Mainnet",
+      "block": 13934292,
+      "txs": 1,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 9,
+      "name": "Quai Network Mainnet",
+      "block": 11268098,
+      "txs": 94,
+      "mint_tokens": 1
+    },
+    {
+      "chain_id": 8,
+      "name": "c8ntinuum",
+      "block": 1874019,
+      "txs": 1,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 1009,
+      "name": "Jumbochain Mainnet",
+      "block": 369401999,
+      "txs": 5,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 1019,
+      "name": "MAI Chain Mainnet",
+      "block": 10833922,
+      "txs": 2,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 480,
+      "name": "World Chain",
+      "block": 38026632,
+      "txs": 21,
+      "mint_tokens": 7
+    },
+    {
+      "chain_id": 6278,
+      "name": "Rails",
+      "block": 15921726,
+      "txs": 2,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 3210,
+      "name": "AVI OS",
+      "block": 18545,
+      "txs": 5,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 685689,
+      "name": "Gensyn Mainnet",
+      "block": 18336372,
+      "txs": 10,
+      "mint_tokens": 0
+    },
+    {
+      "chain_id": 99901,
+      "name": "Elysium",
+      "block": 9693742,
+      "txs": 32,
       "mint_tokens": 2
     }
   ]
