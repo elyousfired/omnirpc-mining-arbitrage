@@ -1,16 +1,27 @@
 {
   "agent_name": "OmniRPC Autonomous Mining Agent",
   "version": "3.0",
-  "total_cycles": 53,
-  "cursor_evm_offset": 46,
-  "cursor_bs_offset": 46,
-  "cursor_query_batch": 3,
-  "last_cycle_at": "2026-11-22T09:16:04Z",
+  "total_cycles": 54,
+  "cursor_evm_offset": 196,
+  "cursor_bs_offset": 81,
+  "cursor_query_batch": 0,
+  "last_cycle_at": "2026-11-22T17:35:17Z",
   "known_protocols_count": 53,
   "newly_added_last_cycle": 0,
   "ai_llm_enabled": false,
-  "last_agent_brief_ar": "الدورة #53: مسح 392 شبكة + Blockscout + WhatToMine؛ المجموع الصافي: 12 عقد PoW حقيقي + 41 عملة GPU L1 صغيرة + 6 لعبة تعدين (4 بنظام المربعات 5x5 فـ /games).",
+  "last_agent_brief_ar": "الدورة #54: مسح 392 شبكة + Blockscout + WhatToMine؛ المجموع الصافي: 12 عقد PoW حقيقي + 41 عملة GPU L1 صغيرة + 6 لعبة تعدين (4 بنظام المربعات 5x5 فـ /games).",
   "cycle_logs": [
+    {
+      "scan_id": 54,
+      "timestamp": "2026-11-22T17:35:17Z",
+      "duration_s": 54.9,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 52,
+      "newly_registered": 0,
+      "new_names": [],
+      "total_registry_size": 53
+    },
     {
       "scan_id": 53,
       "timestamp": "2026-11-22T09:16:04Z",
@@ -1391,7 +1402,7 @@
   "sandbox_wallet": "0x5e71a9E84B2F90C11d43a68C9B77F1A02cD4109E",
   "sandbox_sol_wallet": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
   "sandbox_trials_last_cycle": {
-    "tested": 14,
+    "tested": 15,
     "passed": 53,
     "simulated_open": 5,
     "onchain_pow_promoted": 0
