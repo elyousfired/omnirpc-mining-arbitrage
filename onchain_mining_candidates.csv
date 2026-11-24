@@ -1,2 +1,2 @@
 ﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
-56,BNB Smart Chain Mainnet,BNB,0xd68995d343016f0bb62e8787f0f03aaaed118d8a,1,1,1,0.0,1,"mine(uint256,uint256,uint256)",ABI Tokens: mine
+250,Fantom Opera,FTM,0xef4b763385838fffc708000f884026b8c0434275,3,3,2,0.0,6,"claimMintRewardAndShare(address,uint256)",ABI Tokens: claimmintrewardandshare
