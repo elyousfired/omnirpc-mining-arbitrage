@@ -1,16 +1,27 @@
 {
   "agent_name": "OmniRPC Autonomous Mining Agent",
   "version": "3.0",
-  "total_cycles": 61,
-  "cursor_evm_offset": 50,
-  "cursor_bs_offset": 12,
-  "cursor_query_batch": 3,
-  "last_cycle_at": "2026-11-25T06:41:03Z",
+  "total_cycles": 62,
+  "cursor_evm_offset": 200,
+  "cursor_bs_offset": 47,
+  "cursor_query_batch": 0,
+  "last_cycle_at": "2026-11-25T17:46:31Z",
   "known_protocols_count": 53,
   "newly_added_last_cycle": 0,
   "ai_llm_enabled": false,
-  "last_agent_brief_ar": "الدورة #61: مسح 392 شبكة + Blockscout + WhatToMine؛ المجموع الصافي: 12 عقد PoW حقيقي + 41 عملة GPU L1 صغيرة + 6 لعبة تعدين (4 بنظام المربعات 5x5 فـ /games).",
+  "last_agent_brief_ar": "الدورة #62: مسح 392 شبكة + Blockscout + WhatToMine؛ المجموع الصافي: 12 عقد PoW حقيقي + 41 عملة GPU L1 صغيرة + 6 لعبة تعدين (4 بنظام المربعات 5x5 فـ /games).",
   "cycle_logs": [
+    {
+      "scan_id": 62,
+      "timestamp": "2026-11-25T17:46:31Z",
+      "duration_s": 64.8,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 52,
+      "newly_registered": 0,
+      "new_names": [],
+      "total_registry_size": 53
+    },
     {
       "scan_id": 61,
       "timestamp": "2026-11-25T06:41:03Z",
@@ -455,25 +466,6 @@
         "Meridian (MRDN) — TON Web3 Mint/Mine"
       ],
       "total_registry_size": 18
-    },
-    {
-      "scan_id": 22,
-      "timestamp": "2026-11-14T17:53:57Z",
-      "duration_s": 111.7,
-      "evm_chains_scanned": 180,
-      "total_chains_scanned": 392,
-      "matched_in_scan": 25,
-      "newly_registered": 7,
-      "new_names": [
-        "中文比特币 (比特币)",
-        "Fair 2.0 (FAI)",
-        "BITMINE (BITMINE)",
-        "TitanX Spartans (TXS)",
-        "Auryn (AU)",
-        "Forest (FOREST)",
-        "SolanaJack"
-      ],
-      "total_registry_size": 25
     }
   ],
   "user_directives": [
@@ -1435,7 +1427,7 @@
   "sandbox_wallet": "0x5e71a9E84B2F90C11d43a68C9B77F1A02cD4109E",
   "sandbox_sol_wallet": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
   "sandbox_trials_last_cycle": {
-    "tested": 17,
+    "tested": 15,
     "passed": 53,
     "simulated_open": 5,
     "onchain_pow_promoted": 0
