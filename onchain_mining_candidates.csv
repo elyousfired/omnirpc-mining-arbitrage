@@ -1,2 +1,4 @@
 ﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
-50,XDC Network,XDC,0x70ad26764f8856c0d9bced7379b0721b5eb62f02,3,3,3,0.0,0,xMinePeso(),ABI Tokens: mine
+250,Fantom Opera,FTM,0xef4b763385838fffc708000f884026b8c0434275,4,4,4,0.0,8,"claimMintRewardAndShare(address,uint256)",ABI Tokens: claimmintrewardandshare
+1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,2,1,2,0.0,2,mine(uint256),ABI Tokens: mine
+1,Ethereum Mainnet,ETH,0x8b8a0490e5b757f7860c7bf71fd64b0568acec8b,1,1,1,0.0,1,"mine((uint96,address,bytes32,bytes4,bytes12))",ABI Tokens: mine
