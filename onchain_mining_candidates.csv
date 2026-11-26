@@ -1,3 +1,2 @@
 ﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
-15,Diode Prenet,DIODE,0x5000000000000000000000000000000000000000,10,5,10,0.0,1,"blockReward(uint256,uint256)",ABI Tokens: blockreward
-1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,3,3,2,0.0,1,mine(uint256),ABI Tokens: mine
+1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,2,1,2,0.0,2,mine(uint256),ABI Tokens: mine
