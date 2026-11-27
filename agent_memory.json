@@ -1,16 +1,27 @@
 {
   "agent_name": "OmniRPC Autonomous Mining Agent",
   "version": "3.0",
-  "total_cycles": 65,
-  "cursor_evm_offset": 52,
-  "cursor_bs_offset": 40,
-  "cursor_query_batch": 3,
-  "last_cycle_at": "2026-11-26T19:57:50Z",
+  "total_cycles": 66,
+  "cursor_evm_offset": 202,
+  "cursor_bs_offset": 75,
+  "cursor_query_batch": 0,
+  "last_cycle_at": "2026-11-27T02:41:36Z",
   "known_protocols_count": 53,
   "newly_added_last_cycle": 0,
   "ai_llm_enabled": false,
-  "last_agent_brief_ar": "الدورة #65: مسح 392 شبكة + Blockscout + WhatToMine؛ المجموع الصافي: 12 عقد PoW حقيقي + 41 عملة GPU L1 صغيرة + 6 لعبة تعدين (4 بنظام المربعات 5x5 فـ /games).",
+  "last_agent_brief_ar": "الدورة #66: مسح 392 شبكة + Blockscout + WhatToMine؛ المجموع الصافي: 12 عقد PoW حقيقي + 41 عملة GPU L1 صغيرة + 6 لعبة تعدين (4 بنظام المربعات 5x5 فـ /games).",
   "cycle_logs": [
+    {
+      "scan_id": 66,
+      "timestamp": "2026-11-27T02:41:36Z",
+      "duration_s": 46.0,
+      "evm_chains_scanned": 180,
+      "total_chains_scanned": 392,
+      "matched_in_scan": 52,
+      "newly_registered": 0,
+      "new_names": [],
+      "total_registry_size": 53
+    },
     {
       "scan_id": 65,
       "timestamp": "2026-11-26T19:57:50Z",
@@ -438,28 +449,6 @@
       "matched_in_scan": 52,
       "newly_registered": 0,
       "new_names": [],
-      "total_registry_size": 53
-    },
-    {
-      "scan_id": 26,
-      "timestamp": "2026-11-14T19:36:39Z",
-      "duration_s": 146.9,
-      "evm_chains_scanned": 300,
-      "total_chains_scanned": 512,
-      "matched_in_scan": 53,
-      "newly_registered": 51,
-      "new_names": [
-        "Based Work Token (BWORK) — Base PoW",
-        "Seasonal Spring (SPRING) — Ethereum PoW",
-        "Seasonal Summer (SUMMER) — Ethereum PoW",
-        "Seasonal Autumn (AUTUMN) — Ethereum PoW",
-        "Seasonal Winter (WINTER) — Ethereum PoW",
-        "Seasonal Spring (SPRING) — Polygon PoW",
-        "Seasonal Summer (SUMMER) — Polygon PoW",
-        "Seasonal Autumn (AUTUMN) — Polygon PoW",
-        "Seasonal Winter (WINTER) — Polygon PoW",
-        "Meridian (MRDN) — TON GPU PoW"
-      ],
       "total_registry_size": 53
     }
   ],
@@ -1422,7 +1411,7 @@
   "sandbox_wallet": "0x5e71a9E84B2F90C11d43a68C9B77F1A02cD4109E",
   "sandbox_sol_wallet": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
   "sandbox_trials_last_cycle": {
-    "tested": 14,
+    "tested": 15,
     "passed": 53,
     "simulated_open": 5,
     "onchain_pow_promoted": 0
