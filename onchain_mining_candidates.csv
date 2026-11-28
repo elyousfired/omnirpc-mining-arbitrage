@@ -1,3 +1,3 @@
 ﻿chain_id,chain_name,symbol,address,tx_count,unique_callers,blocks_active,total_value_native,mint_events_in_window,decoded_functions,detection_reason
-1,Ethereum Mainnet,ETH,0xe957ea0b072910f508dd2009f4acb7238c308e29,2,1,2,0.0,2,mine(uint256),ABI Tokens: mine
-15,Diode Prenet,DIODE,0x5000000000000000000000000000000000000000,10,5,10,0.0,1,"blockReward(uint256,uint256)",ABI Tokens: blockreward
+314,Filecoin - Mainnet,FIL,0xbadd0b92c1c71d02e7d520f64c0876538fa2557f,13,6,7,6e-06,0,"provePossession(uint256,(bytes32,bytes32[])[]), cleanupPieces(uint256,uint256), nextProvingPeriod(uint256,uint256,bytes), addPieces(uint256,address,(bytes)[],bytes)","ABI Tokens: prove, provepossession"
+59144,Linea,ETH,0x509ff56c152315edee91a2e0f059195519507e01,2,1,2,0.0,0,"proveBatches((uint64,bytes32,uint64,uint256,bytes32,bytes32,uint256,bytes32),(uint64,bytes32,uint64,uint256,bytes32,bytes32,uint256,bytes32)[],(uint256[],uint256[])), executeBatches((uint64,bytes32,uint64,uint256,bytes32,bytes32,uint256,bytes32)[])",ABI Tokens: prove
